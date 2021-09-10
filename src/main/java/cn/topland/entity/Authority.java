@@ -4,9 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * 权限
@@ -28,4 +26,11 @@ public class Authority extends IdEntity {
      * 展示名称
      */
     private String displayName;
+
+    /**
+     * 权限类型
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "type")
+    private AuthorityType type;
 }
