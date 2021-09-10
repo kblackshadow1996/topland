@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>图澜|TOPLAND 登录</title>
+</head>
+<style>
+    .impowerBox .qrcode {width: 200px;}
+    .impowerBox .title {display: none;}
+    .impowerBox .info {width: 200px;}
+    .status_icon {display: none  !important}
+    .impowerBox .status {text-align: center;}
+</style>
+<body>
+    <div id="qrcode"></div>
+    <script src="http://wwcdn.weixin.qq.com/node/wework/wwopen/js/wwLogin-1.2.4.js" charset="utf-8"></script>
+    <script th:inline="javascript">
+        let wework = [[${wework}]];
+        var wwLogin = new WwLogin({
+            "id": "qrcode",
+            "appid": wework.cropId,
+            "agentid": wework.agentId,
+            "redirect_uri": wework.redirectUrl,
+            "state": "",
+            "href": "",
+            "lang": "zh",
+        });
+    </script>
+</body>
+</html>

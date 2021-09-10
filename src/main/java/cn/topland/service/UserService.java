@@ -1,0 +1,173 @@
+package cn.topland.service;
+
+import cn.topland.dao.DepartmentRepository;
+import cn.topland.dao.UserRepository;
+import cn.topland.entity.Department;
+import cn.topland.entity.User;
+import cn.topland.gateway.WeworkGateway;
+import cn.topland.gateway.response.UserInfo;
+import cn.topland.gateway.response.WeworkUser;
+import cn.topland.service.parser.UserParser;
+import cn.topland.util.annotation.SessionManager;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import javax.servlet.http.HttpSession;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Slf4j
+@Service
+public class UserService {
+
+    @Autowired
+    private SessionManager sessionManager;
+
+    @Autowired
+    private WeworkGateway weworkGateway;
+
+    @Autowired
+    private UserRepository repository;
+
+    @Autowired
+    private DepartmentRepository deptRepository;
+
+    @Autowired
+    private UserParser userParser;
+
+    public User get(Long id) {
+
+        return repository.getById(id);
+    }
+
+    /**
+     * 登录
+     */
+    public User login(String code, HttpSession session) throws Exception {
+
+        UserInfo userInfo = weworkGateway.getUserInfo(code);
+        if (Objects.nonNull(userInfo)) {
+
+            String userId = userInfo.getUserId();
+            User user = repository.getUserByUserId(userId);
+            if (Objects.nonNull(user)) { // 系统存在用户
+
+                log.info("{} login", user.getName());
+                return login(user, session);
+            }
+            throw new Exception("get wework user failed");
+        }
+        throw new Exception("get wework user info failed");
+    }
+
+    /**
+     * 按部门同步(只同步部门直属人员)
+     */
+    @Transactional
+    public List<User> sync(String deptId, User creator) {
+
+        log.info("sync users in dept {} by {} start...", deptId, creator.getName());
+        List<WeworkUser> weworkUsers = weworkGateway.listUsers(deptId, false);
+        List<User> users = userParser.parse(weworkUsers);
+        List<User> persistUsers = repository.findAll();
+        Department department = deptRepository.getDepartmentByDeptId(deptId);
+        List<User> newUsers = syncUsers(persistUsers, users, mappingUserDept(weworkUsers, List.of(department)), creator);
+
+        return repository.saveAllAndFlush(newUsers);
+    }
+
+    /**
+     * 同步所有
+     */
+    @Transactional
+    public List<User> syncAll(User creator) throws Exception {
+
+        log.info("sync all users by {} start...", creator.getName());
+        List<Department> departments = deptRepository.listAllDeptIds();
+        if (CollectionUtils.isEmpty(departments)) { // 同步用户之前必须同步部门
+
+            throw new Exception("sync users failed, please sync departments first");
+        }
+        List<WeworkUser> weworkUsers = weworkGateway.listUsers(filterTopDept(departments).getDeptId(), true);
+        List<User> users = userParser.parse(weworkUsers);
+        List<User> persistUsers = repository.findAll();
+        List<User> newUsers = syncUsers(persistUsers, users, mappingUserDept(weworkUsers, departments), creator);
+
+        return repository.saveAllAndFlush(newUsers);
+    }
+
+    // 关联用户部门
+    private Map<String, List<Department>> mappingUserDept(List<WeworkUser> weworkUsers, List<Department> departments) {
+
+        Map<String, List<Department>> userDeptMap = new HashMap<>();
+        weworkUsers.forEach(user -> {
+
+            List<String> deptIds = user.getDepartment();
+            List<Department> userDepartments = departments.stream()
+                    .filter(dept -> deptIds.contains(dept.getDeptId())).collect(Collectors.toList());
+            userDeptMap.put(user.getUserId(), userDepartments);
+        });
+        return userDeptMap;
+    }
+
+    private List<User> syncUsers(List<User> persistUsers, List<User> users, Map<String, List<Department>> userDeptMap, User creator) {
+
+        Map<String, User> userMap = persistUsers.stream().collect(Collectors.toMap(User::getUserId, u -> u));
+        users.forEach(user -> {
+
+            if (userMap.containsKey(user.getUserId())) {
+
+                updateUser(userMap.get(user.getUserId()), user);
+            } else {
+
+                userMap.put(user.getUserId(), createUser(user, userDeptMap.get(user.getUserId()), creator));
+            }
+        });
+        return new ArrayList<>(userMap.values());
+    }
+
+    private User createUser(User user, List<Department> departments, User creator) {
+
+        user.setCreator(creator.getName());
+        user.setCreatorId(creator.getUserId());
+        user.setEditor(creator.getName());
+        user.setEditorId(creator.getUserId());
+        user.setDepartments(departments);
+        return user;
+    }
+
+    private void updateUser(User persistUser, User user) {
+
+        persistUser.setName(user.getName());
+        persistUser.setMobile(user.getMobile());
+        persistUser.setEmail(user.getEmail());
+        persistUser.setAvatar(user.getAvatar());
+        persistUser.setPosition(user.getPosition());
+        persistUser.setActive(user.getActive() && persistUser.getActive());
+        persistUser.setLeadDepartments(user.getLeadDepartments());
+    }
+
+    private Department filterTopDept(List<Department> departments) {
+
+        List<String> deptIds = departments.stream().map(Department::getDeptId).collect(Collectors.toList());
+        // 顶层组织没有父组织
+        return departments.stream()
+                .filter(dept -> !deptIds.contains(dept.getParentDeptId()))
+                .findFirst().get();
+    }
+
+    private User login(User user, HttpSession session) throws Exception {
+
+        if (user.getActive()) { // 启用
+
+            sessionManager.setUser(user.getId(), session);
+            return user;
+        } else { // 禁用
+
+            throw new Exception("user was forbidden");
+        }
+    }
+}
