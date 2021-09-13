@@ -101,6 +101,6 @@ public class Customer extends RecordEntity {
         CREATE, // 新建
         UPDATE, // 更新
         LOST, // 流失
-        RETRIEVED // 寻回
+        RETRIEVE // 寻回
     }
 }

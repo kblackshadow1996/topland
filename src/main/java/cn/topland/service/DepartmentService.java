@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -64,8 +65,7 @@ public class DepartmentService {
 
     private List<Department> syncDepartments(List<Department> persistDepartments, List<Department> departments, User user) {
 
-        Map<String, Department> deptMap = persistDepartments.stream()
-                .collect(Collectors.toMap(Department::getDeptId, dept -> dept));
+        Map<String, Department> deptMap = getSortedDepartmentByIds(persistDepartments);
         departments.forEach(dept -> {
 
             if (deptMap.containsKey(dept.getDeptId())) {
@@ -78,6 +78,16 @@ public class DepartmentService {
             }
         });
         return new ArrayList<>(deptMap.values());
+    }
+
+    private Map<String, Department> getSortedDepartmentByIds(List<Department> persistDepartments) {
+
+        Map<String, Department> deptMap = new LinkedHashMap<>();
+        persistDepartments.stream()
+                .collect(Collectors.toMap(Department::getDeptId, dept -> dept))
+                .entrySet().stream().sorted(Map.Entry.comparingByKey())
+                .forEachOrdered(entry -> deptMap.put(entry.getKey(), entry.getValue()));
+        return deptMap;
     }
 
     private void updateDept(Department persistDept, Department dept) {
