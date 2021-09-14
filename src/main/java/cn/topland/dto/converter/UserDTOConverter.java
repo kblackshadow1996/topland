@@ -14,6 +14,7 @@ public class UserDTOConverter {
     public UserDTO toUserDTO(User user) {
 
         UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
         userDTO.setUserId(user.getUserId());
         userDTO.setEmployeeId(user.getEmployeeId());
         userDTO.setAvatar(user.getAvatar());
