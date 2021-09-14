@@ -22,10 +22,7 @@ public class UserDTOConverter {
         userDTO.setRemark(user.getRemark());
         userDTO.setCreateTime(DateTimeFormatter.ofPattern(DATE_FORMAT).format(user.getCreateTime()));
         userDTO.setCreator(user.getCreator());
-
-        userDTO.setDataAuth(user.getAuth().name());
-        userDTO.setRoles(user.roles());
-        userDTO.setAuthorities(user.authorities());
+        userDTO.setCreator(user.getCreator());
 
         return userDTO;
     }
