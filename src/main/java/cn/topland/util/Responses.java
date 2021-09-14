@@ -7,6 +7,11 @@ public final class Responses {
     private Responses() {
     }
 
+    public static Response success() {
+
+        return new Response(OK, null);
+    }
+
     public static Response success(Object data) {
 
         return new Response(OK, data);

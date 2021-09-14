@@ -53,4 +53,17 @@ public class LoginController {
             return Responses.fail(Response.ACCESS_FORBIDDEN, e.getMessage());
         }
     }
+
+    @GetMapping("/logout")
+    public Response logout(HttpSession session) {
+
+        try {
+
+            userService.logout(session);
+            return Responses.success();
+        } catch (Exception e) {
+
+            return Responses.fail(Response.ACCESS_FORBIDDEN, e.getMessage());
+        }
+    }
 }

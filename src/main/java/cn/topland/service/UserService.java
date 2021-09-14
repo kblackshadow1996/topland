@@ -167,4 +167,9 @@ public class UserService {
             throw new Exception("user was forbidden");
         }
     }
+
+    public void logout(HttpSession session) {
+
+        sessionManager.removeUser(session);
+    }
 }

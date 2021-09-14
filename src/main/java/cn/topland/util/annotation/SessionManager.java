@@ -47,4 +47,9 @@ public class SessionManager {
             return null;
         }
     }
+
+    public void removeUser(HttpSession session) {
+
+        session.removeAttribute(SESSION_USER);
+    }
 }
