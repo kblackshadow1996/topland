@@ -5,8 +5,7 @@ import cn.topland.entity.Department;
 import cn.topland.entity.User;
 import cn.topland.gateway.WeworkGateway;
 import cn.topland.gateway.response.WeworkDepartment;
-import cn.topland.service.parser.DepartmentParser;
-import lombok.extern.slf4j.Slf4j;
+import cn.topland.service.parser.WeworkDepartmentParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Slf4j
+import static cn.topland.entity.Department.Source;
+
 @Service
 public class DepartmentService {
 
@@ -28,36 +28,29 @@ public class DepartmentService {
     private DepartmentRepository repository;
 
     @Autowired
-    private DepartmentParser departmentParser;
-
-    public List<Department> listAll() {
-
-        return repository.findAll();
-    }
+    private WeworkDepartmentParser departmentParser;
 
     /**
      * 根据组织id同步组织及其直属组织
      */
     @Transactional
-    public List<Department> sync(String deptId, User creator) {
+    public List<Department> syncWeworkDept(String deptId, User creator) {
 
-        log.info("sync departments of dept {} by {} start...", deptId, creator.getName());
         List<Department> departments = departmentParser.parse(filterUpdateDepartments(deptId));
-        List<Department> persistDepartments = repository.findAllByDeptIdIn(getDeptIds(departments));
+        List<Department> persistDepartments = repository.findByDeptIds(getDeptIds(departments), Source.WEWORK);
         List<Department> newDepartments = syncDepartments(persistDepartments, departments, creator);
 
         return repository.saveAllAndFlush(newDepartments);
     }
 
     /**
-     * 同步所有组织
+     * 同步所有企业微信组织
      */
     @Transactional
-    public List<Department> syncAll(User creator) {
+    public List<Department> syncAllWeworkDept(User creator) {
 
-        log.info("sync all departments by {} start...", creator.getName());
         List<Department> departments = departmentParser.parse(weworkGateway.listDepartments(null));
-        List<Department> persistDepartments = repository.findAll();
+        List<Department> persistDepartments = repository.findBySource(Source.WEWORK);
         List<Department> newDepartments = syncDepartments(persistDepartments, departments, creator);
 
         return repository.saveAllAndFlush(newDepartments);
@@ -98,9 +91,9 @@ public class DepartmentService {
 
     private Department createDept(Department dept, User user) {
 
-        dept.setCreatorId(user.getUserId());
+        dept.setCreatorId(user.getId());
         dept.setCreator(user.getName());
-        dept.setEditorId(user.getUserId());
+        dept.setEditorId(user.getId());
         dept.setEditor(user.getName());
         return dept;
     }

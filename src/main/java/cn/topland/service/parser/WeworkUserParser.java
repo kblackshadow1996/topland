@@ -8,11 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static cn.topland.entity.User.Source;
+
 /**
  * 企业微信用户转为系统用户
  */
 @Component
-public class UserParser {
+public class WeworkUserParser {
 
     public List<User> parse(List<WeworkUser> weworkUsers) {
 
@@ -30,6 +32,7 @@ public class UserParser {
         user.setPosition(weworkUser.getPosition());
         user.setEmail(weworkUser.getEmail());
         user.setActive(isActive(weworkUser.getStatus()));
+        user.setSource(Source.WEWORK);
         return user;
     }
 

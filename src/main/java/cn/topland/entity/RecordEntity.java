@@ -20,7 +20,7 @@ public abstract class RecordEntity extends IdEntity {
     /**
      * 创建者id(预留字段,为以后的复杂需求预留空间)
      */
-    private String creatorId;
+    private Long creatorId;
 
     /**
      * 创建者
@@ -30,7 +30,7 @@ public abstract class RecordEntity extends IdEntity {
     /**
      * 修改者id(预留字段,为以后的复杂需求预留空间)
      */
-    private String editorId;
+    private Long editorId;
 
     /**
      * 修改者

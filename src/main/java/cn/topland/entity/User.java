@@ -3,13 +3,9 @@ package cn.topland.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 用户
@@ -80,42 +76,12 @@ public class User extends RecordEntity {
      */
     private String remark;
 
-    /**
-     * 角色
-     */
-    @ManyToMany(targetEntity = Role.class, fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "users_roles",
-            joinColumns = {@JoinColumn(name = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "role_id")})
-    @Fetch(FetchMode.SUBSELECT)
-    private List<Role> roles = new ArrayList<>();
-
-    /**
-     * 数据权限
-     */
     @Enumerated(EnumType.STRING)
-    private DataAuth auth;
+    private Source source;
 
-    public List<String> roles() {
+    public enum Source {
 
-        return roles.stream().map(Role::getName).collect(Collectors.toList());
-    }
-
-    public List<String> authorities() {
-
-        List<String> authorities = new ArrayList<>();
-        roles.forEach(role -> {
-
-            List<String> roleAuths = role.getAuths().stream().map(Authority::getName).collect(Collectors.toList());
-            authorities.addAll(roleAuths);
-        });
-        return authorities.stream().distinct().collect(Collectors.toList());
-    }
-
-    public enum DataAuth {
-
-        USER, // 用户
-        DEPARTMENT, // 部门
-        DEPARTMENT_AND_CHILDREN, // 部门及其子部门
-        ALL // 所有
+        WEWORK,
+        OTHER
     }
 }

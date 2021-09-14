@@ -7,9 +7,8 @@ import cn.topland.entity.User;
 import cn.topland.gateway.WeworkGateway;
 import cn.topland.gateway.response.UserInfo;
 import cn.topland.gateway.response.WeworkUser;
-import cn.topland.service.parser.UserParser;
+import cn.topland.service.parser.WeworkUserParser;
 import cn.topland.util.annotation.SessionManager;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +18,8 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
+import static cn.topland.entity.User.Source;
+
 @Service
 public class UserService {
 
@@ -36,7 +36,7 @@ public class UserService {
     private DepartmentRepository deptRepository;
 
     @Autowired
-    private UserParser userParser;
+    private WeworkUserParser userParser;
 
     public User get(Long id) {
 
@@ -44,19 +44,18 @@ public class UserService {
     }
 
     /**
-     * 登录
+     * 企业微信登录
      */
-    public User login(String code, HttpSession session) throws Exception {
+    public User loginByWework(String code, HttpSession session) throws Exception {
 
         UserInfo userInfo = weworkGateway.getUserInfo(code);
         if (Objects.nonNull(userInfo)) {
 
             String userId = userInfo.getUserId();
-            User user = repository.getUserByUserId(userId);
+            User user = repository.findById(userId, Source.WEWORK);
             if (Objects.nonNull(user)) { // 系统存在用户
 
-                log.info("{} login", user.getName());
-                return login(user, session);
+                return loginByWework(user, session);
             }
             throw new Exception("get wework user failed");
         }
@@ -67,13 +66,12 @@ public class UserService {
      * 按部门同步(只同步部门直属人员)
      */
     @Transactional
-    public List<User> sync(String deptId, User creator) {
+    public List<User> syncWeworkUser(String deptId, User creator) {
 
-        log.info("sync users in dept {} by {} start...", deptId, creator.getName());
         List<WeworkUser> weworkUsers = weworkGateway.listUsers(deptId, false);
         List<User> users = userParser.parse(weworkUsers);
-        List<User> persistUsers = repository.findAll();
-        Department department = deptRepository.getDepartmentByDeptId(deptId);
+        List<User> persistUsers = repository.findBySource(Source.WEWORK);
+        Department department = deptRepository.findByDeptId(deptId, Department.Source.WEWORK);
         List<User> newUsers = syncUsers(persistUsers, users, mappingUserDept(weworkUsers, List.of(department)), creator);
 
         return repository.saveAllAndFlush(newUsers);
@@ -83,10 +81,9 @@ public class UserService {
      * 同步所有
      */
     @Transactional
-    public List<User> syncAll(User creator) throws Exception {
+    public List<User> syncAllWeworkUser(User creator) throws Exception {
 
-        log.info("sync all users by {} start...", creator.getName());
-        List<Department> departments = deptRepository.listAllDeptIds();
+        List<Department> departments = deptRepository.listAllDeptIds(Department.Source.WEWORK);
         if (CollectionUtils.isEmpty(departments)) { // 同步用户之前必须同步部门
 
             throw new Exception("sync users failed, please sync departments first");
@@ -132,9 +129,9 @@ public class UserService {
     private User createUser(User user, List<Department> departments, User creator) {
 
         user.setCreator(creator.getName());
-        user.setCreatorId(creator.getUserId());
+        user.setCreatorId(creator.getId());
         user.setEditor(creator.getName());
-        user.setEditorId(creator.getUserId());
+        user.setEditorId(creator.getId());
         user.setDepartments(departments);
         return user;
     }
@@ -159,7 +156,7 @@ public class UserService {
                 .findFirst().get();
     }
 
-    private User login(User user, HttpSession session) throws Exception {
+    private User loginByWework(User user, HttpSession session) throws Exception {
 
         if (user.getActive()) { // 启用
 

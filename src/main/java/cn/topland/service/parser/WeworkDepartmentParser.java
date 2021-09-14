@@ -12,7 +12,7 @@ import static cn.topland.entity.Department.Source;
 import static cn.topland.entity.Department.Type;
 
 @Component
-public class DepartmentParser {
+public class WeworkDepartmentParser {
 
     public List<Department> parse(List<WeworkDepartment> weworkDepartments) {
 

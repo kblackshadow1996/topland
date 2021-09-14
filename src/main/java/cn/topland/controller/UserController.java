@@ -17,24 +17,24 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/sync/all")
+    @GetMapping("/sync/wework/all")
     public Response syncAll(@SessionUser User creator) {
 
         try {
 
-            return Responses.success(userService.syncAll(creator));
+            return Responses.success(userService.syncAllWeworkUser(creator));
         } catch (Exception e) {
 
             return Responses.fail(Response.INTERNAL_ERROR, e.getMessage());
         }
     }
 
-    @GetMapping("/sync")
+    @GetMapping("/sync/wework")
     public Response sync(String deptId, @SessionUser User creator) {
 
         try {
 
-            return Responses.success(userService.sync(deptId, creator));
+            return Responses.success(userService.syncWeworkUser(deptId, creator));
         } catch (Exception e) {
 
             return Responses.fail(Response.INTERNAL_ERROR, e.getMessage());

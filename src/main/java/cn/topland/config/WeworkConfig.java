@@ -4,12 +4,14 @@ import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
+
 /**
  * 企业微信基础配置,包含企业id,应用id等
  */
 @Data
 @Component
-public final class WeworkConfig {
+public final class WeworkConfig implements Serializable {
 
     @Value("${wework.crop-id}")
     private String cropId;

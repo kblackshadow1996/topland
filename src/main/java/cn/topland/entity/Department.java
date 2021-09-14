@@ -57,7 +57,7 @@ public class Department extends RecordEntity {
      * 来源
      */
     @Enumerated(EnumType.STRING)
-    private Source source = Source.WEWORK;
+    private Source source;
 
     public enum Source {
 

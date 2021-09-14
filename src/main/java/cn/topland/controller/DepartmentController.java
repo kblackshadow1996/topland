@@ -18,21 +18,15 @@ public class DepartmentController {
     @Autowired
     private DepartmentService departmentService;
 
-    @GetMapping("/sync/all")
-    public Response syncAll(@SessionUser User creator) {
+    @GetMapping("/sync/wework/all")
+    public Response syncAllWeworkDept(@SessionUser User creator) {
 
-        return Responses.success(departmentService.syncAll(creator));
+        return Responses.success(departmentService.syncAllWeworkDept(creator));
     }
 
-    @GetMapping("/sync/{deptId}")
-    public Response sync(@PathVariable String deptId, @SessionUser User creator) {
+    @GetMapping("/sync/wework/{deptId}")
+    public Response syncWeworkDept(@PathVariable String deptId, @SessionUser User creator) {
 
-        return Responses.success(departmentService.sync(deptId, creator));
-    }
-
-    @GetMapping("/list")
-    public Response listAll() {
-
-        return Responses.success(departmentService.listAll());
+        return Responses.success(departmentService.syncWeworkDept(deptId, creator));
     }
 }

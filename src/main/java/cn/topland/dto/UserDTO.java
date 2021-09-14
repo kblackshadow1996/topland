@@ -38,21 +38,6 @@ public class UserDTO implements Serializable {
     private String avatar;
 
     /**
-     * 角色
-     */
-    private List<String> roles;
-
-    /**
-     * 权限
-     */
-    private List<String> authorities;
-
-    /**
-     * 数据权限
-     */
-    private String dataAuth;
-
-    /**
      * 账号状态
      */
     private boolean active;
