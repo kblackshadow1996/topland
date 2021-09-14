@@ -13,6 +13,11 @@ import java.util.List;
 public class UserDTO implements Serializable {
 
     /**
+     * id
+     */
+    private Long id;
+
+    /**
      * 账号
      */
     private String userId;
