@@ -90,7 +90,7 @@ public class UserService {
         }
         List<WeworkUser> weworkUsers = weworkGateway.listUsers(filterTopDept(departments).getDeptId(), true);
         List<User> users = userParser.parse(weworkUsers);
-        List<User> persistUsers = repository.findAll();
+        List<User> persistUsers = repository.findBySource(Source.WEWORK);
         List<User> newUsers = syncUsers(persistUsers, users, mappingUserDept(weworkUsers, departments), creator);
 
         return repository.saveAllAndFlush(newUsers);

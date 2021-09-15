@@ -30,7 +30,6 @@ public class User extends RecordEntity {
     /**
      * 唯一标识id
      */
-    @Column(unique = true)
     private String userId;
 
     /**
