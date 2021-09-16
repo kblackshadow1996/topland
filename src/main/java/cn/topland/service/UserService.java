@@ -69,10 +69,15 @@ public class UserService {
     public List<User> syncWeworkUser(String deptId, User creator) {
 
         List<WeworkUser> weworkUsers = weworkGateway.listUsers(deptId, false);
+        // 企业微信同步的用户
         List<User> users = userParser.parse(weworkUsers);
+        // 需要更新的部门用户
         List<User> persistUsers = repository.findBySource(Source.WEWORK);
-        Department department = deptRepository.findByDeptId(deptId, Department.Source.WEWORK);
-        List<User> newUsers = syncUsers(persistUsers, users, mappingUserDept(weworkUsers, List.of(department)), creator);
+        List<User> deptUsers = getUserOfDepartment(persistUsers, deptId);
+        // 用于关联用户部门
+        List<Department> departments = deptRepository.listAllDeptIds(Department.Source.WEWORK);
+
+        List<User> newUsers = syncUsers(deptUsers, users, mappingUserDept(weworkUsers, departments), creator);
 
         return repository.saveAllAndFlush(newUsers);
     }
@@ -145,6 +150,13 @@ public class UserService {
         persistUser.setPosition(user.getPosition());
         persistUser.setActive(user.getActive() && persistUser.getActive());
         persistUser.setLeadDepartments(user.getLeadDepartments());
+    }
+
+    private List<User> getUserOfDepartment(List<User> persistUsers, String deptId) {
+
+        return persistUsers.stream()
+                .filter(user -> user.getDepartments().stream().anyMatch(dept -> deptId.equals(dept.getDeptId())))
+                .collect(Collectors.toList());
     }
 
     private Department filterTopDept(List<Department> departments) {

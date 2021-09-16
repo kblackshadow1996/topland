@@ -3,9 +3,12 @@ package cn.topland.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 /**
  * 用户
@@ -16,6 +19,8 @@ import java.util.List;
 @Entity
 @Table(name = "user")
 public class User extends RecordEntity {
+
+    private static final String EMAIL_HOST = "@topland.cn";
 
     /**
      * 姓名
@@ -77,6 +82,41 @@ public class User extends RecordEntity {
 
     @Enumerated(EnumType.STRING)
     private Source source;
+
+    @ManyToOne
+    @JoinColumn(name = "directus_user")
+    private DirectusUsers directusUser;
+
+    /**
+     * directus登录密码，directus_users中已经将密码加密，
+     * 存明文密码方便登录
+     */
+    private String directusPassword = getRandomPassword();
+
+    private String getRandomPassword() {
+
+        return RandomStringUtils.randomAlphanumeric(8);
+    }
+
+    public String getDirectusId() {
+
+        return Objects.isNull(directusUser)
+                ? null
+                : directusUser.getId();
+    }
+
+    public String getDirectusEmail() {
+
+        return Objects.isNull(directusUser)
+                ? generateEmail()
+                : directusUser.getEmail();
+    }
+
+    // 根据用户来源，用户三方id及固定邮箱域名创建如"wework_weekend@topland.cn"
+    private String generateEmail() {
+
+        return source.name().toLowerCase(Locale.ROOT) + "_" + userId + EMAIL_HOST;
+    }
 
     public enum Source {
 

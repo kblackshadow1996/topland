@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Setter
 @Getter
@@ -61,4 +60,24 @@ public class UserDTO implements Serializable {
      * 创建人
      */
     private String creator;
+
+    /**
+     * 创建人id
+     */
+    private String creatorId;
+
+    /**
+     * directus user id
+     */
+    private String directusUserId;
+
+    /**
+     * directus email
+     */
+    private String directusEmail;
+
+    /**
+     * directus 密码
+     */
+    private String directusPassword;
 }

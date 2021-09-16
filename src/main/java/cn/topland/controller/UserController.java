@@ -1,5 +1,6 @@
 package cn.topland.controller;
 
+import cn.topland.dto.converter.UserConverter;
 import cn.topland.entity.User;
 import cn.topland.service.UserService;
 import cn.topland.util.Response;
@@ -17,12 +18,15 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserConverter userConverter;
+
     @GetMapping("/sync/wework/all")
     public Response syncAll(@SessionUser User creator) {
 
         try {
 
-            return Responses.success(userService.syncAllWeworkUser(creator));
+            return Responses.success(userConverter.toUsersDTO(userService.syncAllWeworkUser(creator)));
         } catch (Exception e) {
 
             return Responses.fail(Response.INTERNAL_ERROR, e.getMessage());
@@ -34,7 +38,7 @@ public class UserController {
 
         try {
 
-            return Responses.success(userService.syncWeworkUser(deptId, creator));
+            return Responses.success(userConverter.toUsersDTO(userService.syncWeworkUser(deptId, creator)));
         } catch (Exception e) {
 
             return Responses.fail(Response.INTERNAL_ERROR, e.getMessage());

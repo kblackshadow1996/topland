@@ -1,7 +1,7 @@
 package cn.topland.controller;
 
 import cn.topland.config.WeworkConfig;
-import cn.topland.dto.converter.UserDTOConverter;
+import cn.topland.dto.converter.UserConverter;
 import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
@@ -24,7 +24,7 @@ public class LoginController {
     private UserService userService;
 
     @Autowired
-    private UserDTOConverter converter;
+    private UserConverter converter;
 
     @GetMapping("/config/wework")
     public Response weworkConfig() {
