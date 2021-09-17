@@ -1,6 +1,7 @@
 package cn.topland.config;
 
 import lombok.Data;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -24,4 +25,9 @@ public final class WeworkConfig implements Serializable {
 
     @Value("${wework.redirect-url}")
     private String redirectUrl;
+
+    /**
+     * 防止跨域攻击
+     */
+    private String state = RandomStringUtils.randomAlphabetic(6);
 }

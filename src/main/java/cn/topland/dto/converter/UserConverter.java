@@ -32,6 +32,12 @@ public class UserConverter {
         userDTO.setCreator(user.getCreator());
         userDTO.setCreatorId(userDTO.getCreatorId());
         userDTO.setCreateTime(DateTimeFormatter.ofPattern(DATE_FORMAT).format(user.getCreateTime()));
+
+        userDTO.setExternalPosition(user.getExternalPosition());
+        userDTO.setInternalPosition(user.getInternalPosition());
+        userDTO.setDepartments(user.getDepartments());
+        userDTO.setLeadDepartments(user.getLeadDepartments());
+
         // directus登录信息, 用于创建及登录
         userDTO.setDirectusUserId(user.getDirectusId());
         userDTO.setDirectusEmail(user.getDirectusEmail());

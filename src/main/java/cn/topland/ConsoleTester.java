@@ -5,17 +5,21 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ConsoleTester {
 
+    public static final String DEST = "/home/zhuliangbin/桌面/2pdf";
+    public static final String SRC = "/home/zhuliangbin/桌面/1.pdf";
+    public static final String LOGO = "./src/main/resources/img/logo.png";
+
     public static void main(String[] args) {
 
-//        String user = "{\"errcode\":\"0\",\"errmsg\"}";
-//        User weworkUser = JsonUtils.parse(user, User.class);
-//        System.out.println(weworkUser);
-//        LocalDateTime nextYear = LocalDateTime.of(LocalDate.now().getYear() + 1, LocalDate.now().getMonth(),
-//                LocalDate.now().getDayOfMonth(), LocalDateTime.now().getHour(), LocalDateTime.now().getMinute(), LocalDateTime.now().getSecond());
+        HtmlToPdfParams params = new HtmlToPdfParamsFactory().quotation();
+        new HtmlToPdfOperation(params).apply("/home/zhuliangbin/桌面/test.html", SRC);
 
-//        System.out.println(nextYear);
-
-        log.error("test for log");
-//        System.out.println(nextYear.isBefore(LocalDateTime.of(2022, 9, 6, 15, 10, 10)));
+        PdfOperation pdfOperation = QuotationPdfOperation
+                .builder()
+                .title("图澜文化&合作公司 服务报价表")
+                .date(LocalDate.now())
+                .number("123456")
+                .build();
+        pdfOperation.apply(SRC, DEST);
     }
 }

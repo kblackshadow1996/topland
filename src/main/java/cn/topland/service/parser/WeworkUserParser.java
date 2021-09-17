@@ -5,7 +5,9 @@ import cn.topland.gateway.response.WeworkUser;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static cn.topland.entity.User.Source;
@@ -15,6 +17,23 @@ import static cn.topland.entity.User.Source;
  */
 @Component
 public class WeworkUserParser {
+
+    private static final Map<String, List<String>> POSITIONS = new HashMap<>();
+
+    static {
+
+        POSITIONS.put("销售经理", List.of("大客户部经理"));
+        POSITIONS.put("销售", List.of("大客户经理", "客户经理"));
+        POSITIONS.put("编导", List.of("编导"));
+        POSITIONS.put("制片", List.of("制片专员"));
+        POSITIONS.put("策划", List.of("策划经理", "策划专员"));
+        POSITIONS.put("人像修图师", List.of("高级人像修图师", "中级人像修图师", "初级人像修图师"));
+        POSITIONS.put("静物修图师", List.of("高级静物修图师", "中级静物修图师", "初级静物修图师"));
+        POSITIONS.put("静物组组长", List.of("静物摄影师组长"));
+        POSITIONS.put("摄影师", List.of("人像摄影师", "静物摄影师"));
+        POSITIONS.put("摄像师", List.of("摄像师"));
+        POSITIONS.put("大助、二助", List.of("人像摄影师助理"));
+    }
 
     public List<User> parse(List<WeworkUser> weworkUsers) {
 
@@ -30,10 +49,19 @@ public class WeworkUserParser {
         user.setLeadDepartments(getLeadDepartments(weworkUser));
         user.setMobile(weworkUser.getMobile());
         user.setExternalPosition(weworkUser.getPosition());
+        user.setInternalPosition(getInternalPosition(weworkUser.getPosition()));
         user.setEmail(weworkUser.getEmail());
         user.setActive(isActive(weworkUser.getStatus()));
         user.setSource(Source.WEWORK);
         return user;
+    }
+
+    private String getInternalPosition(String position) {
+
+        Map.Entry<String, List<String>> positionEntry = POSITIONS.entrySet().stream()
+                .filter(en -> en.getValue().contains(position)).findFirst()
+                .orElse(null);
+        return positionEntry != null ? positionEntry.getKey() : position;
     }
 
     /**

@@ -5,6 +5,7 @@ import cn.topland.dto.converter.UserConverter;
 import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,11 +44,15 @@ public class LoginController {
      * @param session 会话
      */
     @GetMapping("/login/wework")
-    public Response loginByWework(String code, HttpSession session) {
+    public Response loginByWework(String code, String state, HttpSession session) {
 
         try {
 
-            return Responses.success(converter.toUserDTO(userService.loginByWework(code, session)));
+            if (StringUtils.isNotBlank(code) && StringUtils.isNotBlank(state) && StringUtils.equals(state, weworkConfig.getState())) {
+
+                return Responses.success(converter.toUserDTO(userService.loginByWework(code, session)));
+            }
+            return Responses.fail(Response.INTERNAL_ERROR, "scan wework qr code failed");
         } catch (Exception e) {
 
             return Responses.fail(Response.ACCESS_FORBIDDEN, e.getMessage());
