@@ -38,9 +38,14 @@ public class User extends RecordEntity {
     private String userId;
 
     /**
-     * 职称
+     * 职称(外部职称)
      */
-    private String position;
+    private String externalPosition;
+
+    /**
+     * 头衔(内部职称)
+     */
+    private String internalPosition;
 
     /**
      * 部门
@@ -93,6 +98,9 @@ public class User extends RecordEntity {
      */
     private String directusPassword = getRandomPassword();
 
+    @Enumerated(EnumType.STRING)
+    private DataAuth auth;
+
     private String getRandomPassword() {
 
         return RandomStringUtils.randomAlphanumeric(8);
@@ -122,5 +130,11 @@ public class User extends RecordEntity {
 
         WEWORK,
         OTHER
+    }
+
+    public enum DataAuth {
+
+        ACCOUNT,
+        ALL
     }
 }

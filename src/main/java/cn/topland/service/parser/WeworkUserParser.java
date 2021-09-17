@@ -29,7 +29,7 @@ public class WeworkUserParser {
         user.setAvatar(weworkUser.getAvatar());
         user.setLeadDepartments(getLeadDepartments(weworkUser));
         user.setMobile(weworkUser.getMobile());
-        user.setPosition(weworkUser.getPosition());
+        user.setExternalPosition(weworkUser.getPosition());
         user.setEmail(weworkUser.getEmail());
         user.setActive(isActive(weworkUser.getStatus()));
         user.setSource(Source.WEWORK);

@@ -147,7 +147,7 @@ public class UserService {
         persistUser.setMobile(user.getMobile());
         persistUser.setEmail(user.getEmail());
         persistUser.setAvatar(user.getAvatar());
-        persistUser.setPosition(user.getPosition());
+        persistUser.setExternalPosition(user.getExternalPosition());
         persistUser.setActive(user.getActive() && persistUser.getActive());
         persistUser.setLeadDepartments(user.getLeadDepartments());
     }

@@ -34,19 +34,10 @@ public class Quotation extends IdEntity {
     private BigDecimal discount;
 
     /**
-     * 小计备注
+     * 报价备注
      */
-    private String subtotalComment;
-
-    /**
-     * 优惠备注
-     */
-    private String discountComment;
-
-    /**
-     * 未税总计备注
-     */
-    private String totalComment;
+    @Embedded
+    private QuotationComment comment;
 
     /**
      * 报价说明
