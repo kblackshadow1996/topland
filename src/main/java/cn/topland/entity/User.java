@@ -50,7 +50,7 @@ public class User extends RecordEntity {
     /**
      * 部门
      */
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
     @JoinTable(name = "users_departments",
             joinColumns = {@JoinColumn(name = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "department_id")})
     private List<Department> departments;
@@ -88,7 +88,7 @@ public class User extends RecordEntity {
     @Enumerated(EnumType.STRING)
     private Source source;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "directus_user")
     private DirectusUsers directusUser;
 
