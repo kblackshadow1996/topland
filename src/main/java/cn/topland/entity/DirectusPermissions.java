@@ -8,6 +8,7 @@ import org.hibernate.annotations.Type;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.util.Objects;
 
 /**
  * directus权限表
@@ -18,6 +19,11 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @Table(name = "directus_permissions")
 public class DirectusPermissions extends SimpleIdEntity {
+
+    /**
+     * 角色
+     */
+    private String role;
 
     /**
      * 数据集
@@ -54,4 +60,36 @@ public class DirectusPermissions extends SimpleIdEntity {
      * 字段
      */
     private String fields;
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o) {
+
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+
+            return false;
+        }
+        DirectusPermissions that = (DirectusPermissions) o;
+        return equalsTo(that);
+    }
+
+    private boolean equalsTo(DirectusPermissions that) {
+
+        return Objects.equals(this.role, that.role)
+                && Objects.equals(this.collection, that.collection)
+                && Objects.equals(this.action, that.action)
+                && Objects.equals(this.permissions, that.permissions)
+                && Objects.equals(this.validation, that.validation)
+                && Objects.equals(this.presets, that.presets)
+                && Objects.equals(this.fields, that.fields);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(role, collection, action, permissions, validation, presets, fields);
+    }
 }

@@ -8,13 +8,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import java.io.Serializable;
 import java.util.Objects;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @MappedSuperclass
-public abstract class SimpleIdEntity {
+public abstract class SimpleIdEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +32,7 @@ public abstract class SimpleIdEntity {
 
             return false;
         }
-        IdEntity that = (IdEntity) o;
+        SimpleIdEntity that = (SimpleIdEntity) o;
         return Objects.equals(id, that.id);
     }
 

@@ -1,6 +1,5 @@
 package cn.topland.controller;
 
-import cn.topland.entity.DirectusPermissions;
 import cn.topland.service.PermissionService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
@@ -20,8 +19,8 @@ public class PermissionController {
     private PermissionService permissionService;
 
     @GetMapping("/distinct")
-    public Response distinct(@RequestParam(name = "ids") List<DirectusPermissions> permissions) {
+    public Response distinct(@RequestParam("ids") List<Long> ids) {
 
-        return Responses.success(permissionService.distinct(permissions));
+        return Responses.success(permissionService.distinct(ids));
     }
 }
