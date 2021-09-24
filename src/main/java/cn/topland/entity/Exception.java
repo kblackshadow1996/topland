@@ -6,29 +6,25 @@ import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.util.List;
 
 /**
- * 权限
+ * 异常
  */
 @Setter
 @Getter
 @NoArgsConstructor
 @Entity
-@Table(name = "authority_type")
-public class AuthorityType extends IdEntity {
+@Table(name = "operation")
+public class Exception extends RecordEntity {
 
     /**
-     * 名称
+     * 类型
      */
-    private String name;
-
-    /**
-     * 组装directus_permissions的字段对象
-     */
-    @OneToMany
+    @ManyToOne
     @JoinColumn(name = "type")
-    List<Authority> authorities;
+    private ExceptionType type;
+
+
 }

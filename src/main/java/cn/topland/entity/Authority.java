@@ -20,7 +20,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "authority")
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-public class Authority extends IdEntity {
+public class Authority extends SimpleIdEntity {
 
     /**
      * 数据集

@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 /**
@@ -20,7 +22,7 @@ public class Operation extends RecordEntity {
     /**
      * 操作
      */
-    private String operation;
+    private String action;
 
     /**
      * 备注
@@ -30,6 +32,7 @@ public class Operation extends RecordEntity {
     /**
      * 模块
      */
+    @Enumerated(value = EnumType.STRING)
     private Module module;
 
     public enum Module {

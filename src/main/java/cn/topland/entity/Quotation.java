@@ -72,4 +72,8 @@ public class Quotation extends IdEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller")
     private User seller;
+
+    @OneToOne
+    @JoinColumn(name = "pdf")
+    private Attachment pdf;
 }

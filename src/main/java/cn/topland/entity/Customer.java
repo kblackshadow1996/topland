@@ -64,7 +64,7 @@ public class Customer extends RecordEntity {
     private List<Contact> contacts = new ArrayList<>();
 
     /**
-     * 操作记录
+     * 品牌
      */
     @OneToMany
     @JoinColumn(name = "customer_id")
@@ -75,7 +75,7 @@ public class Customer extends RecordEntity {
      */
     @OneToMany
     @JoinColumn(name = "customer_id")
-    @OrderBy("createTime desc")
+    @OrderBy("createTime asc")
     private List<Operation> operations = new ArrayList<>();
 
     public enum Status {

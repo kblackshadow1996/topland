@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 /**
@@ -25,6 +27,7 @@ public class Contact extends IdEntity {
     /**
      * 性别
      */
+    @Enumerated(value = EnumType.STRING)
     private Gender gender;
 
     /**
