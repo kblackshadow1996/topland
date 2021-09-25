@@ -27,7 +27,9 @@ public class Customer extends RecordEntity {
     /**
      * 销售经理
      */
-    private String seller;
+    @ManyToOne
+    @JoinColumn(name = "seller")
+    private User seller;
 
     /**
      * 经营信息
@@ -38,6 +40,13 @@ public class Customer extends RecordEntity {
      * 公司性质
      */
     private Type type;
+
+    /**
+     * 母集团
+     */
+    @ManyToOne
+    @JoinColumn(name = "parent")
+    private Customer parent;
 
     /**
      * 来源

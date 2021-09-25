@@ -26,12 +26,16 @@ public class Brand extends RecordEntity {
     /**
      * 销售
      */
-    private String seller;
+    @ManyToOne
+    @JoinColumn(name = "seller")
+    private User seller;
 
     /**
-     * 销售
+     * 制片
      */
-    private String production;
+    @ManyToOne
+    @JoinColumn(name = "production")
+    private User production;
 
     /**
      * 经营信息

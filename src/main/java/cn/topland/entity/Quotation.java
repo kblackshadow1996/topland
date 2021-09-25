@@ -29,6 +29,11 @@ public class Quotation extends IdEntity {
     private String number;
 
     /**
+     * 小计
+     */
+    private BigDecimal subtotal;
+
+    /**
      * 优惠金额
      */
     private BigDecimal discount;
@@ -73,6 +78,9 @@ public class Quotation extends IdEntity {
     @JoinColumn(name = "seller")
     private User seller;
 
+    /**
+     * pdf
+     */
     @OneToOne
     @JoinColumn(name = "pdf")
     private Attachment pdf;
