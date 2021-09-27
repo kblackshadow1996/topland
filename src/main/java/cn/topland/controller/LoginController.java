@@ -44,13 +44,13 @@ public class LoginController {
      * @param session 会话
      */
     @GetMapping("/login/wework")
-    public Response loginByWework(String code, String state, HttpSession session) {
+    public Response loginByWework(String code, String state) {
 
         try {
 
             if (StringUtils.isNotBlank(code) && StringUtils.isNotBlank(state) && StringUtils.equals(state, weworkConfig.getState())) {
 
-                return Responses.success(converter.toUserDTO(userService.loginByWework(code, session)));
+                return Responses.success(converter.toUserDTO(userService.loginByWework(code)));
             }
             return Responses.fail(Response.INTERNAL_ERROR, "scan wework qr code failed");
         } catch (Exception e) {

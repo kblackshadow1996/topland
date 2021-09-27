@@ -11,8 +11,6 @@ import cn.topland.service.parser.WeworkUserParser;
 import cn.topland.util.annotation.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
@@ -46,7 +44,7 @@ public class UserService {
     /**
      * 企业微信登录
      */
-    public User loginByWework(String code, HttpSession session) throws Exception {
+    public User loginByWework(String code) throws Exception {
 
         UserInfo userInfo = weworkGateway.getUserInfo(code);
         if (Objects.nonNull(userInfo)) {
@@ -55,7 +53,7 @@ public class UserService {
             User user = repository.findById(userId, Source.WEWORK);
             if (Objects.nonNull(user)) { // 系统存在用户
 
-                return loginByWework(user, session);
+                return loginByWeworkUser(user);
             }
             throw new Exception("get wework user failed");
         }
@@ -65,8 +63,7 @@ public class UserService {
     /**
      * 按部门同步(只同步部门直属人员)
      */
-    @Transactional
-    public List<User> syncWeworkUser(String deptId, User creator) {
+    public List<User> syncWeworkUser(String deptId) {
 
         List<WeworkUser> weworkUsers = weworkGateway.listUsers(deptId, false);
         // 企业微信同步的用户
@@ -77,29 +74,21 @@ public class UserService {
         // 用于关联用户部门
         List<Department> departments = deptRepository.listAllDeptIds(Department.Source.WEWORK);
 
-        List<User> newUsers = syncUsers(deptUsers, users, mappingUserDept(weworkUsers, departments), creator);
-
-        return repository.saveAllAndFlush(newUsers);
+        return syncUsers(deptUsers, users, mappingUserDept(weworkUsers, departments));
     }
 
     /**
      * 同步所有
      */
-    @Transactional
-    public List<User> syncAllWeworkUser(User creator) throws Exception {
+    public List<User> syncAllWeworkUser() {
 
         List<Department> departments = deptRepository.listAllDeptIds(Department.Source.WEWORK);
-        if (CollectionUtils.isEmpty(departments)) { // 同步用户之前必须同步部门
-
-            throw new Exception("sync users failed, please sync departments first");
-        }
         List<WeworkUser> weworkUsers = weworkGateway.listUsers(filterTopDept(departments).getDeptId(), true);
         List<User> users = userParser.parse(weworkUsers);
         List<User> persistUsers = repository.findBySource(Source.WEWORK);
         forbiddenResigns(persistUsers, users);
-        List<User> newUsers = syncUsers(persistUsers, users, mappingUserDept(weworkUsers, departments), creator);
 
-        return repository.saveAllAndFlush(newUsers);
+        return syncUsers(persistUsers, users, mappingUserDept(weworkUsers, departments));
     }
 
     // 如果离职自动被禁用
@@ -126,7 +115,7 @@ public class UserService {
         return userDeptMap;
     }
 
-    private List<User> syncUsers(List<User> persistUsers, List<User> users, Map<String, List<Department>> userDeptMap, User creator) {
+    private List<User> syncUsers(List<User> persistUsers, List<User> users, Map<String, List<Department>> userDeptMap) {
 
         Map<String, User> userMap = persistUsers.stream().collect(Collectors.toMap(User::getUserId, u -> u));
         users.forEach(user -> {
@@ -136,16 +125,14 @@ public class UserService {
                 updateUser(userMap.get(user.getUserId()), user);
             } else {
 
-                userMap.put(user.getUserId(), createUser(user, userDeptMap.get(user.getUserId()), creator));
+                userMap.put(user.getUserId(), createUser(user, userDeptMap.get(user.getUserId())));
             }
         });
         return new ArrayList<>(userMap.values());
     }
 
-    private User createUser(User user, List<Department> departments, User creator) {
+    private User createUser(User user, List<Department> departments) {
 
-        user.setCreatorId(creator.getId());
-        user.setEditorId(creator.getId());
         user.setDepartments(departments);
         return user;
     }
@@ -177,11 +164,10 @@ public class UserService {
                 .findFirst().get();
     }
 
-    private User loginByWework(User user, HttpSession session) throws Exception {
+    private User loginByWeworkUser(User user) throws Exception {
 
         if (user.getActive()) { // 启用
 
-            sessionManager.setUser(user.getId(), session);
             return user;
         } else { // 禁用
 

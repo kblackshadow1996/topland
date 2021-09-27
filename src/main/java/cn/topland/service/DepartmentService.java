@@ -2,13 +2,11 @@ package cn.topland.service;
 
 import cn.topland.dao.DepartmentRepository;
 import cn.topland.entity.Department;
-import cn.topland.entity.User;
 import cn.topland.gateway.WeworkGateway;
 import cn.topland.gateway.response.WeworkDepartment;
 import cn.topland.service.parser.WeworkDepartmentParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -33,30 +31,26 @@ public class DepartmentService {
     /**
      * 根据组织id同步组织及其直属组织
      */
-    @Transactional
-    public List<Department> syncWeworkDept(String deptId, User creator) {
+    public List<Department> syncWeworkDept(String deptId) {
 
         List<Department> departments = departmentParser.parse(filterUpdateDepartments(deptId));
         List<Department> persistDepartments = repository.findByDeptIds(getDeptIds(departments), Source.WEWORK);
-        List<Department> newDepartments = syncDepartments(persistDepartments, departments, creator);
 
-        return repository.saveAllAndFlush(newDepartments);
+        return syncDepartments(persistDepartments, departments);
     }
 
     /**
      * 同步所有企业微信组织
      */
-    @Transactional
-    public List<Department> syncAllWeworkDept(User creator) {
+    public List<Department> syncAllWeworkDept() {
 
         List<Department> departments = departmentParser.parse(weworkGateway.listDepartments(null));
         List<Department> persistDepartments = repository.findBySource(Source.WEWORK);
-        List<Department> newDepartments = syncDepartments(persistDepartments, departments, creator);
 
-        return repository.saveAllAndFlush(newDepartments);
+        return syncDepartments(persistDepartments, departments);
     }
 
-    private List<Department> syncDepartments(List<Department> persistDepartments, List<Department> departments, User user) {
+    private List<Department> syncDepartments(List<Department> persistDepartments, List<Department> departments) {
 
         Map<String, Department> deptMap = getSortedDepartmentByIds(persistDepartments);
         departments.forEach(dept -> {
@@ -67,7 +61,7 @@ public class DepartmentService {
 
             } else {
 
-                deptMap.put(dept.getDeptId(), createDept(dept, user));
+                deptMap.put(dept.getDeptId(), dept);
             }
         });
         return new ArrayList<>(deptMap.values());
@@ -87,13 +81,6 @@ public class DepartmentService {
 
         persistDept.setName(dept.getName());
         persistDept.setSort(dept.getSort());
-    }
-
-    private Department createDept(Department dept, User user) {
-
-        dept.setCreatorId(user.getId());
-        dept.setEditorId(user.getId());
-        return dept;
     }
 
     private List<String> getDeptIds(List<Department> departments) {

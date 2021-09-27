@@ -22,13 +22,4 @@ public class RoleService {
 
         return repository.getById(id);
     }
-
-    public Role auth(Long roleId, List<Long> auths) {
-
-        Role role = repository.getById(roleId);
-        List<Authority> authorities = authRepository.findAllById(auths);
-        role.setAuthorities(authorities);
-
-        return repository.saveAndFlush(role);
-    }
 }

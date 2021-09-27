@@ -22,11 +22,11 @@ public class UserController {
     private UserConverter userConverter;
 
     @GetMapping("/sync/wework/all")
-    public Response syncAll(@SessionUser User creator) {
+    public Response syncAll() {
 
         try {
 
-            return Responses.success(userConverter.toUsersDTO(userService.syncAllWeworkUser(creator)));
+            return Responses.success(userConverter.toUsersDTOs(userService.syncAllWeworkUser()));
         } catch (Exception e) {
 
             return Responses.fail(Response.INTERNAL_ERROR, e.getMessage());
@@ -34,11 +34,11 @@ public class UserController {
     }
 
     @GetMapping("/sync/wework")
-    public Response sync(String deptId, @SessionUser User creator) {
+    public Response sync(String deptId) {
 
         try {
 
-            return Responses.success(userConverter.toUsersDTO(userService.syncWeworkUser(deptId, creator)));
+            return Responses.success(userConverter.toUsersDTOs(userService.syncWeworkUser(deptId)));
         } catch (Exception e) {
 
             return Responses.fail(Response.INTERNAL_ERROR, e.getMessage());

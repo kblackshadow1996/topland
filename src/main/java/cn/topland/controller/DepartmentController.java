@@ -19,14 +19,14 @@ public class DepartmentController {
     private DepartmentService departmentService;
 
     @GetMapping("/sync/wework/all")
-    public Response syncAllWeworkDept(@SessionUser User creator) {
+    public Response syncAllWeworkDept() {
 
-        return Responses.success(departmentService.syncAllWeworkDept(creator));
+        return Responses.success(departmentService.syncAllWeworkDept());
     }
 
     @GetMapping("/sync/wework/{deptId}")
-    public Response syncWeworkDept(@PathVariable String deptId, @SessionUser User creator) {
+    public Response syncWeworkDept(@PathVariable String deptId) {
 
-        return Responses.success(departmentService.syncWeworkDept(deptId, creator));
+        return Responses.success(departmentService.syncWeworkDept(deptId));
     }
 }

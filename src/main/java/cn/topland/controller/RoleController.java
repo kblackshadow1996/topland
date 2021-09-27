@@ -3,6 +3,7 @@ package cn.topland.controller;
 import cn.topland.dto.composer.PermissionComposer;
 import cn.topland.entity.Authority;
 import cn.topland.entity.Role;
+import cn.topland.service.AuthorityService;
 import cn.topland.service.RoleService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
@@ -23,15 +24,16 @@ public class RoleController {
     private RoleService roleService;
 
     @Autowired
+    private AuthorityService authorityService;
+
+    @Autowired
     private PermissionComposer composer;
 
     @GetMapping("/auth")
     public Response auth(Long roleId, @RequestParam("auths") List<Long> auths) {
 
         Role role = roleService.get(roleId);
-        List<Authority> oldAuths = getAuths(role);
-        List<Authority> newAuths = getAuths(roleService.auth(roleId, auths));
-        return Responses.success(composer.compose(oldAuths, newAuths, role.getRole().getId()));
+        return Responses.success(composer.compose(getAuths(role), authorityService.findByIds(auths), role.getRole().getId()));
     }
 
     private List<Authority> getAuths(Role role) {

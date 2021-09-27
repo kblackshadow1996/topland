@@ -13,7 +13,7 @@ public class UserConverter {
 
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    public List<UserDTO> toUsersDTO(List<User> users) {
+    public List<UserDTO> toUsersDTOs(List<User> users) {
 
         return users.stream().map(this::toUserDTO).collect(Collectors.toList());
     }
