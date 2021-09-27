@@ -10,9 +10,6 @@ import java.util.List;
 @Repository
 public interface DepartmentRepository extends JpaRepository<Department, Long> {
 
-    @Query(value = "select dept from Department dept where dept.source=?2 and dept.deptId=?1")
-    Department findByDeptId(String deptId, Department.Source source);
-
     @Query(value = "select dept from Department dept where dept.source=?2 and dept.deptId in ?1")
     List<Department> findByDeptIds(List<String> deptIds, Department.Source source);
 
