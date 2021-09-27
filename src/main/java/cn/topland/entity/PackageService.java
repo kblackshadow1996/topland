@@ -24,11 +24,21 @@ public class PackageService extends IdEntity {
      * 服务
      */
     @ManyToOne
-    @JoinColumn(name = "service_id")
+    @JoinColumn(name = "service")
     private Service service;
+
+    /**
+     * 单位
+     */
+    private String unit;
 
     /**
      * 服务单价
      */
     private BigDecimal price;
+
+    /**
+     * 交付类型
+     */
+    private String delivery;
 }

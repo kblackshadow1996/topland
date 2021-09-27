@@ -24,7 +24,7 @@ public class QuotationService extends IdEntity {
      * 服务
      */
     @ManyToOne
-    @JoinColumn(name = "service_id")
+    @JoinColumn(name = "service")
     private Service service;
 
     /**

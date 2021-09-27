@@ -1,60 +1,32 @@
 package cn.topland.entity;
 
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.List;
 
 /**
- * 接口权限
+ * 功能
  */
 @Setter
 @Getter
 @NoArgsConstructor
 @Entity
 @Table(name = "authority")
-@TypeDef(name = "json", typeClass = JsonStringType.class)
 public class Authority extends SimpleIdEntity {
 
     /**
-     * 数据集
+     * 名称
      */
-    private String collection;
+    private String name;
 
     /**
-     * 行为
+     * 组装directus_permissions的字段对象
      */
-    private String action;
-
-    /**
-     * 权限
-     */
-    @Type(type = "json")
-    @Column(columnDefinition = "json")
-    private String permissions;
-
-    /**
-     * 验证
-     */
-    @Type(type = "json")
-    @Column(columnDefinition = "json")
-    private String validation;
-
-    /**
-     * 预设
-     */
-    @Type(type = "json")
-    @Column(columnDefinition = "json")
-    private String presets;
-
-    /**
-     * 字段
-     */
-    private String fields;
+    @ManyToMany
+    @JoinTable(name = "authorities_permissions",
+            joinColumns = {@JoinColumn(name = "authority_id")}, inverseJoinColumns = {@JoinColumn(name = "permission_id")})
+    List<Permission> authorities;
 }

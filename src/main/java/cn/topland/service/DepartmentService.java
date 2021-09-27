@@ -92,9 +92,7 @@ public class DepartmentService {
     private Department createDept(Department dept, User user) {
 
         dept.setCreatorId(user.getId());
-        dept.setCreator(user.getName());
         dept.setEditorId(user.getId());
-        dept.setEditor(user.getName());
         return dept;
     }
 

@@ -32,7 +32,7 @@ public class SettlementContract extends RecordEntity {
      * 关联订单
      */
     @OneToOne
-    @JoinColumn(name = "order")
+    @JoinColumn(name = "`order`")
     private Order order;
 
     /**
@@ -47,10 +47,28 @@ public class SettlementContract extends RecordEntity {
     @JoinColumn(name = "settlement_contract")
     private List<Receive> receives;
 
-    /**
-     * 审核记录
-     */
     @OneToMany
-    @JoinColumn(name = "settlement_contract")
-    private List<Approval> approvals;
+    @JoinColumn(name = "settlement")
+    private List<Attachment> attachments;
+
+    @Enumerated(value = EnumType.STRING)
+    private Status status;
+
+    @OneToMany
+    @JoinColumn(name = "settlement")
+    private List<Operation> operations;
+
+    public enum Status {
+
+        REVIEWING,
+        REJECTED,
+        APPROVED
+    }
+
+    public enum Action {
+
+        SUBMIT,
+        REJECT,
+        APPROVE
+    }
 }

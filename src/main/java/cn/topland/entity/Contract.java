@@ -95,7 +95,7 @@ public class Contract extends RecordEntity {
      * 关联订单
      */
     @OneToOne
-    @JoinColumn(name = "order")
+    @JoinColumn(name = "`order`")
     private Order order;
 
     /**
@@ -120,11 +120,28 @@ public class Contract extends RecordEntity {
     private List<Receive> receives;
 
     /**
-     * 审核记录
+     * 审核状态
      */
+    @Enumerated(value = EnumType.STRING)
+    private Status status;
+
     @OneToMany
     @JoinColumn(name = "contract")
-    private List<Approval> approvals;
+    private List<Operation> operations;
+
+    public enum Status {
+
+        REVIEWING,
+        REJECTED,
+        APPROVED
+    }
+
+    public enum Action {
+
+        SUBMIT,
+        REJECT,
+        APPROVE
+    }
 
     public enum Type {
 

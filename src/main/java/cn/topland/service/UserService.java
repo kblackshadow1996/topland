@@ -96,9 +96,20 @@ public class UserService {
         List<WeworkUser> weworkUsers = weworkGateway.listUsers(filterTopDept(departments).getDeptId(), true);
         List<User> users = userParser.parse(weworkUsers);
         List<User> persistUsers = repository.findBySource(Source.WEWORK);
+        forbiddenResigns(persistUsers, users);
         List<User> newUsers = syncUsers(persistUsers, users, mappingUserDept(weworkUsers, departments), creator);
 
         return repository.saveAllAndFlush(newUsers);
+    }
+
+    // 如果离职自动被禁用
+    private void forbiddenResigns(List<User> persistUsers, List<User> users) {
+
+        Map<String, User> updateUsers = users.stream().collect(Collectors.toMap(User::getUserId, u -> u));
+        persistUsers.stream().filter(u -> !updateUsers.containsKey(u.getUserId())).forEach(u -> {
+
+            u.setActive(false);
+        });
     }
 
     // 关联用户部门
@@ -133,9 +144,7 @@ public class UserService {
 
     private User createUser(User user, List<Department> departments, User creator) {
 
-        user.setCreator(creator.getName());
         user.setCreatorId(creator.getId());
-        user.setEditor(creator.getName());
         user.setEditorId(creator.getId());
         user.setDepartments(departments);
         return user;

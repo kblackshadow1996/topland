@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -46,16 +45,16 @@ public class Brand extends RecordEntity {
      * 联系人
      */
     @OneToMany(targetEntity = Contact.class)
-    @JoinColumn(name = "brand_id")
-    private List<Contact> contacts = new ArrayList<>();
+    @JoinColumn(name = "brand")
+    private List<Contact> contacts;
 
     /**
      * 操作记录
      */
-    @OneToMany(targetEntity = Operation.class)
-    @JoinColumn(name = "brand_id")
+    @OneToMany
+    @JoinColumn(name = "brand")
     @OrderBy("createTime desc")
-    private List<Operation> operations = new ArrayList<>();
+    private List<Operation> operations;
 
     public enum Action {
 

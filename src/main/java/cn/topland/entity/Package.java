@@ -4,7 +4,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.List;
 
 /**
@@ -25,9 +28,8 @@ public class Package extends RecordEntity {
     /**
      * 包含服务
      */
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "packages_services",
-            joinColumns = {@JoinColumn(name = "package_id")}, inverseJoinColumns = {@JoinColumn(name = "service_id")})
+    @OneToMany
+    @JoinColumn(name = "package")
     private List<PackageService> services;
 
     /**

@@ -27,21 +27,21 @@ public class Equipment extends RecordEntity {
     /**
      * 型号
      */
-    @ManyToOne(targetEntity = Model.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne
     @JoinColumn(name = "model")
     private Model model;
 
     /**
      * 存储仓库
      */
-    @ManyToOne(targetEntity = Storage.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne
     @JoinColumn(name = "storage")
     private Storage storage;
 
     /**
      * 序列号
      */
-    private String serialNumber;
+    private String identity;
 
     /**
      * 购入价格
@@ -56,6 +56,7 @@ public class Equipment extends RecordEntity {
     /**
      * 状态
      */
+    @Enumerated(value = EnumType.STRING)
     private Status status;
 
     /**
@@ -67,6 +68,6 @@ public class Equipment extends RecordEntity {
 
         IN_SERVICE, // 正常
         UNDER_REPAIR, // 维修中
-        DECOMMISSIONING // 退役
+        RETIRED // 退役
     }
 }

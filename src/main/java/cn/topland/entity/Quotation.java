@@ -26,7 +26,7 @@ public class Quotation extends IdEntity {
     /**
      * 单号
      */
-    private String number;
+    private String identity;
 
     /**
      * 小计
@@ -52,7 +52,7 @@ public class Quotation extends IdEntity {
     /**
      * 客户
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "customer")
     private Customer customer;
 
@@ -64,17 +64,23 @@ public class Quotation extends IdEntity {
     private Brand brand;
 
     /**
+     * 套餐
+     */
+    @ManyToOne
+    @JoinColumn(name = "package")
+    private Package servicePackage;
+
+    /**
      * 包含服务
      */
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "quotations_services",
-            joinColumns = {@JoinColumn(name = "quotation_id")}, inverseJoinColumns = {@JoinColumn(name = "service_id")})
+    @OneToMany
+    @JoinColumn(name = "quotation")
     private List<QuotationService> services;
 
     /**
      * 销售经理id
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "seller")
     private User seller;
 

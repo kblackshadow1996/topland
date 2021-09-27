@@ -9,6 +9,6 @@ import javax.persistence.Table;
 @Setter
 @Getter
 @Entity
-@Table(name = "order_")
+@Table(name = "`order`")
 public class Order extends RecordEntity {
 }

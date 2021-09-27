@@ -29,7 +29,6 @@ public class UserConverter {
         userDTO.setMobile(user.getMobile());
         userDTO.setActive(user.getActive());
         userDTO.setRemark(user.getRemark());
-        userDTO.setCreator(user.getCreator());
         userDTO.setCreatorId(userDTO.getCreatorId());
         userDTO.setCreateTime(DateTimeFormatter.ofPattern(DATE_FORMAT).format(user.getCreateTime()));
 

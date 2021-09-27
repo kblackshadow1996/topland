@@ -38,6 +38,8 @@ public class Operation extends RecordEntity {
     public enum Module {
 
         CUSTOMER, // 客户
-        BRAND // 品牌
+        BRAND, // 品牌
+        CONTRACT, // 合同
+        SETTLEMENT // 结算合同
     }
 }

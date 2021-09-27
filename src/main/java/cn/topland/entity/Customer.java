@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,6 +38,7 @@ public class Customer extends RecordEntity {
     /**
      * 公司性质
      */
+    @Enumerated(EnumType.STRING)
     private Type type;
 
     /**
@@ -51,41 +51,42 @@ public class Customer extends RecordEntity {
     /**
      * 来源
      */
+    @Enumerated(EnumType.STRING)
     private Source source;
 
     /**
      * 状态
      */
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     /**
      * 发票信息
      */
     @OneToOne
-    @JoinColumn(name = "invoice_id")
+    @JoinColumn(name = "invoice")
     private Invoice invoice;
 
     /**
      * 联系人
      */
     @OneToMany
-    @JoinColumn(name = "customer_id")
-    private List<Contact> contacts = new ArrayList<>();
+    @JoinColumn(name = "customer")
+    private List<Contact> contacts;
 
     /**
      * 品牌
      */
     @OneToMany
-    @JoinColumn(name = "customer_id")
-    private List<Brand> brands = new ArrayList<>();
+    @JoinColumn(name = "customer")
+    private List<Brand> brands;
 
     /**
      * 操作记录
      */
     @OneToMany
-    @JoinColumn(name = "customer_id")
-    @OrderBy("createTime asc")
-    private List<Operation> operations = new ArrayList<>();
+    @JoinColumn(name = "customer")
+    private List<Operation> operations;
 
     public enum Status {
 

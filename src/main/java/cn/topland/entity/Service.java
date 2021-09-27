@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * 服务
@@ -30,9 +31,10 @@ public class Service extends IdEntity {
     /**
      * 费用
      */
-    @ManyToOne
-    @JoinColumn(name = "cost")
-    private Cost cost;
+    @ManyToMany
+    @JoinTable(name = "services_costs",
+            joinColumns = {@JoinColumn(name = "service_id")}, inverseJoinColumns = {@JoinColumn(name = "cost_id")})
+    private List<Cost> costs;
 
     /**
      * 单位

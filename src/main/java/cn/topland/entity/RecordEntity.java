@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
 /**
@@ -23,17 +22,7 @@ public abstract class RecordEntity extends IdEntity {
     private Long creatorId;
 
     /**
-     * 创建者
-     */
-    private String creator;
-
-    /**
      * 修改者id(预留字段,为以后的复杂需求预留空间)
      */
     private Long editorId;
-
-    /**
-     * 修改者
-     */
-    private String editor;
 }

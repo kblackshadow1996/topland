@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Setter
 @Getter
 @Entity
-@Table
+@Table(name = "receive")
 public class Receive extends RecordEntity {
 
     /**
