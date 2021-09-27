@@ -1,26 +1,27 @@
 package cn.topland.controller;
 
+import cn.topland.dto.converter.PermissionConverter;
 import cn.topland.service.PermissionService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/permission")
+@RequestMapping("permission")
 public class PermissionController {
 
     @Autowired
-    private PermissionService permissionService;
+    private PermissionService service;
 
-    @GetMapping("/distinct")
-    public Response distinct(@RequestParam("ids") List<Long> ids) {
+    @Autowired
+    private PermissionConverter converter;
 
-        return Responses.success(permissionService.distinct(ids));
+    @GetMapping("/defaults")
+    public Response defaults() {
+
+        return Responses.success(converter.toPermissionDTOs(service.listDefaultPermissions()));
     }
 }

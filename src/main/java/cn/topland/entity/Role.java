@@ -17,12 +17,23 @@ import java.util.List;
 @Table(name = "role")
 public class Role extends RecordEntity {
 
+    /**
+     * directus角色
+     */
     @OneToOne
     @JoinColumn(name = "directus_role")
     private DirectusRoles role;
 
-    @ManyToMany
+    /**
+     * 功能
+     */
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "roles_authorities",
             joinColumns = {@JoinColumn(name = "role_id")}, inverseJoinColumns = {@JoinColumn(name = "authority_id")})
     private List<Authority> authorities;
+
+    /**
+     * 备注
+     */
+    private String remark;
 }
