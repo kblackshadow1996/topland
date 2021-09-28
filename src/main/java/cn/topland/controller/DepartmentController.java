@@ -16,13 +16,13 @@ public class DepartmentController {
     @Autowired
     private DepartmentService departmentService;
 
-    @GetMapping("/sync/wework/all")
+    @GetMapping("/wework/sync/all")
     public Response syncAllWeworkDept() {
 
         return Responses.success(departmentService.syncAllWeworkDept());
     }
 
-    @GetMapping("/sync/wework/{deptId}")
+    @GetMapping("/wework/sync/{deptId}")
     public Response syncWeworkDept(@PathVariable String deptId) {
 
         return Responses.success(departmentService.syncWeworkDept(deptId));

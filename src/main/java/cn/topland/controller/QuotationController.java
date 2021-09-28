@@ -23,7 +23,7 @@ public class QuotationController {
     @Autowired
     private QuotationService service;
 
-    @GetMapping("/pdf/download")
+    @GetMapping(value = "/pdf/download", consumes = "application/json")
     public Response downloadPdf(@RequestBody QuotationPdfVO pdf) {
 
         try {

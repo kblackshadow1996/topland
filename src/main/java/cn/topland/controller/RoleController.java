@@ -7,7 +7,7 @@ import cn.topland.service.AuthorityService;
 import cn.topland.service.RoleService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
-import cn.topland.vo.AuthVO;
+import cn.topland.vo.AuthorityVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +31,7 @@ public class RoleController {
     private PermissionComposer composer;
 
     @GetMapping(value = "/auth", consumes = "application/json")
-    public Response auth(@RequestBody AuthVO auth) {
+    public Response auth(@RequestBody AuthorityVO auth) {
 
         Role role = roleService.get(auth.getRole());
         return Responses.success(composer.compose(getAuths(role), authorityService.findByIds(auth.getAuths()), role.getRole().getId()));

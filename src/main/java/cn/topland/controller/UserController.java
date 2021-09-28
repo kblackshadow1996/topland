@@ -4,8 +4,10 @@ import cn.topland.dto.converter.UserConverter;
 import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
+import cn.topland.vo.DepartmentVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,7 +21,7 @@ public class UserController {
     @Autowired
     private UserConverter userConverter;
 
-    @GetMapping("/sync/wework/all")
+    @GetMapping("/wework/sync/all")
     public Response syncAll() {
 
         try {
@@ -31,12 +33,12 @@ public class UserController {
         }
     }
 
-    @GetMapping("/sync/wework")
-    public Response sync(String deptId) {
+    @GetMapping(value = "/wework/sync", consumes = "application/json")
+    public Response sync(@RequestBody DepartmentVO department) {
 
         try {
 
-            return Responses.success(userConverter.toUsersDTOs(userService.syncWeworkUser(deptId)));
+            return Responses.success(userConverter.toUsersDTOs(userService.syncWeworkUser(department.getDeptId())));
         } catch (Exception e) {
 
             return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());

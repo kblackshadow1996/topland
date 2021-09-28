@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class AuthVO implements Serializable {
+public class AuthorityVO implements Serializable {
 
     private Long role;
 
