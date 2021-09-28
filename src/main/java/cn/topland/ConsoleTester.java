@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Slf4j
 public class ConsoleTester {
 
-    public static final String DEST = "/home/zhuliangbin/桌面/2pdf";
+    public static final String DEST = "/home/zhuliangbin/桌面/2.pdf";
     public static final String SRC = "/home/zhuliangbin/桌面/1.pdf";
     public static final String LOGO = "./src/main/resources/img/logo.png";
 

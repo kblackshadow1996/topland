@@ -37,7 +37,17 @@ public class QuotationPdfOperation implements PdfOperation {
 
     private static final String LOGO = "./src/main/resources/img/logo.png";
 
-    private static final float LOGO_SCALING = (float) (1. / 16);
+    private static final float LOGO_WIDTH = 58;
+
+    private static final float LOGO_HEIGHT = 6;
+
+    private static final float HEADER_FONT_SIZE = 5;
+
+    private static final float FOOTER_FONT_SIZE = 5;
+
+    private static final float TITLE_FONT_SIZE = 11;
+
+    private static final float TITLE_MAX_WIDTH = 350;
 
     /**
      * 注册中文字体
@@ -75,18 +85,21 @@ public class QuotationPdfOperation implements PdfOperation {
             Paragraph headerRight = createHeaderRight();
             Image logo = createLogo();
             // 以下的文本、图像位置都是经验数据，与文字、图片大小有关系
-            for (int i = 1; i < pdfDoc.getNumberOfPages(); i++) {
+            for (int i = 1; i <= pdfDoc.getNumberOfPages(); i++) {
 
                 Rectangle pageSize = pdfDoc.getPage(i).getPageSize();
                 if (i == 1) { // 第一页加标题
 
                     doc.showTextAligned(title, pageSize.getWidth() / 2, pageSize.getTop() - 35, i, TextAlignment.CENTER, VerticalAlignment.BOTTOM, 0);
                 }
+
                 // 设置左右页眉
-                doc.showTextAligned(headerLeft, 111, pageSize.getTop() - 55, i, TextAlignment.CENTER, VerticalAlignment.BOTTOM, 0);
-                doc.showTextAligned(headerRight, pageSize.getRight() - 115, pageSize.getTop() - 55, i, TextAlignment.CENTER, VerticalAlignment.BOTTOM, 0);
+                headerLeft.setFixedPosition(90, pageSize.getTop() - 55, 300);
+                headerRight.setFixedPosition(pageSize.getRight() - 140, pageSize.getTop() - 55, 50);
+                doc.add(headerLeft);
+                doc.add(headerRight);
                 // 设置logo
-                logo.setFixedPosition(i, 90, pageSize.getTop() - 20);
+                logo.setFixedPosition(90, pageSize.getTop() - 20);
                 doc.add(logo);
             }
             doc.close();
@@ -100,8 +113,8 @@ public class QuotationPdfOperation implements PdfOperation {
     private Image createLogo() throws MalformedURLException {
 
         Image image = new Image(ImageDataFactory.create(LOGO));
-        image.setHeight(image.getImageHeight() * LOGO_SCALING);
-        image.setWidth(image.getImageWidth() * LOGO_SCALING);
+        image.setHeight(LOGO_HEIGHT);
+        image.setWidth(LOGO_WIDTH);
         return image;
     }
 
@@ -109,16 +122,18 @@ public class QuotationPdfOperation implements PdfOperation {
     private Paragraph createHeaderRight() throws IOException {
 
         return new Paragraph(QUOTATION_DATE_PREFIX + date)
+                .setMaxWidth(300)
                 .setFont(PdfFontFactory.createRegisteredFont("微软雅黑", PdfEncodings.IDENTITY_H, true))
-                .setFontSize(5);
+                .setFontSize(HEADER_FONT_SIZE);
     }
 
     // 页眉左侧文字
     private Paragraph createHeaderLeft() throws IOException {
 
         return new Paragraph(QUOTATION_NO_PREFIX + number)
+                .setMaxWidth(300)
                 .setFont(PdfFontFactory.createRegisteredFont("微软雅黑", PdfEncodings.IDENTITY_H, true))
-                .setFontSize(5);
+                .setFontSize(HEADER_FONT_SIZE);
     }
 
     // 首页标题
@@ -126,8 +141,8 @@ public class QuotationPdfOperation implements PdfOperation {
 
         return new Paragraph(title)
                 .setFont(PdfFontFactory.createRegisteredFont("微软雅黑", PdfEncodings.IDENTITY_H, true))
-                .setFontSize(11)
+                .setFontSize(TITLE_FONT_SIZE)
                 .setBold()
-                .setMaxWidth(350);
+                .setMaxWidth(TITLE_MAX_WIDTH);
     }
 }

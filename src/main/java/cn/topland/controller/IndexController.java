@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @Controller
 public class IndexController {
@@ -15,11 +14,11 @@ public class IndexController {
     @Autowired
     private WeworkConfig weworkConfig;
 
-//    @GetMapping("/heartbeat")
-//    public Response heartbeat() {
-//
-//        return Responses.success("hello world!");
-//    }
+    @GetMapping("/heartbeat")
+    public Response heartbeat() {
+
+        return Responses.success("hello world!");
+    }
 
     @GetMapping("/test/login")
     public String heartbeat(Model model) {

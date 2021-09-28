@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 
 /**
@@ -17,12 +19,16 @@ import javax.persistence.MappedSuperclass;
 public abstract class RecordEntity extends IdEntity {
 
     /**
-     * 创建者id(预留字段,为以后的复杂需求预留空间)
+     * 创建者(预留字段,为以后的复杂需求预留空间)
      */
-    private Long creatorId;
+    @ManyToOne
+    @JoinColumn(name = "creator")
+    private User creator;
 
     /**
-     * 修改者id(预留字段,为以后的复杂需求预留空间)
+     * 修改者(预留字段,为以后的复杂需求预留空间)
      */
-    private Long editorId;
+    @ManyToOne
+    @JoinColumn(name = "editor")
+    private User editor;
 }

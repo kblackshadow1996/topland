@@ -10,6 +10,7 @@ import org.hibernate.annotations.TypeDef;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.util.Objects;
 
 /**
  * 权限
@@ -20,7 +21,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "permission")
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-public class Permission extends SimpleIdEntity {
+public class Permission extends SimpleIdEntity implements Cloneable {
 
     /**
      * 数据集
@@ -62,4 +63,48 @@ public class Permission extends SimpleIdEntity {
      * 是否初始字段
      */
     private Boolean init;
+
+    @Override
+    public boolean equals(Object that) {
+
+        if (this == that) {
+
+            return true;
+        }
+        if (that == null || getClass() != that.getClass()) {
+
+            return false;
+        }
+        return equalsTo((Permission) that);
+    }
+
+    private boolean equalsTo(Permission that) {
+
+        return Objects.equals(this.collection, that.collection)
+                && Objects.equals(this.action, that.action)
+                && Objects.equals(this.permissions, that.permissions)
+                && Objects.equals(this.validation, that.validation)
+                && Objects.equals(this.presets, that.presets)
+                && Objects.equals(this.fields, that.fields);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(collection, action, permissions, validation, presets, fields);
+    }
+
+    @Override
+    public Permission clone() {
+
+        Permission permission = new Permission();
+        permission.setCollection(collection);
+        permission.setAction(action);
+        permission.setPermissions(permissions);
+        permission.setPresets(presets);
+        permission.setValidation(validation);
+        permission.setFields(fields);
+        permission.setInit(init);
+        return permission;
+    }
 }

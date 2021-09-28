@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.LocalDate;
 
@@ -27,12 +28,16 @@ public class QuotationService {
             new File(temDir).mkdirs();
         }
         String randomName = UUIDGenerator.generate();
+        String htmlPath = temDir + "/" + randomName + ".html";
         String tmp = temDir + "/" + randomName + ".tmp.pdf";
-        String dest = temDir + "/" + randomName + "pdf";
+        String dest = temDir + "/" + randomName + ".pdf";
+
+        // 存html
+        FileUtils.writeStringToFile(new File(htmlPath), html, StandardCharsets.UTF_8);
 
         // 生成pdf
         HtmlToPdfParams params = new HtmlToPdfParamsFactory().quotation();
-        new HtmlToPdfOperation(params).apply(html, tmp);
+        new HtmlToPdfOperation(params).apply(htmlPath, tmp);
 
         // 处理pdf
         QuotationPdfOperation pdfOperation = getPdfOperation(title, number, date);

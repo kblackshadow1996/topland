@@ -7,11 +7,12 @@ import cn.topland.service.AuthorityService;
 import cn.topland.service.RoleService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
+import cn.topland.vo.AuthVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -29,11 +30,11 @@ public class RoleController {
     @Autowired
     private PermissionComposer composer;
 
-    @GetMapping("/auth")
-    public Response auth(Long roleId, @RequestParam("auths") List<Long> auths) {
+    @GetMapping(value = "/auth", consumes = "application/json")
+    public Response auth(@RequestBody AuthVO auth) {
 
-        Role role = roleService.get(roleId);
-        return Responses.success(composer.compose(getAuths(role), authorityService.findByIds(auths), role.getRole().getId()));
+        Role role = roleService.get(auth.getRole());
+        return Responses.success(composer.compose(getAuths(role), authorityService.findByIds(auth.getAuths()), role.getRole().getId()));
     }
 
     private List<Authority> getAuths(Role role) {

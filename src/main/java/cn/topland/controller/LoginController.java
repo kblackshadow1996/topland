@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpSession;
-
 /**
  * 登录
  */
@@ -35,13 +33,12 @@ public class LoginController {
             return Responses.success(weworkConfig);
         } catch (Exception e) {
 
-            return Responses.fail(Response.ACCESS_FORBIDDEN, e.getMessage());
+            return Responses.fail(Response.FORBIDDEN, e.getMessage());
         }
     }
 
     /**
-     * @param code    企业微信登录成功回调时用户特定字符，有效期5分钟
-     * @param session 会话
+     * @param code 企业微信登录成功回调时用户特定字符，有效期5分钟
      */
     @GetMapping("/login/wework")
     public Response loginByWework(String code, String state) {
@@ -52,23 +49,10 @@ public class LoginController {
 
                 return Responses.success(converter.toUserDTO(userService.loginByWework(code)));
             }
-            return Responses.fail(Response.INTERNAL_ERROR, "scan wework qr code failed");
+            return Responses.fail(Response.INTERNAL_SERVER_ERROR, "扫描二维码失败");
         } catch (Exception e) {
 
-            return Responses.fail(Response.ACCESS_FORBIDDEN, e.getMessage());
-        }
-    }
-
-    @GetMapping("/logout")
-    public Response logout(HttpSession session) {
-
-        try {
-
-            userService.logout(session);
-            return Responses.success();
-        } catch (Exception e) {
-
-            return Responses.fail(Response.ACCESS_FORBIDDEN, e.getMessage());
+            return Responses.fail(Response.FORBIDDEN, e.getMessage());
         }
     }
 }

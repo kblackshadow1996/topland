@@ -1,11 +1,9 @@
 package cn.topland.controller;
 
 import cn.topland.dto.converter.UserConverter;
-import cn.topland.entity.User;
 import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
-import cn.topland.util.annotation.bind.SessionUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +27,7 @@ public class UserController {
             return Responses.success(userConverter.toUsersDTOs(userService.syncAllWeworkUser()));
         } catch (Exception e) {
 
-            return Responses.fail(Response.INTERNAL_ERROR, e.getMessage());
+            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
@@ -41,7 +39,7 @@ public class UserController {
             return Responses.success(userConverter.toUsersDTOs(userService.syncWeworkUser(deptId)));
         } catch (Exception e) {
 
-            return Responses.fail(Response.INTERNAL_ERROR, e.getMessage());
+            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 }

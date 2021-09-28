@@ -1,59 +1,42 @@
 package cn.topland.util;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * REST接口数据统一格式
  */
+@Setter
+@Getter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Response implements Serializable {
 
-    public static final int OK = 200;
-    public static final int ACCESS_FORBIDDEN = 403;
-    public static final int INTERNAL_ERROR = 500;
+    public static final String INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
 
-    private int code;
+    public static final String FORBIDDEN = "FORBIDDEN";
+
+    private String code;
 
     private Object data;
 
     private String message;
 
-    public Response(int code, Object data, String message) {
-        this.code = code;
-        this.data = data;
-        this.message = message;
-    }
+    private List<Errors> errors;
 
-    public Response(int code, String message) {
-        this.code = code;
-        this.message = message;
-    }
+    public Response(Object data) {
 
-    public Response(int code, Object data) {
-        this.code = code;
         this.data = data;
     }
 
-    public int getCode() {
-        return code;
-    }
+    public Response(String code, String message) {
 
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public Object getData() {
-        return data;
-    }
-
-    public void setData(Object data) {
-        this.data = data;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
+        errors = new ArrayList<>();
+        Errors error = new Errors(message, new Errors.Extensions(code));
+        errors.add(error);
     }
 }

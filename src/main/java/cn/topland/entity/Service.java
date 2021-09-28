@@ -32,7 +32,7 @@ public class Service extends IdEntity {
      * 费用
      */
     @ManyToMany
-    @JoinTable(name = "services_costs",
+    @JoinTable(name = "service_cost",
             joinColumns = {@JoinColumn(name = "service_id")}, inverseJoinColumns = {@JoinColumn(name = "cost_id")})
     private List<Cost> costs;
 

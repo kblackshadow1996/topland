@@ -8,11 +8,10 @@ import cn.topland.gateway.WeworkGateway;
 import cn.topland.gateway.response.UserInfo;
 import cn.topland.gateway.response.WeworkUser;
 import cn.topland.service.parser.WeworkUserParser;
-import cn.topland.util.annotation.SessionManager;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,9 +19,6 @@ import static cn.topland.entity.User.Source;
 
 @Service
 public class UserService {
-
-    @Autowired
-    private SessionManager sessionManager;
 
     @Autowired
     private WeworkGateway weworkGateway;
@@ -55,24 +51,25 @@ public class UserService {
 
                 return loginByWeworkUser(user);
             }
-            throw new Exception("get wework user failed");
+            throw new Exception("获取微信用户失败");
         }
-        throw new Exception("get wework user info failed");
+        throw new Exception("获取微信用户信息失败");
     }
 
     /**
      * 按部门同步(只同步部门直属人员)
      */
-    public List<User> syncWeworkUser(String deptId) {
+    public List<User> syncWeworkUser(String deptId) throws Exception {
 
+        // 用于关联用户部门
+        List<Department> departments = deptRepository.listAllDeptIds(Department.Source.WEWORK);
+        checkIfSyncDept(departments);
         List<WeworkUser> weworkUsers = weworkGateway.listUsers(deptId, false);
         // 企业微信同步的用户
         List<User> users = userParser.parse(weworkUsers);
         // 需要更新的部门用户
         List<User> persistUsers = repository.findBySource(Source.WEWORK);
         List<User> deptUsers = getUserOfDepartment(persistUsers, deptId);
-        // 用于关联用户部门
-        List<Department> departments = deptRepository.listAllDeptIds(Department.Source.WEWORK);
 
         return syncUsers(deptUsers, users, mappingUserDept(weworkUsers, departments));
     }
@@ -80,9 +77,10 @@ public class UserService {
     /**
      * 同步所有
      */
-    public List<User> syncAllWeworkUser() {
+    public List<User> syncAllWeworkUser() throws Exception {
 
         List<Department> departments = deptRepository.listAllDeptIds(Department.Source.WEWORK);
+        checkIfSyncDept(departments);
         List<WeworkUser> weworkUsers = weworkGateway.listUsers(filterTopDept(departments).getDeptId(), true);
         List<User> users = userParser.parse(weworkUsers);
         List<User> persistUsers = repository.findBySource(Source.WEWORK);
@@ -171,12 +169,15 @@ public class UserService {
             return user;
         } else { // 禁用
 
-            throw new Exception("user was forbidden");
+            throw new Exception("用户已被禁用");
         }
     }
 
-    public void logout(HttpSession session) {
+    private void checkIfSyncDept(List<Department> departments) throws Exception {
 
-        sessionManager.removeUser(session);
+        if (CollectionUtils.isEmpty(departments)) {
+
+            throw new Exception("请先同步组织");
+        }
     }
 }

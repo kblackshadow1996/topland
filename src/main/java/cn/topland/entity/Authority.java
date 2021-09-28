@@ -26,7 +26,7 @@ public class Authority extends SimpleIdEntity {
      * 组装directus_permissions的字段对象
      */
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "authorities_permissions",
+    @JoinTable(name = "authority_permission",
             joinColumns = {@JoinColumn(name = "authority_id")}, inverseJoinColumns = {@JoinColumn(name = "permission_id")})
     List<Permission> permissions;
 }

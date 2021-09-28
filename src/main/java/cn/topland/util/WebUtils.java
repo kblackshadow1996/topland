@@ -27,14 +27,13 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static javax.ws.rs.core.Response.*;
+import static javax.ws.rs.core.Response.Status;
 
 /**
  * web get/post工具
@@ -51,6 +50,18 @@ public final class WebUtils {
     public static Reply postWithoutSsl(String url, MultiValueMap<String, String> parameters) {
 
         return doPost(wrapClientWithoutSsl(new DefaultHttpClient()), url, parameters);
+    }
+
+    public static String get(String url, String charset) {
+
+        try {
+
+            return doGet(new DefaultHttpClient(), url, charset);
+        } catch (IOException e) {
+
+            logger.error("call failed: ", e);
+            return null;
+        }
     }
 
     public static String get(String url) {

@@ -51,7 +51,7 @@ public class User extends RecordEntity {
      * 部门
      */
     @ManyToMany
-    @JoinTable(name = "users_departments",
+    @JoinTable(name = "user_departments",
             joinColumns = {@JoinColumn(name = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "department_id")})
     private List<Department> departments;
 
