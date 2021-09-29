@@ -19,7 +19,7 @@ public class Solution extends RecordEntity {
     /**
      * 解决日期
      */
-    private LocalDate solveDate;
+    private LocalDate date;
 
     /**
      * 实际损失金额

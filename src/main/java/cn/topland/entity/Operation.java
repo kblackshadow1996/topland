@@ -40,6 +40,7 @@ public class Operation extends RecordEntity {
         CUSTOMER, // 客户
         BRAND, // 品牌
         CONTRACT, // 合同
-        SETTLEMENT // 结算合同
+        SETTLEMENT, // 结算合同
+        EXCEPTION // 异常
     }
 }
