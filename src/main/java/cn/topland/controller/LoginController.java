@@ -5,11 +5,9 @@ import cn.topland.dto.converter.UserConverter;
 import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
-import cn.topland.vo.WeworkLoginVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -39,15 +37,14 @@ public class LoginController {
         }
     }
 
-    @GetMapping(value = "/wework/login", consumes = "application/json")
-    public Response loginByWework(@RequestBody WeworkLoginVO login) {
+    @GetMapping(value = "/wework/login")
+    public Response loginByWework(String code, String state) {
 
         try {
 
-            if (StringUtils.isNotBlank(login.getCode())
-                    && StringUtils.equals(login.getState(), weworkConfig.getState())) {
+            if (StringUtils.isNotBlank(code) && StringUtils.equals(state, weworkConfig.getState())) {
 
-                return Responses.success(converter.toUserDTO(userService.loginByWework(login.getCode())));
+                return Responses.success(converter.toUserDTO(userService.loginByWework(code)));
             }
             return Responses.fail(Response.INTERNAL_SERVER_ERROR, "扫描二维码失败");
         } catch (Exception e) {
