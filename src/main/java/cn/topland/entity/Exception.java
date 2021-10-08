@@ -20,12 +20,6 @@ import java.util.List;
 public class Exception extends RecordEntity {
 
     /**
-     * 异常分类
-     */
-    @Enumerated(EnumType.STRING)
-    private Classification classification;
-
-    /**
      * 订单
      */
     @ManyToMany
@@ -143,12 +137,6 @@ public class Exception extends RecordEntity {
 
         RESOLVED, // 已解决
         UNRESOLVED // 待处理
-    }
-
-    public enum Classification {
-
-        INTERNAL, // 内部
-        ORDER // 订单
     }
 
     public enum Action {

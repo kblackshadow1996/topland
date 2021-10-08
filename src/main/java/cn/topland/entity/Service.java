@@ -31,10 +31,9 @@ public class Service extends IdEntity {
     /**
      * 费用
      */
-    @ManyToMany
-    @JoinTable(name = "service_cost",
-            joinColumns = {@JoinColumn(name = "service_id")}, inverseJoinColumns = {@JoinColumn(name = "cost_id")})
-    private List<Cost> costs;
+    @OneToOne
+    @JoinColumn(name = "cost")
+    private Cost cost;
 
     /**
      * 单位
@@ -66,6 +65,7 @@ public class Service extends IdEntity {
     /**
      * 性质
      */
+    @Enumerated(value = EnumType.STRING)
     private Type type;
 
     public enum Type {

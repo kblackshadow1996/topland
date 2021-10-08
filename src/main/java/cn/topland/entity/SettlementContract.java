@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -29,6 +30,11 @@ public class SettlementContract extends RecordEntity {
     private LocalDate contractDate;
 
     /**
+     * 应收金额
+     */
+    private BigDecimal receivable;
+
+    /**
      * 关联订单
      */
     @OneToOne
@@ -47,13 +53,22 @@ public class SettlementContract extends RecordEntity {
     @JoinColumn(name = "settlement_contract")
     private List<Receive> receives;
 
+    /**
+     * 附件
+     */
     @OneToMany
     @JoinColumn(name = "settlement")
     private List<Attachment> attachments;
 
+    /**
+     * 状态
+     */
     @Enumerated(value = EnumType.STRING)
     private Status status;
 
+    /**
+     * 操作
+     */
     @OneToMany
     @JoinColumn(name = "settlement")
     private List<Operation> operations;

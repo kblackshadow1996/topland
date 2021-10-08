@@ -28,6 +28,7 @@ public class Contract extends RecordEntity {
     /**
      * 类型
      */
+    @Enumerated(value = EnumType.STRING)
     private Type type;
 
     /**

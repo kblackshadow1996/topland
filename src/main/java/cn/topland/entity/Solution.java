@@ -29,7 +29,7 @@ public class Solution extends RecordEntity {
     /**
      * 实际损失情况
      */
-    private BigDecimal actualLossCondition;
+    private String actualLossCondition;
 
     /**
      * 解决方案

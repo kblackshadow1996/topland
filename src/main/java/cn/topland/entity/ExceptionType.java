@@ -30,11 +30,6 @@ public class ExceptionType extends SimpleIdEntity {
     private String remark;
 
     /**
-     * 最优解决方案
-     */
-    private String solution;
-
-    /**
      * 启用状态
      */
     private Boolean active;

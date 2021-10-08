@@ -28,7 +28,7 @@ public class Role extends RecordEntity {
      * 功能
      */
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "roles_authorities",
+    @JoinTable(name = "role_authority",
             joinColumns = {@JoinColumn(name = "role_id")}, inverseJoinColumns = {@JoinColumn(name = "authority_id")})
     private List<Authority> authorities;
 

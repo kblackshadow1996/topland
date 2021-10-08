@@ -4,9 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * 发票
@@ -21,6 +19,7 @@ public class Invoice extends IdEntity {
     /**
      * 类型
      */
+    @Enumerated(value = EnumType.STRING)
     private Type type;
 
     /**

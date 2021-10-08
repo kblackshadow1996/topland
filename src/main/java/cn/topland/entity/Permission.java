@@ -59,11 +59,6 @@ public class Permission extends SimpleIdEntity implements Cloneable {
      */
     private String fields;
 
-    /**
-     * 是否初始字段
-     */
-    private Boolean init;
-
     @Override
     public boolean equals(Object that) {
 
@@ -104,7 +99,6 @@ public class Permission extends SimpleIdEntity implements Cloneable {
         permission.setPresets(presets);
         permission.setValidation(validation);
         permission.setFields(fields);
-        permission.setInit(init);
         return permission;
     }
 }
