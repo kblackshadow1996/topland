@@ -20,6 +20,12 @@ import java.util.List;
 public class Exception extends RecordEntity {
 
     /**
+     * 异常属性
+     */
+    @Enumerated(value = EnumType.STRING)
+    private Attribute attribute;
+
+    /**
      * 订单
      */
     @ManyToMany
@@ -37,7 +43,7 @@ public class Exception extends RecordEntity {
     /**
      * 日期
      */
-    private LocalDate date;
+    private LocalDate createDate;
 
     /**
      * 归属部门
@@ -102,13 +108,6 @@ public class Exception extends RecordEntity {
     private String estimatedLossCondition;
 
     /**
-     * 处理
-     */
-    @OneToOne
-    @JoinColumn(name = "solution")
-    private Solution solution;
-
-    /**
      * 等级
      */
     @Enumerated(EnumType.STRING)
@@ -119,6 +118,36 @@ public class Exception extends RecordEntity {
      */
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    /**
+     * 解决日期
+     */
+    private LocalDate closeDate;
+
+    /**
+     * 实际损失金额
+     */
+    private BigDecimal actualLoss;
+
+    /**
+     * 实际损失情况
+     */
+    private String actualLossCondition;
+
+    /**
+     * 解决方案
+     */
+    private String solution;
+
+    /**
+     * 最优解决方案
+     */
+    private String optimalSolution;
+
+    /**
+     * 是否实施最优解
+     */
+    private Boolean optimal;
 
     public enum Level {
 
@@ -138,5 +167,11 @@ public class Exception extends RecordEntity {
         UPDATE,
         CREATE_SOLUTION,
         UPDATE_SOLUTION
+    }
+
+    public enum Attribute {
+
+        INTERNAL, // 内部异常
+        ORDER // 订单异常
     }
 }
