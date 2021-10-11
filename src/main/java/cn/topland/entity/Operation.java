@@ -35,6 +35,11 @@ public class Operation extends RecordEntity {
     @Enumerated(value = EnumType.STRING)
     private Module module;
 
+    /**
+     * 对应模块对象id
+     */
+    private String moduleId;
+
     public enum Module {
 
         CUSTOMER, // 客户

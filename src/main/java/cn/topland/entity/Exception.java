@@ -120,13 +120,6 @@ public class Exception extends RecordEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    /**
-     * 操作记录
-     */
-    @OneToMany
-    @JoinColumn(name = "exception")
-    private List<Operation> operations;
-
     public enum Level {
 
         NORMAL,

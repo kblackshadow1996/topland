@@ -33,8 +33,8 @@ public class Brand extends RecordEntity {
      * 制片
      */
     @ManyToOne
-    @JoinColumn(name = "production")
-    private User production;
+    @JoinColumn(name = "producer")
+    private User producer;
 
     /**
      * 经营信息
@@ -47,14 +47,6 @@ public class Brand extends RecordEntity {
     @OneToMany(targetEntity = Contact.class)
     @JoinColumn(name = "brand")
     private List<Contact> contacts;
-
-    /**
-     * 操作记录
-     */
-    @OneToMany
-    @JoinColumn(name = "brand")
-    @OrderBy("createTime desc")
-    private List<Operation> operations;
 
     public enum Action {
 

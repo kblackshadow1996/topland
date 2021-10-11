@@ -81,13 +81,6 @@ public class Customer extends RecordEntity {
     @JoinColumn(name = "customer")
     private List<Brand> brands;
 
-    /**
-     * 操作记录
-     */
-    @OneToMany
-    @JoinColumn(name = "customer")
-    private List<Operation> operations;
-
     public enum Status {
 
         COOPERATING, // 合作中

@@ -22,6 +22,7 @@ public class SettlementContract extends RecordEntity {
     /**
      * 编号
      */
+    @Column(unique = true)
     private String identity;
 
     /**
@@ -65,13 +66,6 @@ public class SettlementContract extends RecordEntity {
      */
     @Enumerated(value = EnumType.STRING)
     private Status status;
-
-    /**
-     * 操作
-     */
-    @OneToMany
-    @JoinColumn(name = "settlement")
-    private List<Operation> operations;
 
     public enum Status {
 

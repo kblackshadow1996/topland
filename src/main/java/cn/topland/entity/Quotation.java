@@ -26,6 +26,7 @@ public class Quotation extends IdEntity {
     /**
      * 单号
      */
+    @Column(unique = true)
     private String identity;
 
     /**
