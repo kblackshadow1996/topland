@@ -1,12 +1,15 @@
 package cn.topland.dto;
 
 import cn.topland.entity.Department;
+import cn.topland.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.List;
+
+import static cn.topland.entity.User.*;
 
 @Setter
 @Getter
@@ -41,7 +44,7 @@ public class UserDTO implements Serializable {
     /**
      * 部门
      */
-    private List<Department> departments;
+    private List<DepartmentDTO> departments;
 
     /**
      * 部门负责人
@@ -51,7 +54,7 @@ public class UserDTO implements Serializable {
     /**
      * 来源
      */
-    private String source;
+    private Source source;
 
     /**
      * 工号

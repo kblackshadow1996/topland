@@ -63,14 +63,13 @@ public class Customer extends RecordEntity {
     /**
      * 发票信息
      */
-    @OneToOne
-    @JoinColumn(name = "invoice")
+    @Embedded
     private Invoice invoice;
 
     /**
      * 联系人
      */
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "customer")
     private List<Contact> contacts;
 

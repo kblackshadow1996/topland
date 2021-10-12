@@ -1,7 +1,10 @@
 package cn.topland.controller;
 
 import cn.topland.dto.converter.UserConverter;
+import cn.topland.entity.User;
 import cn.topland.service.UserService;
+import cn.topland.util.AccessException;
+import cn.topland.util.InternalException;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,24 +22,34 @@ public class UserController {
     @Autowired
     private UserConverter userConverter;
 
-    @GetMapping("/wework/sync/all")
-    public Response syncAll() {
+    @Autowired
+    private PermissionValidator validator;
 
+    @GetMapping("/wework/sync/all")
+    public Response syncAll(Long userId) {
+
+        User user = userService.get(userId);
         try {
 
-            return Responses.success(userConverter.toUsersDTOs(userService.syncAllWeworkUser()));
-        } catch (Exception e) {
+            validator.validateUserPermissions(user.getRole());
+            return Responses.success(userConverter.toUsersDTOs(userService.syncAllWeworkUser(user)));
+        } catch (InternalException e) {
 
             return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
+        } catch (AccessException e) {
+
+            return Responses.fail(Response.FORBIDDEN, e.getMessage());
         }
     }
 
     @GetMapping(value = "/wework/sync")
-    public Response sync(String deptId) {
+    public Response sync(String deptId, Long userId) {
 
+        User user = userService.get(userId);
         try {
 
-            return Responses.success(userConverter.toUsersDTOs(userService.syncWeworkUser(deptId)));
+            validator.validateUserPermissions(user.getRole());
+            return Responses.success(userConverter.toUsersDTOs(userService.syncWeworkUser(deptId, user)));
         } catch (Exception e) {
 
             return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());

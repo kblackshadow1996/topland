@@ -4,7 +4,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 /**
  * 发票
@@ -12,20 +14,19 @@ import javax.persistence.*;
 @Setter
 @Getter
 @NoArgsConstructor
-@Entity
-@Table(name = "invoice")
-public class Invoice extends IdEntity {
+@Embeddable
+public class Invoice {
 
     /**
      * 类型
      */
     @Enumerated(value = EnumType.STRING)
-    private Type type;
+    private InvoiceType invoiceType;
 
     /**
      * 纳税人识别号
      */
-    private String identify;
+    private String identity;
 
     /**
      * 邮寄地址
@@ -52,7 +53,7 @@ public class Invoice extends IdEntity {
      */
     private String account;
 
-    public enum Type {
+    public enum InvoiceType {
 
         NORMAL, // 普通
         SPECIAL // 专用

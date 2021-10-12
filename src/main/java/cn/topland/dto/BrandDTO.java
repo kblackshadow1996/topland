@@ -1,4 +1,4 @@
-package cn.topland.vo;
+package cn.topland.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Setter
 @Getter
-public class BrandVO implements Serializable {
+public class BrandDTO implements Serializable {
 
     private Long id;
 
@@ -20,5 +20,5 @@ public class BrandVO implements Serializable {
 
     private String business;
 
-    private List<ContactVO> contracts;
+    private List<ContactDTO> contracts;
 }

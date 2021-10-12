@@ -20,6 +20,8 @@ public class Response implements Serializable {
 
     public static final String FORBIDDEN = "FORBIDDEN";
 
+    public static final String FAILED_VALIDATION = "FAILED_VALIDATION";
+
     private String code;
 
     private Object data;

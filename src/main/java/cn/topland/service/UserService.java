@@ -8,6 +8,7 @@ import cn.topland.gateway.WeworkGateway;
 import cn.topland.gateway.response.UserInfo;
 import cn.topland.gateway.response.WeworkUser;
 import cn.topland.service.parser.WeworkUserParser;
+import cn.topland.util.InternalException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,15 +52,15 @@ public class UserService {
 
                 return loginByWeworkUser(user);
             }
-            throw new Exception("获取微信用户失败");
+            throw new InternalException("获取微信用户失败");
         }
-        throw new Exception("获取微信用户信息失败");
+        throw new InternalException("获取微信用户信息失败");
     }
 
     /**
      * 按部门同步(只同步部门直属人员)
      */
-    public List<User> syncWeworkUser(String deptId) throws Exception {
+    public List<User> syncWeworkUser(String deptId, User creator) throws Exception {
 
         // 用于关联用户部门
         List<Department> departments = deptRepository.listAllDeptIds(Department.Source.WEWORK);
@@ -68,16 +69,17 @@ public class UserService {
         // 企业微信同步的用户
         List<User> users = userParser.parse(weworkUsers);
         // 需要更新的部门用户
-        List<User> persistUsers = repository.findBySource(Source.WEWORK);
-        List<User> deptUsers = getUserOfDepartment(persistUsers, deptId);
+        List<User> allUsers = repository.findBySource(Source.WEWORK);
+        List<User> deptUsers = getUserOfDepartment(allUsers, deptId);
 
-        return syncUsers(deptUsers, users, mappingUserDept(weworkUsers, departments));
+        List<User> mergeUsers = syncUsers(deptUsers, users, mappingUserDept(weworkUsers, departments), creator);
+        return repository.saveAllAndFlush(mergeUsers);
     }
 
     /**
      * 同步所有
      */
-    public List<User> syncAllWeworkUser() throws Exception {
+    public List<User> syncAllWeworkUser(User creator) throws InternalException {
 
         List<Department> departments = deptRepository.listAllDeptIds(Department.Source.WEWORK);
         checkIfSyncDept(departments);
@@ -86,7 +88,8 @@ public class UserService {
         List<User> persistUsers = repository.findBySource(Source.WEWORK);
         forbiddenResigns(persistUsers, users);
 
-        return syncUsers(persistUsers, users, mappingUserDept(weworkUsers, departments));
+        List<User> mergeUsers = syncUsers(persistUsers, users, mappingUserDept(weworkUsers, departments), creator);
+        return repository.saveAllAndFlush(mergeUsers);
     }
 
     // 如果离职自动被禁用
@@ -113,7 +116,7 @@ public class UserService {
         return userDeptMap;
     }
 
-    private List<User> syncUsers(List<User> persistUsers, List<User> users, Map<String, List<Department>> userDeptMap) {
+    private List<User> syncUsers(List<User> persistUsers, List<User> users, Map<String, List<Department>> userDeptMap, User creator) {
 
         Map<String, User> userMap = persistUsers.stream().collect(Collectors.toMap(User::getUserId, u -> u));
         users.forEach(user -> {
@@ -123,14 +126,16 @@ public class UserService {
                 updateUser(userMap.get(user.getUserId()), user);
             } else {
 
-                userMap.put(user.getUserId(), createUser(user, userDeptMap.get(user.getUserId())));
+                userMap.put(user.getUserId(), createUser(user, userDeptMap.get(user.getUserId()), creator));
             }
         });
         return new ArrayList<>(userMap.values());
     }
 
-    private User createUser(User user, List<Department> departments) {
+    private User createUser(User user, List<Department> departments, User creator) {
 
+        user.setCreator(creator);
+        user.setEditor(creator);
         user.setDepartments(departments);
         return user;
     }
@@ -162,22 +167,22 @@ public class UserService {
                 .findFirst().get();
     }
 
-    private User loginByWeworkUser(User user) throws Exception {
+    private User loginByWeworkUser(User user) throws InternalException {
 
         if (user.getActive()) { // 启用
 
             return user;
         } else { // 禁用
 
-            throw new Exception("用户已被禁用");
+            throw new InternalException("用户已被禁用");
         }
     }
 
-    private void checkIfSyncDept(List<Department> departments) throws Exception {
+    private void checkIfSyncDept(List<Department> departments) throws InternalException {
 
         if (CollectionUtils.isEmpty(departments)) {
 
-            throw new Exception("请先同步组织");
+            throw new InternalException("请先同步组织");
         }
     }
 }

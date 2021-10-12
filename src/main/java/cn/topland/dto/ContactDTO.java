@@ -1,14 +1,15 @@
-package cn.topland.vo;
+package cn.topland.dto;
 
-import cn.topland.entity.Contact.Gender;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
 
+import static cn.topland.entity.Contact.Gender;
+
 @Setter
 @Getter
-public class ContactVO implements Serializable {
+public class ContactDTO implements Serializable {
 
     private Long id;
 
