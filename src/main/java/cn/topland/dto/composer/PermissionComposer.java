@@ -49,7 +49,7 @@ public class PermissionComposer {
 
         return permissions.stream().map(p -> {
 
-            PermissionDTO permission = converter.toPermissionDTO(p);
+            PermissionDTO permission = converter.toDTO(p);
             permission.setOperation(Operation.CREATE);
             return permission;
         }).collect(Collectors.toList());
@@ -59,7 +59,7 @@ public class PermissionComposer {
 
         return permissions.stream().map(p -> {
 
-            PermissionDTO permission = converter.toPermissionDTO(p);
+            PermissionDTO permission = converter.toDTO(p);
             permission.setOperation(Operation.DELETE);
             return permission;
         }).collect(Collectors.toList());
