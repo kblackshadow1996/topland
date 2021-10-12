@@ -14,11 +14,13 @@ public class BrandVO implements Serializable {
 
     private String name;
 
+    private Long customer;
+
     private Long seller;
 
     private Long producer;
 
     private String business;
 
-    private List<ContactVO> contracts;
+    private List<ContactVO> contacts;
 }

@@ -1,6 +1,5 @@
 package cn.topland.dto;
 
-import cn.topland.entity.User;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,7 +19,7 @@ public class CustomerDTO implements Serializable {
 
     private String name;
 
-    private UserDTO seller;
+    private String seller;
 
     private String business;
 
@@ -46,9 +45,9 @@ public class CustomerDTO implements Serializable {
 
     private List<ContactDTO> contacts;
 
-    private UserDTO creator;
+    private String creator;
 
-    private UserDTO editor;
+    private String editor;
 
     private LocalDateTime createTime;
 

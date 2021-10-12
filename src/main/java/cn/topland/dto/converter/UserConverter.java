@@ -5,24 +5,23 @@ import cn.topland.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class UserConverter {
-
-    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+public class UserConverter extends BaseConverter<User, UserDTO> {
 
     @Autowired
     private DepartmentConverter departmentConverter;
 
-    public List<UserDTO> toUsersDTOs(List<User> users) {
+    @Override
+    public List<UserDTO> toDTOs(List<User> users) {
 
-        return users.stream().map(this::toUserDTO).collect(Collectors.toList());
+        return users.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    public UserDTO toUserDTO(User user) {
+    @Override
+    public UserDTO toDTO(User user) {
 
         return user != null
                 ? composeUserDTO(user)
@@ -41,12 +40,12 @@ public class UserConverter {
         userDTO.setActive(user.getActive());
         userDTO.setRemark(user.getRemark());
         userDTO.setSource(user.getSource());
-        userDTO.setCreatorId(userDTO.getCreatorId());
-        userDTO.setCreateTime(DateTimeFormatter.ofPattern(DATE_FORMAT).format(user.getCreateTime()));
+        userDTO.setCreator(getUserName(user));
+        userDTO.setCreateTime(user.getCreateTime());
 
         userDTO.setExternalPosition(user.getExternalPosition());
         userDTO.setInternalPosition(user.getInternalPosition());
-        userDTO.setDepartments(departmentConverter.toDepartmentDTOs(user.getDepartments()));
+        userDTO.setDepartments(departmentConverter.toDTOs(user.getDepartments()));
         userDTO.setLeadDepartments(user.getLeadDepartments());
 
         // directus登录信息, 用于创建及登录

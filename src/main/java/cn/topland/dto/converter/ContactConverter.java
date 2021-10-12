@@ -8,14 +8,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class ContactConverter {
+public class ContactConverter extends BaseConverter<Contact, ContactDTO> {
 
-    public List<ContactDTO> toContactDTOs(List<Contact> contacts) {
+    @Override
+    public List<ContactDTO> toDTOs(List<Contact> contacts) {
 
-        return contacts.stream().map(this::toContactDTO).collect(Collectors.toList());
+        return contacts.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    private ContactDTO toContactDTO(Contact contact) {
+    @Override
+    public ContactDTO toDTO(Contact contact) {
 
         return contact != null
                 ? composeContactDTO(contact)

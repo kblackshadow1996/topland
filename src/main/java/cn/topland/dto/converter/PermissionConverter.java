@@ -8,14 +8,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class PermissionConverter {
+public class PermissionConverter extends BaseConverter<Permission, PermissionDTO> {
 
-    public List<PermissionDTO> toPermissionDTOs(List<Permission> permissions) {
+    @Override
+    public List<PermissionDTO> toDTOs(List<Permission> permissions) {
 
-        return permissions.stream().map(this::toPermissionDTO).collect(Collectors.toList());
+        return permissions.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    public PermissionDTO toPermissionDTO(Permission permission) {
+    @Override
+    public PermissionDTO toDTO(Permission permission) {
 
         PermissionDTO dto = new PermissionDTO();
         dto.setCollection(permission.getCollection());

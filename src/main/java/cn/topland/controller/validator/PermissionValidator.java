@@ -1,4 +1,4 @@
-package cn.topland.controller;
+package cn.topland.controller.validator;
 
 import cn.topland.entity.DirectusPermissions;
 import cn.topland.entity.Role;

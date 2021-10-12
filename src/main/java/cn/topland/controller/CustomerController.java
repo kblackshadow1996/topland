@@ -1,5 +1,6 @@
 package cn.topland.controller;
 
+import cn.topland.controller.validator.PermissionValidator;
 import cn.topland.dto.converter.CustomerConverter;
 import cn.topland.entity.User;
 import cn.topland.service.CustomerService;
@@ -35,7 +36,7 @@ public class CustomerController {
         try {
 
             validator.validateCustomerCreatePermissions(user.getRole());
-            return Responses.success(customerConverter.toCustomerDTO(customerService.add(customer, user)));
+            return Responses.success(customerConverter.toDTO(customerService.add(customer, user)));
         } catch (AccessException e) {
 
             return Responses.fail(Response.FORBIDDEN, e.getMessage());
@@ -52,7 +53,7 @@ public class CustomerController {
         try {
 
             validator.validateCustomerCreatePermissions(user.getRole());
-            return Responses.success(customerConverter.toCustomerDTO(customerService.update(customer, user)));
+            return Responses.success(customerConverter.toDTO(customerService.update(customer, user)));
         } catch (AccessException e) {
 
             return Responses.fail(Response.FORBIDDEN, e.getMessage());

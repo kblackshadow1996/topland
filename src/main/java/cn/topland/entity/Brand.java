@@ -20,6 +20,7 @@ public class Brand extends RecordEntity {
     /**
      * 名称
      */
+    @Column(unique = true)
     private String name;
 
     /**

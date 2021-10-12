@@ -44,7 +44,7 @@ public class LoginController {
 
             if (StringUtils.isNotBlank(code) && StringUtils.equals(state, weworkConfig.getState())) {
 
-                return Responses.success(converter.toUserDTO(userService.loginByWework(code)));
+                return Responses.success(converter.toDTO(userService.loginByWework(code)));
             }
             return Responses.fail(Response.INTERNAL_SERVER_ERROR, "扫描二维码失败");
         } catch (Exception e) {

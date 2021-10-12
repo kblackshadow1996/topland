@@ -7,15 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CustomerConverter {
-
-    @Autowired
-    private UserConverter userConverter;
+public class CustomerConverter extends BaseConverter<Customer, CustomerDTO> {
 
     @Autowired
     private ContactConverter contactConverter;
 
-    public CustomerDTO toCustomerDTO(Customer customer) {
+    @Override
+    public CustomerDTO toDTO(Customer customer) {
 
         return customer != null
                 ? composeCustomerDTO(customer)
@@ -28,10 +26,10 @@ public class CustomerConverter {
         CustomerDTO dto = new CustomerDTO();
         dto.setId(customer.getId());
         dto.setName(customer.getName());
-        dto.setSeller(userConverter.toUserDTO(customer.getSeller()));
+        dto.setSeller(getUserName(customer.getSeller()));
         dto.setBusiness(customer.getBusiness());
         dto.setType(customer.getType());
-        dto.setParent(toCustomerDTO(customer.getParent()));
+        dto.setParent(toDTO(customer.getParent()));
         dto.setSource(customer.getSource());
 
         // 发票
@@ -45,11 +43,11 @@ public class CustomerConverter {
         dto.setBank(invoice.getBank());
 
         // 联系人
-        dto.setContacts(contactConverter.toContactDTOs(customer.getContacts()));
+        dto.setContacts(contactConverter.toDTOs(customer.getContacts()));
 
         // 创建信息
-        dto.setCreator(userConverter.toUserDTO(customer.getCreator()));
-        dto.setEditor(userConverter.toUserDTO(customer.getEditor()));
+        dto.setCreator(customer.getCreator().getName());
+        dto.setEditor(customer.getEditor().getName());
         dto.setCreateTime(customer.getCreateTime());
         dto.setLastUpdateTime(customer.getLastUpdateTime());
         return dto;

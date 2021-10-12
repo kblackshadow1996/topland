@@ -1,6 +1,6 @@
-package cn.topland.controller.validator;
+package cn.topland.controller;
 
-import cn.topland.controller.PermissionValidator;
+import cn.topland.controller.validator.PermissionValidator;
 import cn.topland.entity.User;
 import cn.topland.service.DepartmentService;
 import cn.topland.service.UserService;

@@ -8,14 +8,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class DepartmentConverter {
+public class DepartmentConverter extends BaseConverter<Department, DepartmentDTO> {
 
-    public List<DepartmentDTO> toDepartmentDTOs(List<Department> departments) {
+    @Override
+    public List<DepartmentDTO> toDTOs(List<Department> departments) {
 
-        return departments.stream().map(this::toDepartmentDTO).collect(Collectors.toList());
+        return departments.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    private DepartmentDTO toDepartmentDTO(Department department) {
+    @Override
+    public DepartmentDTO toDTO(Department department) {
 
         return department != null
                 ? composeDepartmentDTO(department)
@@ -32,6 +34,8 @@ public class DepartmentConverter {
         dto.setParentDeptId(department.getParentDeptId());
         dto.setType(department.getType());
         dto.setSource(department.getSource());
+        dto.setCreator(department.getCreator().getName());
+        dto.setCreateTime(department.getCreateTime());
         return dto;
     }
 }

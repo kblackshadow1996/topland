@@ -1,15 +1,14 @@
 package cn.topland.dto;
 
-import cn.topland.entity.Department;
-import cn.topland.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static cn.topland.entity.User.*;
+import static cn.topland.entity.User.Source;
 
 @Setter
 @Getter
@@ -84,7 +83,7 @@ public class UserDTO implements Serializable {
     /**
      * 创建时间
      */
-    private String createTime;
+    private LocalDateTime createTime;
 
     /**
      * 创建人

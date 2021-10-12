@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.fasterxml.jackson.core.JsonParser.*;
+import static com.fasterxml.jackson.core.JsonParser.Feature;
 
 /**
  * Json序列化

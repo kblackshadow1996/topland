@@ -1,5 +1,6 @@
 package cn.topland.controller;
 
+import cn.topland.controller.validator.PermissionValidator;
 import cn.topland.dto.converter.UserConverter;
 import cn.topland.entity.User;
 import cn.topland.service.UserService;
@@ -32,7 +33,7 @@ public class UserController {
         try {
 
             validator.validateUserPermissions(user.getRole());
-            return Responses.success(userConverter.toUsersDTOs(userService.syncAllWeworkUser(user)));
+            return Responses.success(userConverter.toDTOs(userService.syncAllWeworkUser(user)));
         } catch (InternalException e) {
 
             return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
@@ -49,7 +50,7 @@ public class UserController {
         try {
 
             validator.validateUserPermissions(user.getRole());
-            return Responses.success(userConverter.toUsersDTOs(userService.syncWeworkUser(deptId, user)));
+            return Responses.success(userConverter.toDTOs(userService.syncWeworkUser(deptId, user)));
         } catch (Exception e) {
 
             return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
