@@ -16,10 +16,10 @@ public abstract class BaseConverter<T, R> {
         return null;
     }
 
-    protected String getUserName(User user) {
+    protected Long getUserId(User user) {
 
         return user != null
-                ? user.getName()
+                ? user.getId()
                 : null;
     }
 }

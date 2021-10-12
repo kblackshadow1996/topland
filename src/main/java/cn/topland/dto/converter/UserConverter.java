@@ -40,7 +40,7 @@ public class UserConverter extends BaseConverter<User, UserDTO> {
         userDTO.setActive(user.getActive());
         userDTO.setRemark(user.getRemark());
         userDTO.setSource(user.getSource());
-        userDTO.setCreator(getUserName(user));
+        userDTO.setCreator(getUserId(user));
         userDTO.setCreateTime(user.getCreateTime());
 
         userDTO.setExternalPosition(user.getExternalPosition());

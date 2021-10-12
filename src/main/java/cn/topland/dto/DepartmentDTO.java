@@ -28,7 +28,7 @@ public class DepartmentDTO implements Serializable {
 
     private Department.Source source;
 
-    private String creator;
+    private Long creator;
 
     @JsonProperty(value = "create_time")
     private LocalDateTime createTime;

@@ -23,14 +23,14 @@ public class CustomerVO implements Serializable {
 
     private String business;
 
-    private String type;
+    private Type type;
 
     private Long parent;
 
-    private String source;
+    private Source source;
 
     @JsonProperty("invoice_type")
-    private String invoiceType;
+    private InvoiceType invoiceType;
 
     private String identity;
 
@@ -47,19 +47,4 @@ public class CustomerVO implements Serializable {
     private String account;
 
     private List<ContactVO> contacts;
-
-    public Type getType() {
-
-        return Type.valueOf(type);
-    }
-
-    public Source getSource() {
-
-        return Source.valueOf(source);
-    }
-
-    public InvoiceType getInvoiceType() {
-
-        return InvoiceType.valueOf(invoiceType);
-    }
 }

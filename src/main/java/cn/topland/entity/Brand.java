@@ -49,6 +49,10 @@ public class Brand extends RecordEntity {
     @JoinColumn(name = "brand")
     private List<Contact> contacts;
 
+    @ManyToOne
+    @JoinColumn(name = "customer")
+    private Customer customer;
+
     public enum Action {
 
         CREATE, // 新建

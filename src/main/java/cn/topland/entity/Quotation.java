@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "quotation")
-public class Quotation extends IdEntity {
+public class Quotation extends RecordEntity {
 
     /**
      * 标题
@@ -74,7 +74,7 @@ public class Quotation extends IdEntity {
     /**
      * 包含服务
      */
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "quotation")
     private List<QuotationService> services;
 

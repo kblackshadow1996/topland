@@ -52,7 +52,7 @@ public class CustomerController {
         User user = userService.get(userId);
         try {
 
-            validator.validateCustomerCreatePermissions(user.getRole());
+            validator.validateCustomerUpdatePermissions(user.getRole());
             return Responses.success(customerConverter.toDTO(customerService.update(customer, user)));
         } catch (AccessException e) {
 

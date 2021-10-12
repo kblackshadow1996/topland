@@ -19,7 +19,7 @@ public class CustomerDTO implements Serializable {
 
     private String name;
 
-    private String seller;
+    private Long seller;
 
     private String business;
 
@@ -45,9 +45,9 @@ public class CustomerDTO implements Serializable {
 
     private List<ContactDTO> contacts;
 
-    private String creator;
+    private Long creator;
 
-    private String editor;
+    private Long editor;
 
     private LocalDateTime createTime;
 

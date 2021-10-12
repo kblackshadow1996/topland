@@ -1,9 +1,11 @@
 package cn.topland.service;
 
 import cn.topland.dao.BrandRepository;
+import cn.topland.dao.CustomerRepository;
 import cn.topland.dao.OperationRepository;
 import cn.topland.dao.UserRepository;
 import cn.topland.entity.Brand;
+import cn.topland.entity.Customer;
 import cn.topland.entity.Operation;
 import cn.topland.entity.User;
 import cn.topland.util.UniqueException;
@@ -26,6 +28,9 @@ public class BrandService {
 
     @Autowired
     private OperationRepository operationRepository;
+
+    @Autowired
+    private CustomerRepository customerRepository;
 
     @Autowired
     private ContactService contactService;
@@ -83,6 +88,7 @@ public class BrandService {
         brand.setSeller(getUser(brandVO.getSeller()));
         brand.setProducer(getUser(brandVO.getProducer()));
         brand.setName(brandVO.getName());
+        brand.setCustomer(getCustomer(brandVO.getCustomer()));
         brand.setBusiness(brandVO.getBusiness());
     }
 
@@ -122,6 +128,13 @@ public class BrandService {
 
         return userId != null
                 ? userRepository.getById(userId)
+                : null;
+    }
+
+    private Customer getCustomer(Long customerId) {
+
+        return customerId != null
+                ? customerRepository.getById(customerId)
                 : null;
     }
 }

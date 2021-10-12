@@ -88,12 +88,7 @@ public class UserDTO implements Serializable {
     /**
      * 创建人
      */
-    private String creator;
-
-    /**
-     * 创建人id
-     */
-    private String creatorId;
+    private Long creator;
 
     /**
      * directus user id

@@ -16,17 +16,17 @@ public class BrandDTO implements Serializable {
 
     private String name;
 
-    private String seller;
+    private Long seller;
 
-    private String producer;
+    private Long producer;
 
     private String business;
 
     private List<ContactDTO> contracts;
 
-    private String creator;
+    private Long creator;
 
-    private String editor;
+    private Long editor;
 
     @JsonProperty(value = "create_time")
     private LocalDateTime createTime;

@@ -25,11 +25,11 @@ public class BrandConverter extends BaseConverter<Brand, BrandDTO> {
         dto.setId(brand.getId());
         dto.setName(brand.getName());
         dto.setBusiness(brand.getBusiness());
-        dto.setSeller(getUserName(brand.getSeller()));
-        dto.setProducer(getUserName(brand.getProducer()));
+        dto.setSeller(getUserId(brand.getSeller()));
+        dto.setProducer(getUserId(brand.getProducer()));
         dto.setContracts(contactConverter.toDTOs(brand.getContacts()));
-        dto.setCreator(getUserName(brand.getCreator()));
-        dto.setEditor(getUserName(brand.getEditor()));
+        dto.setCreator(getUserId(brand.getCreator()));
+        dto.setEditor(getUserId(brand.getEditor()));
         dto.setCreateTime(brand.getCreateTime());
         dto.setLastUpdateTime(brand.getLastUpdateTime());
         return dto;

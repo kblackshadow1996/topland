@@ -24,6 +24,8 @@ public class PermissionValidator {
 
     private static final String BRAND = "brand";
 
+    private static final String QUOTATION = "quotation";
+
     private static final String ACTION_CREATE = "create";
 
     private static final String ACTION_UPDATE = "update";
@@ -114,6 +116,44 @@ public class PermissionValidator {
 
             throw new AccessException();
         }
+    }
+
+    public void validateQuotationCreatePermission(Role role) throws AccessException {
+
+        if (Objects.isNull(role)) {
+
+            throw new AccessException();
+        }
+        List<DirectusPermissions> directusPermissions = directusPermissionsService.listRolesPermissions(role.getRole().getId());
+        boolean hasPermission = directusPermissions.stream().anyMatch(p -> hasQuotationCreatePermission(directusPermissions));
+        if (!hasPermission) {
+
+            throw new AccessException();
+        }
+    }
+
+    public void validateQuotationUpdatePermission(Role role) throws AccessException {
+
+        if (Objects.isNull(role)) {
+
+            throw new AccessException();
+        }
+        List<DirectusPermissions> directusPermissions = directusPermissionsService.listRolesPermissions(role.getRole().getId());
+        boolean hasPermission = directusPermissions.stream().anyMatch(p -> hasQuotationUpdatePermission(directusPermissions));
+        if (!hasPermission) {
+
+            throw new AccessException();
+        }
+    }
+
+    private boolean hasQuotationUpdatePermission(List<DirectusPermissions> directusPermissions) {
+
+        return directusPermissions.stream().anyMatch(p -> matchCollectionAction(p, QUOTATION, ACTION_UPDATE));
+    }
+
+    private boolean hasQuotationCreatePermission(List<DirectusPermissions> directusPermissions) {
+
+        return directusPermissions.stream().anyMatch(p -> matchCollectionAction(p, QUOTATION, ACTION_CREATE));
     }
 
     private boolean hasBrandUpdatePermission(List<DirectusPermissions> directusPermissions) {
