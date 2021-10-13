@@ -2,7 +2,10 @@ package cn.topland.controller;
 
 import cn.topland.controller.validator.PermissionValidator;
 import cn.topland.dto.converter.CustomerConverter;
+import cn.topland.entity.Contact;
+import cn.topland.entity.Customer;
 import cn.topland.entity.User;
+import cn.topland.service.ContactService;
 import cn.topland.service.CustomerService;
 import cn.topland.service.UserService;
 import cn.topland.util.AccessException;
@@ -13,12 +16,17 @@ import cn.topland.vo.CustomerVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("customer")
 public class CustomerController {
 
     @Autowired
     private CustomerService customerService;
+
+    @Autowired
+    private ContactService contactService;
 
     @Autowired
     private UserService userService;
@@ -30,13 +38,15 @@ public class CustomerController {
     private CustomerConverter customerConverter;
 
     @PostMapping("/add")
-    public Response add(@RequestBody CustomerVO customer) {
+    public Response add(@RequestBody CustomerVO customerVO) {
 
-        User user = userService.get(customer.getCreator());
         try {
 
+            User user = userService.get(customerVO.getCreator());
             validator.validateCustomerCreatePermissions(user.getRole());
-            return Responses.success(customerConverter.toDTO(customerService.add(customer, user)));
+            return Responses.success(customerConverter.toDTO(
+                    customerService.add(customerVO, contactService.createContacts(customerVO.getContacts()), user))
+            );
         } catch (AccessException e) {
 
             return Responses.fail(Response.FORBIDDEN, e.getMessage());
@@ -50,13 +60,15 @@ public class CustomerController {
     }
 
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody CustomerVO customer) {
+    public Response update(@PathVariable Long id, @RequestBody CustomerVO customerVO) {
 
-        User user = userService.get(customer.getCreator());
         try {
 
+            User user = userService.get(customerVO.getCreator());
             validator.validateCustomerUpdatePermissions(user.getRole());
-            return Responses.success(customerConverter.toDTO(customerService.update(id, customer, user)));
+            Customer customer = customerService.get(id);
+            List<Contact> contacts = contactService.updateContacts(customer.getContacts(), customerVO.getContacts());
+            return Responses.success(customerConverter.toDTO(customerService.update(customer, customerVO, contacts, user)));
         } catch (AccessException e) {
 
             return Responses.fail(Response.FORBIDDEN, e.getMessage());
@@ -72,9 +84,9 @@ public class CustomerController {
     @PatchMapping("/lost/{id}")
     public Response lost(@PathVariable Long id, @RequestBody CustomerVO customer) {
 
-        User user = userService.get(customer.getCreator());
         try {
 
+            User user = userService.get(customer.getCreator());
             validator.validateCustomerLostPermissions(user.getRole());
             return Responses.success(customerConverter.toDTO(customerService.lost(id, customer, user)));
         } catch (AccessException e) {
@@ -89,9 +101,9 @@ public class CustomerController {
     @PatchMapping("/retrieve/{id}")
     public Response retrieve(@PathVariable Long id, @RequestBody CustomerVO customer) {
 
-        User user = userService.get(customer.getCreator());
         try {
 
+            User user = userService.get(customer.getCreator());
             validator.validateCustomerRetrievePermissions(user.getRole());
             return Responses.success(customerConverter.toDTO(customerService.retrieve(id, user)));
         } catch (AccessException e) {

@@ -50,9 +50,9 @@ public class QuotationController {
     @PostMapping("/add")
     public Response add(@RequestBody QuotationVO quotationVO) {
 
-        User user = userService.get(quotationVO.getCreator());
         try {
 
+            User user = userService.get(quotationVO.getCreator());
             validator.validateQuotationCreatePermission(user.getRole());
             return Responses.success(quotationConverter.toDTO(quotationService.add(quotationVO, user)));
         } catch (AccessException e) {
@@ -67,9 +67,9 @@ public class QuotationController {
     @PatchMapping("/update/{id}")
     public Response update(@PathVariable Long id, @RequestBody QuotationVO quotationVO) {
 
-        User user = userService.get(quotationVO.getCreator());
         try {
 
+            User user = userService.get(quotationVO.getCreator());
             validator.validateQuotationUpdatePermission(user.getRole());
             return Responses.success(quotationConverter.toDTO(quotationService.update(id, quotationVO, user)));
         } catch (AccessException e) {

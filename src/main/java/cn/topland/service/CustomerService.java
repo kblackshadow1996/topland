@@ -3,10 +3,7 @@ package cn.topland.service;
 import cn.topland.dao.CustomerRepository;
 import cn.topland.dao.OperationRepository;
 import cn.topland.dao.UserRepository;
-import cn.topland.entity.Customer;
-import cn.topland.entity.Invoice;
-import cn.topland.entity.Operation;
-import cn.topland.entity.User;
+import cn.topland.entity.*;
 import cn.topland.util.UniqueException;
 import cn.topland.vo.CustomerVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static cn.topland.entity.Customer.Action;
 import static cn.topland.entity.Customer.Status;
@@ -31,15 +29,17 @@ public class CustomerService {
     @Autowired
     private OperationRepository operationRepository;
 
-    @Autowired
-    private ContactService contactService;
+    public Customer get(Long id) {
+
+        return repository.getById(id);
+    }
 
     @Transactional
-    public Customer add(CustomerVO customerVO, User creator) throws UniqueException {
+    public Customer add(CustomerVO customerVO, List<Contact> contacts, User creator) throws UniqueException {
 
         try {
 
-            Customer customer = repository.saveAndFlush(createCustomer(customerVO, creator));
+            Customer customer = repository.saveAndFlush(createCustomer(customerVO, contacts, creator));
             saveOperation(customer.getId(), Action.CREATE, creator, null);
             return customer;
         } catch (DataIntegrityViolationException e) {
@@ -49,13 +49,12 @@ public class CustomerService {
     }
 
     @Transactional
-    public Customer update(Long id, CustomerVO customerVO, User editor) {
+    public Customer update(Customer customer, CustomerVO customerVO, List<Contact> contacts, User editor) {
 
         try {
 
-            Customer persistCustomer = repository.getById(id);
-            Customer customer = repository.saveAndFlush(updateCustomer(persistCustomer, customerVO, editor));
-            saveOperation(id, Action.UPDATE, editor, null);
+            repository.saveAndFlush(updateCustomer(customer, customerVO, contacts, editor));
+            saveOperation(customer.getId(), Action.UPDATE, editor, null);
             return customer;
         } catch (DataIntegrityViolationException e) {
 
@@ -95,20 +94,20 @@ public class CustomerService {
         return customer;
     }
 
-    private Customer updateCustomer(Customer customer, CustomerVO customerVO, User editor) {
+    private Customer updateCustomer(Customer customer, CustomerVO customerVO, List<Contact> contacts, User editor) {
 
         composeCustomer(customerVO, customer);
-        customer.setContacts(contactService.updateContacts(customer.getContacts(), customerVO.getContacts()));
+        customer.setContacts(contacts);
         customer.setEditor(editor);
         customer.setLastUpdateTime(LocalDateTime.now());
         return customer;
     }
 
-    private Customer createCustomer(CustomerVO customerVO, User creator) {
+    private Customer createCustomer(CustomerVO customerVO, List<Contact> contacts, User creator) {
 
         Customer customer = new Customer();
         composeCustomer(customerVO, customer);
-        customer.setContacts(contactService.createContacts(customerVO.getContacts()));
+        customer.setContacts(contacts);
         customer.setCreator(creator);
         customer.setEditor(creator);
         return customer;

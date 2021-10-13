@@ -3,6 +3,7 @@ package cn.topland.controller;
 import cn.topland.controller.validator.PermissionValidator;
 import cn.topland.dto.converter.ContractConverter;
 import cn.topland.entity.User;
+import cn.topland.service.AttachmentService;
 import cn.topland.service.ContractService;
 import cn.topland.service.UserService;
 import cn.topland.util.AccessException;
@@ -20,6 +21,9 @@ public class ContractController {
     private ContractService contractService;
 
     @Autowired
+    private AttachmentService attachmentService;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -31,9 +35,9 @@ public class ContractController {
     @PostMapping("/add")
     public Response add(@RequestBody ContractVO contractVO) {
 
-        User user = userService.get(contractVO.getCreator());
         try {
 
+            User user = userService.get(contractVO.getCreator());
             validator.validateContractCreatePermissions(user.getRole());
             return Responses.success(contractConverter.toDTO(contractService.add(contractVO, user)));
         } catch (AccessException e) {
@@ -48,11 +52,13 @@ public class ContractController {
     @PatchMapping("/receive-paper/{id}")
     public Response receivePaper(@PathVariable Long id, @RequestBody ContractVO contractVO) {
 
-        User user = userService.get(contractVO.getCreator());
         try {
 
+            User user = userService.get(contractVO.getCreator());
             validator.validateContractReceivePaperPermissions(user.getRole());
-            return Responses.success(contractConverter.toDTO(contractService.receivePaper(id, contractVO, user)));
+            return Responses.success(contractConverter.toDTO(
+                    contractService.receivePaper(id, contractVO, attachmentService.upload(contractVO.getAttachments()), user)
+            ));
         } catch (AccessException e) {
 
             return Responses.fail(Response.FORBIDDEN, e.getMessage());
@@ -65,9 +71,9 @@ public class ContractController {
     @PatchMapping("/review/{id}")
     public Response review(@PathVariable Long id, @RequestBody ContractVO contractVO) {
 
-        User user = userService.get(contractVO.getCreator());
         try {
 
+            User user = userService.get(contractVO.getCreator());
             validator.validateContractReviewPermissions(user.getRole());
             return Responses.success(contractConverter.toDTO(contractService.review(id, contractVO, user)));
         } catch (AccessException e) {

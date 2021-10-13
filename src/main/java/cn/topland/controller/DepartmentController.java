@@ -29,9 +29,9 @@ public class DepartmentController {
     @PostMapping("/wework/sync/all")
     public Response syncAllWeworkDept(Long userId) {
 
-        User user = userService.get(userId);
         try {
 
+            User user = userService.get(userId);
             validator.validDepartmentPermissions(user.getRole());
             return Responses.success(departmentService.syncAllWeworkDept(user));
         } catch (AccessException e) {
@@ -46,9 +46,9 @@ public class DepartmentController {
     @PostMapping("/wework/sync/{deptId}")
     public Response syncWeworkDept(@PathVariable String deptId, Long userId) {
 
-        User user = userService.get(userId);
         try {
 
+            User user = userService.get(userId);
             validator.validDepartmentPermissions(user.getRole());
             return Responses.success(departmentService.syncWeworkDept(deptId, userService.get(userId)));
         } catch (AccessException e) {

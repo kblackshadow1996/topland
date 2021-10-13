@@ -2,7 +2,6 @@ package cn.topland.service;
 
 import cn.topland.dao.*;
 import cn.topland.entity.*;
-import cn.topland.vo.AttachmentVO;
 import cn.topland.vo.ContractVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,8 +12,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static cn.topland.entity.Contract.*;
 
@@ -23,12 +20,6 @@ public class ContractService {
 
     @Autowired
     private ContractRepository repository;
-
-    @Autowired
-    private DirectusFilesRepository filesRepository;
-
-    @Autowired
-    private AttachmentRepository attachmentRepository;
 
     @Autowired
     private OrderRepository orderRepository;
@@ -60,16 +51,16 @@ public class ContractService {
         Action action = contractVO.getAction();
         Status status = Action.APPROVE == action ? Status.APPROVED : Status.REJECTED;
         contract.setStatus(status);
-        saveOperation(id, action, editor, contractVO.getRemark());
+        saveOperation(id, action, editor, contractVO.getReviewComments());
         return repository.saveAndFlush(contract);
     }
 
     @Transactional
-    public Contract receivePaper(Long id, ContractVO contractVO, User creator) {
+    public Contract receivePaper(Long id, ContractVO contractVO, List<Attachment> attachments, User creator) {
 
         Contract contract = repository.getById(id);
         // 上传附件
-        contract.setAttachments(uploadAttachments(contractVO.getAttachments()));
+        contract.setAttachments(attachments);
         contract.setPaperDate(contractVO.getPaperDate());
         contract.setCreator(creator);
         contract.setLastUpdateTime(LocalDateTime.now());
@@ -131,26 +122,6 @@ public class ContractService {
         String prefix = Type.YEAR == type ? "Y" : "O";
         // 类型+时间+工号+第n份合同
         return prefix + date + employeeId + (count + 1);
-    }
-
-    // 关联附件
-    private List<Attachment> uploadAttachments(List<AttachmentVO> attachmentVOs) {
-
-        List<String> filedIds = attachmentVOs.stream().map(AttachmentVO::getFile).collect(Collectors.toList());
-        Map<String, DirectusFiles> fileMap = filesRepository.findAllById(filedIds).stream()
-                .collect(Collectors.toMap(UuidEntity::getId, f -> f));
-
-        List<Attachment> attachments = attachmentVOs.stream()
-                .map(attachmentVO -> createAttachment(fileMap.get(attachmentVO.getFile())))
-                .collect(Collectors.toList());
-        return attachmentRepository.saveAllAndFlush(attachments);
-    }
-
-    private Attachment createAttachment(DirectusFiles file) {
-
-        Attachment attachment = new Attachment();
-        attachment.setFile(file);
-        return attachment;
     }
 
     private Order getOrder(Long orderId) {

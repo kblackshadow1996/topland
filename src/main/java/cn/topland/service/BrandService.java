@@ -4,10 +4,7 @@ import cn.topland.dao.BrandRepository;
 import cn.topland.dao.CustomerRepository;
 import cn.topland.dao.OperationRepository;
 import cn.topland.dao.UserRepository;
-import cn.topland.entity.Brand;
-import cn.topland.entity.Customer;
-import cn.topland.entity.Operation;
-import cn.topland.entity.User;
+import cn.topland.entity.*;
 import cn.topland.util.UniqueException;
 import cn.topland.vo.BrandVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-import static cn.topland.entity.Brand.*;
+import static cn.topland.entity.Brand.Action;
 
 @Service
 public class BrandService {
@@ -34,15 +32,17 @@ public class BrandService {
     @Autowired
     private CustomerRepository customerRepository;
 
-    @Autowired
-    private ContactService contactService;
+    public Brand get(Long id) {
+
+        return repository.getById(id);
+    }
 
     @Transactional
-    public Brand add(BrandVO brandVO, User creator) {
+    public Brand add(BrandVO brandVO, List<Contact> contacts, User creator) {
 
         try {
 
-            Brand brand = repository.saveAndFlush(createBrand(brandVO, creator));
+            Brand brand = repository.saveAndFlush(createBrand(brandVO, contacts, creator));
             saveOperation(brand.getId(), Action.CREATE, creator);
             return brand;
         } catch (DataIntegrityViolationException e) {
@@ -52,12 +52,11 @@ public class BrandService {
     }
 
     @Transactional
-    public Brand update(Long id, BrandVO brandVO, User editor) {
+    public Brand update(Brand brand, BrandVO brandVO, List<Contact> contacts, User editor) {
 
         try {
 
-            Brand persistBrand = repository.getById(id);
-            Brand brand = repository.saveAndFlush(updateBrand(persistBrand, brandVO, editor));
+            repository.saveAndFlush(updateBrand(brand, brandVO, contacts, editor));
             saveOperation(brand.getId(), Action.UPDATE, editor);
             return brand;
         } catch (DataIntegrityViolationException e) {
@@ -66,20 +65,20 @@ public class BrandService {
         }
     }
 
-    private Brand updateBrand(Brand brand, BrandVO brandVO, User editor) {
+    private Brand updateBrand(Brand brand, BrandVO brandVO, List<Contact> contacts, User editor) {
 
         composeBrand(brand, brandVO);
-        brand.setContacts(contactService.updateContacts(brand.getContacts(), brandVO.getContacts()));
+        brand.setContacts(contacts);
         brand.setEditor(editor);
         brand.setLastUpdateTime(LocalDateTime.now());
         return brand;
     }
 
-    private Brand createBrand(BrandVO brandVO, User creator) {
+    private Brand createBrand(BrandVO brandVO, List<Contact> contacts, User creator) {
 
         Brand brand = new Brand();
         composeBrand(brand, brandVO);
-        brand.setContacts(contactService.createContacts(brandVO.getContacts()));
+        brand.setContacts(contacts);
         brand.setCreator(creator);
         brand.setEditor(creator);
         return brand;

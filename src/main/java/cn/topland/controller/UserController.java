@@ -28,9 +28,9 @@ public class UserController {
     @PostMapping("/wework/sync/all")
     public Response syncAll(Long userId) {
 
-        User user = userService.get(userId);
         try {
 
+            User user = userService.get(userId);
             validator.validateUserPermissions(user.getRole());
             return Responses.success(userConverter.toDTOs(userService.syncAllWeworkUser(user)));
         } catch (AccessException e) {
@@ -45,9 +45,9 @@ public class UserController {
     @PostMapping(value = "/wework/sync")
     public Response sync(String deptId, Long userId) {
 
-        User user = userService.get(userId);
         try {
 
+            User user = userService.get(userId);
             validator.validateUserPermissions(user.getRole());
             return Responses.success(userConverter.toDTOs(userService.syncWeworkUser(deptId, user)));
         } catch (AccessException e) {
