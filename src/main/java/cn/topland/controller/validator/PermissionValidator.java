@@ -146,6 +146,25 @@ public class PermissionValidator {
         }
     }
 
+    public void validateContractReceivePaperPermissions(Role role) throws AccessException {
+
+        if (Objects.isNull(role)) {
+
+            throw new AccessException();
+        }
+        List<DirectusPermissions> directusPermissions = directusPermissionsService.listRolesPermissions(role.getRole().getId());
+        boolean hasPermission = directusPermissions.stream().anyMatch(p -> hasContractReceivePaperPermission(directusPermissions));
+        if (!hasPermission) {
+
+            throw new AccessException();
+        }
+    }
+
+    private boolean hasContractReceivePaperPermission(List<DirectusPermissions> directusPermissions) {
+
+        return directusPermissions.stream().anyMatch(p -> matchCollectionActionFields(p, QUOTATION, ACTION_UPDATE, "paper_date"));
+    }
+
     private boolean hasQuotationUpdatePermission(List<DirectusPermissions> directusPermissions) {
 
         return directusPermissions.stream().anyMatch(p -> matchCollectionAction(p, QUOTATION, ACTION_UPDATE));
@@ -198,6 +217,14 @@ public class PermissionValidator {
 
     private boolean matchCollectionAction(DirectusPermissions permission, String collection, String action) {
 
-        return collection.equals(permission.getCollection()) && action.equals(permission.getAction());
+        return collection.equals(permission.getCollection())
+                && action.equals(permission.getAction());
+    }
+
+    private boolean matchCollectionActionFields(DirectusPermissions permission, String collection, String action, String fields) {
+
+        return collection.equals(permission.getCollection())
+                && action.equals(permission.getAction())
+                && permission.getFields().contains(fields);
     }
 }
