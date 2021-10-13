@@ -62,9 +62,9 @@ public class QuotationService {
     }
 
     @Transactional
-    public Quotation update(QuotationVO quotationVO, User editor) {
+    public Quotation update(Long id, QuotationVO quotationVO, User editor) {
 
-        return repository.saveAndFlush(updateQuotation(repository.getById(quotationVO.getId()), quotationVO, editor));
+        return repository.saveAndFlush(updateQuotation(repository.getById(id), quotationVO, editor));
     }
 
     public byte[] downloadPdf(String html, String title, String number, LocalDate date) throws IOException {

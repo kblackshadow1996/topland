@@ -46,11 +46,11 @@ public class CustomerService {
     }
 
     @Transactional
-    public Customer update(CustomerVO customerVO, User editor) {
+    public Customer update(Long id, CustomerVO customerVO, User editor) {
 
         try {
 
-            Customer persistCustomer = repository.getById(customerVO.getId());
+            Customer persistCustomer = repository.getById(id);
             Customer customer = repository.saveAndFlush(updateCustomer(persistCustomer, customerVO, editor));
             saveUpdateOperation(editor, customer.getId());
             return customer;

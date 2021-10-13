@@ -30,9 +30,9 @@ public class BrandController {
     private BrandConverter brandConverter;
 
     @PostMapping("/add")
-    public Response add(@RequestBody BrandVO brandVO, @RequestParam Long userId) {
+    public Response add(@RequestBody BrandVO brandVO) {
 
-        User user = userService.get(userId);
+        User user = userService.get(brandVO.getCreator());
         try {
 
             validator.validateBrandCreatePermissions(user.getRole());
@@ -46,14 +46,14 @@ public class BrandController {
         }
     }
 
-    @PatchMapping("/update")
-    public Response update(@RequestBody BrandVO brandVO, @RequestParam Long userId) {
+    @PatchMapping("/update/{id}")
+    public Response update(@PathVariable Long id, @RequestBody BrandVO brandVO) {
 
-        User user = userService.get(userId);
+        User user = userService.get(brandVO.getCreator());
         try {
 
             validator.validateBrandUpdatePermissions(user.getRole());
-            return Responses.success(brandConverter.toDTO(brandService.update(brandVO, user)));
+            return Responses.success(brandConverter.toDTO(brandService.update(id, brandVO, user)));
         } catch (AccessException e) {
 
             return Responses.fail(Response.FORBIDDEN, e.getMessage());

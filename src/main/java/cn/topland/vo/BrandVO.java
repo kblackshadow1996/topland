@@ -10,8 +10,6 @@ import java.util.List;
 @Getter
 public class BrandVO implements Serializable {
 
-    private Long id;
-
     private String name;
 
     private Long customer;
@@ -23,4 +21,6 @@ public class BrandVO implements Serializable {
     private String business;
 
     private List<ContactVO> contacts;
+
+    private Long creator;
 }

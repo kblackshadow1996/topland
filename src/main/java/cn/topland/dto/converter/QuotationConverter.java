@@ -41,7 +41,9 @@ public class QuotationConverter extends BaseConverter<Quotation, QuotationDTO> {
         dto.setTotalComment(comment.getTotalComment());
 
         dto.setCreator(getUserId(quotation.getCreator()));
+        dto.setEditor(getUserId(quotation.getEditor()));
         dto.setCreateTime(quotation.getCreateTime());
+        dto.setLastUpdateTime(quotation.getLastUpdateTime());
         return dto;
     }
 

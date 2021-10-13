@@ -1,5 +1,7 @@
 package cn.topland.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,6 +25,7 @@ public class UserDTO implements Serializable {
     /**
      * 账号
      */
+    @JsonProperty(value = "user_id")
     private String userId;
 
     /**
@@ -33,11 +36,13 @@ public class UserDTO implements Serializable {
     /**
      * 外部职位
      */
+    @JsonProperty(value = "external_position")
     private String externalPosition;
 
     /**
      * 内部职位
      */
+    @JsonProperty(value = "internal_position")
     private String internalPosition;
 
     /**
@@ -48,6 +53,7 @@ public class UserDTO implements Serializable {
     /**
      * 部门负责人
      */
+    @JsonProperty(value = "lead_departments")
     private String leadDepartments;
 
     /**
@@ -58,6 +64,7 @@ public class UserDTO implements Serializable {
     /**
      * 工号
      */
+    @JsonProperty(value = "employee_id")
     private String employeeId;
 
     /**
@@ -83,6 +90,8 @@ public class UserDTO implements Serializable {
     /**
      * 创建时间
      */
+    @JsonProperty(value = "create_time")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createTime;
 
     /**
@@ -93,15 +102,18 @@ public class UserDTO implements Serializable {
     /**
      * directus user id
      */
+    @JsonProperty(value = "directus_user_id")
     private String directusUserId;
 
     /**
      * directus email
      */
+    @JsonProperty(value = "directus_email")
     private String directusEmail;
 
     /**
      * directus 密码
      */
+    @JsonProperty(value = "directus_password")
     private String directusPassword;
 }

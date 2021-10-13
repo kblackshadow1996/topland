@@ -9,7 +9,7 @@ import cn.topland.util.InternalException;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,7 +26,7 @@ public class UserController {
     @Autowired
     private PermissionValidator validator;
 
-    @GetMapping("/wework/sync/all")
+    @PostMapping("/wework/sync/all")
     public Response syncAll(Long userId) {
 
         User user = userService.get(userId);
@@ -43,7 +43,7 @@ public class UserController {
         }
     }
 
-    @GetMapping(value = "/wework/sync")
+    @PostMapping(value = "/wework/sync")
     public Response sync(String deptId, Long userId) {
 
         User user = userService.get(userId);

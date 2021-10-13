@@ -15,8 +15,6 @@ import static cn.topland.entity.Invoice.InvoiceType;
 @Getter
 public class CustomerVO implements Serializable {
 
-    private Long id;
-
     private String name;
 
     private Long seller;
@@ -47,4 +45,6 @@ public class CustomerVO implements Serializable {
     private String account;
 
     private List<ContactVO> contacts;
+
+    private Long creator;
 }

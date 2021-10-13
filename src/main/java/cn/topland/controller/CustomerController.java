@@ -30,9 +30,9 @@ public class CustomerController {
     private CustomerConverter customerConverter;
 
     @PostMapping("/add")
-    public Response add(@RequestBody CustomerVO customer, @RequestParam Long userId) {
+    public Response add(@RequestBody CustomerVO customer) {
 
-        User user = userService.get(userId);
+        User user = userService.get(customer.getCreator());
         try {
 
             validator.validateCustomerCreatePermissions(user.getRole());
@@ -46,14 +46,14 @@ public class CustomerController {
         }
     }
 
-    @PatchMapping("/update")
-    public Response update(@RequestBody CustomerVO customer, @RequestParam Long userId) {
+    @PatchMapping("/update/{id}")
+    public Response update(@PathVariable Long id, @RequestBody CustomerVO customer) {
 
-        User user = userService.get(userId);
+        User user = userService.get(customer.getCreator());
         try {
 
             validator.validateCustomerUpdatePermissions(user.getRole());
-            return Responses.success(customerConverter.toDTO(customerService.update(customer, user)));
+            return Responses.success(customerConverter.toDTO(customerService.update(id, customer, user)));
         } catch (AccessException e) {
 
             return Responses.fail(Response.FORBIDDEN, e.getMessage());

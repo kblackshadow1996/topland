@@ -29,6 +29,7 @@ public class ContactConverter extends BaseConverter<Contact, ContactDTO> {
         ContactDTO dto = new ContactDTO();
         dto.setId(contact.getId());
         dto.setName(contact.getName());
+        dto.setGender(contact.getGender());
         dto.setMobile(contact.getMobile());
         dto.setAddress(contact.getAddress());
         dto.setPosition(contact.getPosition());

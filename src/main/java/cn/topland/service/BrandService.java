@@ -50,11 +50,11 @@ public class BrandService {
     }
 
     @Transactional
-    public Brand update(BrandVO brandVO, User editor) {
+    public Brand update(Long id, BrandVO brandVO, User editor) {
 
         try {
 
-            Brand persistBrand = repository.getById(brandVO.getId());
+            Brand persistBrand = repository.getById(id);
             Brand brand = repository.saveAndFlush(updateBrand(persistBrand, brandVO, editor));
             saveUpdateOperation(editor, brand.getId());
             return brand;

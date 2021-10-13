@@ -12,8 +12,6 @@ import java.util.List;
 @Getter
 public class QuotationVO implements Serializable {
 
-    private Long id;
-
     private Long customer;
 
     private Long brand;
@@ -41,4 +39,6 @@ public class QuotationVO implements Serializable {
     private String explanations;
 
     private List<QuotationServiceVO> services;
+
+    private Long creator;
 }

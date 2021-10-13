@@ -8,10 +8,7 @@ import cn.topland.util.AccessException;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/department")
@@ -26,7 +23,7 @@ public class DepartmentController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/wework/sync/all")
+    @PostMapping("/wework/sync/all")
     public Response syncAllWeworkDept(Long userId) {
 
         User user = userService.get(userId);
@@ -40,7 +37,7 @@ public class DepartmentController {
         }
     }
 
-    @GetMapping("/wework/sync/{deptId}")
+    @PostMapping("/wework/sync/{deptId}")
     public Response syncWeworkDept(@PathVariable String deptId, Long userId) {
 
         User user = userService.get(userId);

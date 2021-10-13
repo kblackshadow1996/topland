@@ -5,6 +5,7 @@ import cn.topland.dto.converter.QuotationConverter;
 import cn.topland.entity.User;
 import cn.topland.service.QuotationService;
 import cn.topland.service.UserService;
+import cn.topland.util.AccessException;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.util.StringReader;
@@ -47,27 +48,33 @@ public class QuotationController {
     }
 
     @PostMapping("/add")
-    public Response add(@RequestBody QuotationVO quotationVO, @RequestParam Long userId) {
+    public Response add(@RequestBody QuotationVO quotationVO) {
 
-        User user = userService.get(userId);
+        User user = userService.get(quotationVO.getCreator());
         try {
 
             validator.validateQuotationCreatePermission(user.getRole());
             return Responses.success(quotationConverter.toDTO(quotationService.add(quotationVO, user)));
+        } catch (AccessException e) {
+
+            return Responses.fail(Response.FORBIDDEN, e.getMessage());
         } catch (Exception e) {
 
             return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
-    @PatchMapping("/update")
-    public Response update(@RequestBody QuotationVO quotationVO, @RequestParam Long userId) {
+    @PatchMapping("/update/{id}")
+    public Response update(@PathVariable Long id, @RequestBody QuotationVO quotationVO) {
 
-        User user = userService.get(userId);
+        User user = userService.get(quotationVO.getCreator());
         try {
 
             validator.validateQuotationUpdatePermission(user.getRole());
-            return Responses.success(quotationConverter.toDTO(quotationService.update(quotationVO, user)));
+            return Responses.success(quotationConverter.toDTO(quotationService.update(id, quotationVO, user)));
+        } catch (AccessException e) {
+
+            return Responses.fail(Response.FORBIDDEN, e.getMessage());
         } catch (Exception e) {
 
             return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
