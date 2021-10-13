@@ -1,6 +1,8 @@
 package cn.topland.service;
 
-import cn.topland.dao.*;
+import cn.topland.dao.OperationRepository;
+import cn.topland.dao.OrderRepository;
+import cn.topland.dao.SettlementContractRepository;
 import cn.topland.entity.*;
 import cn.topland.vo.SettlementContractVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +15,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static cn.topland.entity.SettlementContract.*;
 import static cn.topland.entity.SettlementContract.Action;
+import static cn.topland.entity.SettlementContract.Status;
 
 @Service
 public class SettlementContractService {
