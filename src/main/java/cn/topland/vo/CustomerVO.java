@@ -47,4 +47,6 @@ public class CustomerVO implements Serializable {
     private List<ContactVO> contacts;
 
     private Long creator;
+
+    private String lostReason;
 }

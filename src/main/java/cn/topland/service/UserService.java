@@ -8,6 +8,7 @@ import cn.topland.gateway.WeworkGateway;
 import cn.topland.gateway.response.UserInfo;
 import cn.topland.gateway.response.WeworkUser;
 import cn.topland.service.parser.WeworkUserParser;
+import cn.topland.util.AccessException;
 import cn.topland.util.InternalException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ public class UserService {
     /**
      * 企业微信登录
      */
-    public User loginByWework(String code) throws Exception {
+    public User loginByWework(String code) throws AccessException, InternalException {
 
         UserInfo userInfo = weworkGateway.getUserInfo(code);
         if (Objects.nonNull(userInfo)) {
@@ -167,14 +168,14 @@ public class UserService {
                 .findFirst().get();
     }
 
-    private User loginByWeworkUser(User user) throws InternalException {
+    private User loginByWeworkUser(User user) throws AccessException {
 
         if (user.getActive()) { // 启用
 
             return user;
         } else { // 禁用
 
-            throw new InternalException("用户已被禁用");
+            throw new AccessException();
         }
     }
 

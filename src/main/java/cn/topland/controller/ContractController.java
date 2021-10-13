@@ -1,6 +1,7 @@
 package cn.topland.controller;
 
 import cn.topland.controller.validator.PermissionValidator;
+import cn.topland.dto.converter.ContractConverter;
 import cn.topland.entity.User;
 import cn.topland.service.ContractService;
 import cn.topland.service.UserService;
@@ -24,17 +25,57 @@ public class ContractController {
     @Autowired
     private PermissionValidator validator;
 
-    @PatchMapping("/{id}/receive-paper")
+    @Autowired
+    private ContractConverter contractConverter;
+
+    @PostMapping("/add")
+    public Response add(@RequestBody ContractVO contractVO) {
+
+        User user = userService.get(contractVO.getCreator());
+        try {
+
+            validator.validateContractCreatePermissions(user.getRole());
+            return Responses.success(contractConverter.toDTO(contractService.add(contractVO, user)));
+        } catch (AccessException e) {
+
+            return Responses.fail(Response.FORBIDDEN, e.getMessage());
+        } catch (Exception e) {
+
+            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
+    @PatchMapping("/receive-paper/{id}")
     public Response receivePaper(@PathVariable Long id, @RequestBody ContractVO contractVO) {
 
         User user = userService.get(contractVO.getCreator());
         try {
 
             validator.validateContractReceivePaperPermissions(user.getRole());
-            return Responses.success(contractService.receivePaper(id, contractVO, user));
+            return Responses.success(contractConverter.toDTO(contractService.receivePaper(id, contractVO, user)));
         } catch (AccessException e) {
 
             return Responses.fail(Response.FORBIDDEN, e.getMessage());
+        } catch (Exception e) {
+
+            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
+    @PatchMapping("/review/{id}")
+    public Response review(@PathVariable Long id, @RequestBody ContractVO contractVO) {
+
+        User user = userService.get(contractVO.getCreator());
+        try {
+
+            validator.validateContractReviewPermissions(user.getRole());
+            return Responses.success(contractConverter.toDTO(contractService.review(id, contractVO, user)));
+        } catch (AccessException e) {
+
+            return Responses.fail(Response.FORBIDDEN, e.getMessage());
+        } catch (Exception e) {
+
+            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 }

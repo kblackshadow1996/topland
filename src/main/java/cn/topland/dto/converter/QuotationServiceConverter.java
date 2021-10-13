@@ -3,6 +3,7 @@ package cn.topland.dto.converter;
 import cn.topland.dto.QuotationServiceDTO;
 import cn.topland.entity.QuotationService;
 import cn.topland.entity.Service;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,7 +15,9 @@ public class QuotationServiceConverter extends BaseConverter<QuotationService, Q
     @Override
     public List<QuotationServiceDTO> toDTOs(List<QuotationService> services) {
 
-        return services.stream().map(this::toDTO).collect(Collectors.toList());
+        return CollectionUtils.isEmpty(services)
+                ? List.of()
+                : services.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
     @Override

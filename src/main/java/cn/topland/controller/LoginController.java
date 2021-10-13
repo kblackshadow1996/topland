@@ -3,6 +3,8 @@ package cn.topland.controller;
 import cn.topland.config.WeworkConfig;
 import cn.topland.dto.converter.UserConverter;
 import cn.topland.service.UserService;
+import cn.topland.util.AccessException;
+import cn.topland.util.InternalException;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import org.apache.commons.lang3.StringUtils;
@@ -33,7 +35,7 @@ public class LoginController {
             return Responses.success(weworkConfig);
         } catch (Exception e) {
 
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
+            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
@@ -47,9 +49,12 @@ public class LoginController {
                 return Responses.success(converter.toDTO(userService.loginByWework(code)));
             }
             return Responses.fail(Response.INTERNAL_SERVER_ERROR, "扫描二维码失败");
-        } catch (Exception e) {
+        } catch (AccessException e) {
 
             return Responses.fail(Response.FORBIDDEN, e.getMessage());
+        } catch (InternalException e) {
+
+            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 }

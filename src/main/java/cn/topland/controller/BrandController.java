@@ -42,7 +42,10 @@ public class BrandController {
             return Responses.fail(Response.FORBIDDEN, e.getMessage());
         } catch (UniqueException e) {
 
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
+            return Responses.fail(Response.FAILED_VALIDATION, e.getMessage());
+        } catch (Exception e) {
+
+            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
@@ -59,7 +62,10 @@ public class BrandController {
             return Responses.fail(Response.FORBIDDEN, e.getMessage());
         } catch (UniqueException e) {
 
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
+            return Responses.fail(Response.FAILED_VALIDATION, e.getMessage());
+        } catch (Exception e) {
+
+            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 }

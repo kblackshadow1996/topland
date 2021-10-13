@@ -1,8 +1,6 @@
 package cn.topland.dto;
 
 import cn.topland.entity.Contract;
-import cn.topland.entity.Order;
-import cn.topland.entity.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -46,11 +44,11 @@ public class ContractDTO implements Serializable {
 
     private BigDecimal receivable;
 
-    private User seller;
+    private Long seller;
 
     private String remark;
 
-    private Order order;
+    private Long order;
 
     private List<AttachmentDTO> attachments;
 

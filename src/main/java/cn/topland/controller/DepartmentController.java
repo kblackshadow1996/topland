@@ -8,7 +8,10 @@ import cn.topland.util.AccessException;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/department")
@@ -34,6 +37,9 @@ public class DepartmentController {
         } catch (AccessException e) {
 
             return Responses.fail(Response.FORBIDDEN, e.getMessage());
+        } catch (Exception e) {
+
+            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
@@ -48,6 +54,9 @@ public class DepartmentController {
         } catch (AccessException e) {
 
             return Responses.fail(Response.FORBIDDEN, e.getMessage());
+        } catch (Exception e) {
+
+            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 }

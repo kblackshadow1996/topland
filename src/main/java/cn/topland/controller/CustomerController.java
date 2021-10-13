@@ -42,7 +42,10 @@ public class CustomerController {
             return Responses.fail(Response.FORBIDDEN, e.getMessage());
         } catch (UniqueException e) {
 
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
+            return Responses.fail(Response.FAILED_VALIDATION, e.getMessage());
+        } catch (Exception e) {
+
+            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
@@ -59,7 +62,44 @@ public class CustomerController {
             return Responses.fail(Response.FORBIDDEN, e.getMessage());
         } catch (UniqueException e) {
 
+            return Responses.fail(Response.FAILED_VALIDATION, e.getMessage());
+        } catch (Exception e) {
+
+            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
+    @PatchMapping("/lost/{id}")
+    public Response lost(@PathVariable Long id, @RequestBody CustomerVO customer) {
+
+        User user = userService.get(customer.getCreator());
+        try {
+
+            validator.validateCustomerLostPermissions(user.getRole());
+            return Responses.success(customerConverter.toDTO(customerService.lost(id, customer, user)));
+        } catch (AccessException e) {
+
             return Responses.fail(Response.FORBIDDEN, e.getMessage());
+        } catch (Exception e) {
+
+            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
+    @PatchMapping("/retrieve/{id}")
+    public Response retrieve(@PathVariable Long id, @RequestBody CustomerVO customer) {
+
+        User user = userService.get(customer.getCreator());
+        try {
+
+            validator.validateCustomerRetrievePermissions(user.getRole());
+            return Responses.success(customerConverter.toDTO(customerService.retrieve(id, user)));
+        } catch (AccessException e) {
+
+            return Responses.fail(Response.FORBIDDEN, e.getMessage());
+        } catch (Exception e) {
+
+            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 }

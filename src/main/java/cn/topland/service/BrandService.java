@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+import static cn.topland.entity.Brand.*;
+
 @Service
 public class BrandService {
 
@@ -41,7 +43,7 @@ public class BrandService {
         try {
 
             Brand brand = repository.saveAndFlush(createBrand(brandVO, creator));
-            saveCreateOperation(creator, brand.getId());
+            saveOperation(brand.getId(), Action.CREATE, creator);
             return brand;
         } catch (DataIntegrityViolationException e) {
 
@@ -56,7 +58,7 @@ public class BrandService {
 
             Brand persistBrand = repository.getById(id);
             Brand brand = repository.saveAndFlush(updateBrand(persistBrand, brandVO, editor));
-            saveUpdateOperation(editor, brand.getId());
+            saveOperation(brand.getId(), Action.UPDATE, editor);
             return brand;
         } catch (DataIntegrityViolationException e) {
 
@@ -83,6 +85,22 @@ public class BrandService {
         return brand;
     }
 
+    private void saveOperation(Long id, Action action, User creator) {
+
+        operationRepository.saveAndFlush(createOperation(id, action, creator));
+    }
+
+    private Operation createOperation(Long id, Action action, User creator) {
+
+        Operation operation = new Operation();
+        operation.setModule(Operation.Module.BRAND);
+        operation.setAction(action.name());
+        operation.setModuleId(String.valueOf(id));
+        operation.setCreator(creator);
+        operation.setEditor(creator);
+        return operation;
+    }
+
     private void composeBrand(Brand brand, BrandVO brandVO) {
 
         brand.setSeller(getUser(brandVO.getSeller()));
@@ -90,38 +108,6 @@ public class BrandService {
         brand.setName(brandVO.getName());
         brand.setCustomer(getCustomer(brandVO.getCustomer()));
         brand.setBusiness(brandVO.getBusiness());
-    }
-
-    private void saveCreateOperation(User creator, Long id) {
-
-        operationRepository.saveAndFlush(createAddBrandOperation(creator, id));
-    }
-
-    private void saveUpdateOperation(User editor, Long id) {
-
-        operationRepository.saveAndFlush(createUpdateBrandOperation(editor, id));
-    }
-
-    private Operation createUpdateBrandOperation(User creator, Long id) {
-
-        Operation operation = new Operation();
-        operation.setModule(Operation.Module.BRAND);
-        operation.setModuleId(String.valueOf(id));
-        operation.setAction(Brand.Action.UPDATE.name());
-        operation.setCreator(creator);
-        operation.setEditor(creator);
-        return operation;
-    }
-
-    private Operation createAddBrandOperation(User creator, Long id) {
-
-        Operation operation = new Operation();
-        operation.setModule(Operation.Module.BRAND);
-        operation.setModuleId(String.valueOf(id));
-        operation.setAction(Brand.Action.CREATE.name());
-        operation.setCreator(creator);
-        operation.setEditor(creator);
-        return operation;
     }
 
     private User getUser(Long userId) {

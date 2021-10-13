@@ -2,6 +2,7 @@ package cn.topland.dto.converter;
 
 import cn.topland.dto.UserDTO;
 import cn.topland.entity.User;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +18,9 @@ public class UserConverter extends BaseConverter<User, UserDTO> {
     @Override
     public List<UserDTO> toDTOs(List<User> users) {
 
-        return users.stream().map(this::toDTO).collect(Collectors.toList());
+        return CollectionUtils.isEmpty(users)
+                ? List.of()
+                : users.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
     @Override

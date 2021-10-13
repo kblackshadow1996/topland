@@ -2,6 +2,7 @@ package cn.topland.dto.converter;
 
 import cn.topland.dto.PermissionDTO;
 import cn.topland.entity.Permission;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,7 +14,9 @@ public class PermissionConverter extends BaseConverter<Permission, PermissionDTO
     @Override
     public List<PermissionDTO> toDTOs(List<Permission> permissions) {
 
-        return permissions.stream().map(this::toDTO).collect(Collectors.toList());
+        return CollectionUtils.isEmpty(permissions)
+                ? List.of()
+                : permissions.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
     @Override

@@ -2,6 +2,7 @@ package cn.topland.dto.converter;
 
 import cn.topland.dto.ContactDTO;
 import cn.topland.entity.Contact;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,7 +14,9 @@ public class ContactConverter extends BaseConverter<Contact, ContactDTO> {
     @Override
     public List<ContactDTO> toDTOs(List<Contact> contacts) {
 
-        return contacts.stream().map(this::toDTO).collect(Collectors.toList());
+        return CollectionUtils.isEmpty(contacts)
+                ? List.of()
+                : contacts.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
     @Override

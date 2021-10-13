@@ -122,7 +122,7 @@ public class QuotationService {
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         // 工号
         String employeeId = creator.getEmployeeId();
-        // 当日时间+工号+第n份合同
+        // 时间+工号+第n份合同
         return date + employeeId + (count + 1);
     }
 

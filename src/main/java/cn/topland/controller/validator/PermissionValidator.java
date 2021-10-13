@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 权限验证工具
@@ -26,6 +25,8 @@ public class PermissionValidator {
 
     private static final String QUOTATION = "quotation";
 
+    private static final String CONTRACT = "contract";
+
     private static final String ACTION_CREATE = "create";
 
     private static final String ACTION_UPDATE = "update";
@@ -35,184 +36,87 @@ public class PermissionValidator {
 
     public void validDepartmentPermissions(Role role) throws AccessException {
 
-        if (Objects.isNull(role)) {
-
-            throw new AccessException();
-        }
-        List<DirectusPermissions> directusPermissions = directusPermissionsService.listRolesPermissions(role.getRole().getId());
-        boolean hasPermission = directusPermissions.stream().anyMatch(p -> hasDepartmentsCreatePermission(directusPermissions) || hasDepartmentUpdatePermission(directusPermissions));
-        if (!hasPermission) {
-
-            throw new AccessException();
-        }
+        validateRole(hasPermission(role, DEPARTMENT, ACTION_CREATE));
     }
 
     public void validateUserPermissions(Role role) throws AccessException {
 
-        if (Objects.isNull(role)) {
-
-            throw new AccessException();
-        }
-
-        List<DirectusPermissions> directusPermissions = directusPermissionsService.listRolesPermissions(role.getRole().getId());
-        boolean hasPermission = directusPermissions.stream().anyMatch(p -> hasUserCreatePermission(directusPermissions) || hasUserUpdatePermission(directusPermissions));
-        if (!hasPermission) {
-
-            throw new AccessException();
-        }
+        validateRole(hasPermission(role, USER, ACTION_CREATE));
     }
 
     public void validateCustomerCreatePermissions(Role role) throws AccessException {
 
-        if (Objects.isNull(role)) {
-
-            throw new AccessException();
-        }
-        List<DirectusPermissions> directusPermissions = directusPermissionsService.listRolesPermissions(role.getRole().getId());
-        boolean hasPermission = directusPermissions.stream().anyMatch(p -> hasCustomerCreatePermission(directusPermissions));
-        if (!hasPermission) {
-
-            throw new AccessException();
-        }
+        validateRole(hasPermission(role, CUSTOMER, ACTION_CREATE));
     }
 
     public void validateCustomerUpdatePermissions(Role role) throws AccessException {
 
-        if (Objects.isNull(role)) {
+        validateRole(hasPermission(role, CUSTOMER, ACTION_UPDATE, "name"));
+    }
 
-            throw new AccessException();
-        }
-        List<DirectusPermissions> directusPermissions = directusPermissionsService.listRolesPermissions(role.getRole().getId());
-        boolean hasPermission = directusPermissions.stream().anyMatch(p -> hasCustomerUpdatePermission(directusPermissions));
-        if (!hasPermission) {
+    public void validateCustomerLostPermissions(Role role) throws AccessException {
 
-            throw new AccessException();
-        }
+        validateRole(hasPermission(role, CUSTOMER, ACTION_UPDATE, "status"));
+    }
+
+    public void validateCustomerRetrievePermissions(Role role) throws AccessException {
+
+        validateRole(hasPermission(role, CUSTOMER, ACTION_UPDATE, "status"));
     }
 
     public void validateBrandCreatePermissions(Role role) throws AccessException {
 
-        if (Objects.isNull(role)) {
-
-            throw new AccessException();
-        }
-        List<DirectusPermissions> directusPermissions = directusPermissionsService.listRolesPermissions(role.getRole().getId());
-        boolean hasPermission = directusPermissions.stream().anyMatch(p -> hasBrandCreatePermission(directusPermissions));
-        if (!hasPermission) {
-
-            throw new AccessException();
-        }
+        validateRole(hasPermission(role, BRAND, ACTION_CREATE));
     }
 
     public void validateBrandUpdatePermissions(Role role) throws AccessException {
 
-        if (Objects.isNull(role)) {
-
-            throw new AccessException();
-        }
-        List<DirectusPermissions> directusPermissions = directusPermissionsService.listRolesPermissions(role.getRole().getId());
-        boolean hasPermission = directusPermissions.stream().anyMatch(p -> hasBrandUpdatePermission(directusPermissions));
-        if (!hasPermission) {
-
-            throw new AccessException();
-        }
+        validateRole(hasPermission(role, BRAND, ACTION_UPDATE));
     }
 
     public void validateQuotationCreatePermission(Role role) throws AccessException {
 
-        if (Objects.isNull(role)) {
-
-            throw new AccessException();
-        }
-        List<DirectusPermissions> directusPermissions = directusPermissionsService.listRolesPermissions(role.getRole().getId());
-        boolean hasPermission = directusPermissions.stream().anyMatch(p -> hasQuotationCreatePermission(directusPermissions));
-        if (!hasPermission) {
-
-            throw new AccessException();
-        }
+        validateRole(hasPermission(role, QUOTATION, ACTION_CREATE));
     }
 
     public void validateQuotationUpdatePermission(Role role) throws AccessException {
 
-        if (Objects.isNull(role)) {
+        validateRole(hasPermission(role, QUOTATION, ACTION_UPDATE));
+    }
 
-            throw new AccessException();
-        }
-        List<DirectusPermissions> directusPermissions = directusPermissionsService.listRolesPermissions(role.getRole().getId());
-        boolean hasPermission = directusPermissions.stream().anyMatch(p -> hasQuotationUpdatePermission(directusPermissions));
-        if (!hasPermission) {
+    public void validateContractCreatePermissions(Role role) throws AccessException {
 
-            throw new AccessException();
-        }
+        validateRole(hasPermission(role, CONTRACT, ACTION_CREATE));
     }
 
     public void validateContractReceivePaperPermissions(Role role) throws AccessException {
 
-        if (Objects.isNull(role)) {
+        validateRole(hasPermission(role, CONTRACT, ACTION_UPDATE, "paper_date"));
+    }
+
+    public void validateContractReviewPermissions(Role role) throws AccessException {
+
+        validateRole(hasPermission(role, CONTRACT, ACTION_UPDATE, "status"));
+    }
+
+    private boolean hasPermission(Role role, String collection, String action, String fields) throws AccessException {
+
+        if (role == null) {
 
             throw new AccessException();
         }
         List<DirectusPermissions> directusPermissions = directusPermissionsService.listRolesPermissions(role.getRole().getId());
-        boolean hasPermission = directusPermissions.stream().anyMatch(p -> hasContractReceivePaperPermission(directusPermissions));
-        if (!hasPermission) {
+        return directusPermissions.stream().anyMatch(p -> matchCollectionActionFields(p, collection, action, fields));
+    }
+
+    private boolean hasPermission(Role role, String collection, String action) throws AccessException {
+
+        if (role == null) {
 
             throw new AccessException();
         }
-    }
-
-    private boolean hasContractReceivePaperPermission(List<DirectusPermissions> directusPermissions) {
-
-        return directusPermissions.stream().anyMatch(p -> matchCollectionActionFields(p, QUOTATION, ACTION_UPDATE, "paper_date"));
-    }
-
-    private boolean hasQuotationUpdatePermission(List<DirectusPermissions> directusPermissions) {
-
-        return directusPermissions.stream().anyMatch(p -> matchCollectionAction(p, QUOTATION, ACTION_UPDATE));
-    }
-
-    private boolean hasQuotationCreatePermission(List<DirectusPermissions> directusPermissions) {
-
-        return directusPermissions.stream().anyMatch(p -> matchCollectionAction(p, QUOTATION, ACTION_CREATE));
-    }
-
-    private boolean hasBrandUpdatePermission(List<DirectusPermissions> directusPermissions) {
-
-        return directusPermissions.stream().anyMatch(p -> matchCollectionAction(p, BRAND, ACTION_UPDATE));
-    }
-
-    private boolean hasBrandCreatePermission(List<DirectusPermissions> directusPermissions) {
-
-        return directusPermissions.stream().anyMatch(p -> matchCollectionAction(p, BRAND, ACTION_CREATE));
-    }
-
-    private boolean hasCustomerUpdatePermission(List<DirectusPermissions> directusPermissions) {
-
-        return directusPermissions.stream().anyMatch(p -> matchCollectionAction(p, CUSTOMER, ACTION_UPDATE));
-    }
-
-    private boolean hasCustomerCreatePermission(List<DirectusPermissions> directusPermissions) {
-
-        return directusPermissions.stream().anyMatch(p -> matchCollectionAction(p, CUSTOMER, ACTION_CREATE));
-    }
-
-    private boolean hasUserUpdatePermission(List<DirectusPermissions> directusPermissions) {
-
-        return directusPermissions.stream().anyMatch(p -> matchCollectionAction(p, USER, ACTION_UPDATE));
-    }
-
-    private boolean hasUserCreatePermission(List<DirectusPermissions> directusPermissions) {
-
-        return directusPermissions.stream().anyMatch(p -> matchCollectionAction(p, USER, ACTION_CREATE));
-    }
-
-    private boolean hasDepartmentUpdatePermission(List<DirectusPermissions> directusPermissions) {
-
-        return directusPermissions.stream().anyMatch(p -> matchCollectionAction(p, DEPARTMENT, ACTION_UPDATE));
-    }
-
-    private boolean hasDepartmentsCreatePermission(List<DirectusPermissions> directusPermissions) {
-
-        return directusPermissions.stream().anyMatch(p -> matchCollectionAction(p, DEPARTMENT, ACTION_UPDATE));
+        List<DirectusPermissions> directusPermissions = directusPermissionsService.listRolesPermissions(role.getRole().getId());
+        return directusPermissions.stream().anyMatch(p -> matchCollectionAction(p, collection, action));
     }
 
     private boolean matchCollectionAction(DirectusPermissions permission, String collection, String action) {
@@ -226,5 +130,13 @@ public class PermissionValidator {
         return collection.equals(permission.getCollection())
                 && action.equals(permission.getAction())
                 && permission.getFields().contains(fields);
+    }
+
+    private void validateRole(boolean hasPermission) throws AccessException {
+
+        if (!hasPermission) {
+
+            throw new AccessException();
+        }
     }
 }

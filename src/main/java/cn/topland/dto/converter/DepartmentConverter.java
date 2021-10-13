@@ -2,6 +2,7 @@ package cn.topland.dto.converter;
 
 import cn.topland.dto.DepartmentDTO;
 import cn.topland.entity.Department;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,7 +14,9 @@ public class DepartmentConverter extends BaseConverter<Department, DepartmentDTO
     @Override
     public List<DepartmentDTO> toDTOs(List<Department> departments) {
 
-        return departments.stream().map(this::toDTO).collect(Collectors.toList());
+        return CollectionUtils.isEmpty(departments)
+                ? List.of()
+                : departments.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
     @Override

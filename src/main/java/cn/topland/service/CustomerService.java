@@ -16,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+import static cn.topland.entity.Customer.Action;
+import static cn.topland.entity.Customer.Status;
+
 @Service
 public class CustomerService {
 
@@ -37,7 +40,7 @@ public class CustomerService {
         try {
 
             Customer customer = repository.saveAndFlush(createCustomer(customerVO, creator));
-            saveCreateOperation(creator, customer.getId());
+            saveOperation(customer.getId(), Action.CREATE, creator, null);
             return customer;
         } catch (DataIntegrityViolationException e) {
 
@@ -52,7 +55,7 @@ public class CustomerService {
 
             Customer persistCustomer = repository.getById(id);
             Customer customer = repository.saveAndFlush(updateCustomer(persistCustomer, customerVO, editor));
-            saveUpdateOperation(editor, customer.getId());
+            saveOperation(id, Action.UPDATE, editor, null);
             return customer;
         } catch (DataIntegrityViolationException e) {
 
@@ -60,36 +63,36 @@ public class CustomerService {
         }
     }
 
-    private void saveCreateOperation(User creator, Long id) {
+    @Transactional
+    public Customer lost(Long id, CustomerVO customerVO, User editor) {
 
-        operationRepository.saveAndFlush(createAddCustomerOperation(creator, id));
+        Customer customer = repository.saveAndFlush(lostCustomer(repository.getById(id), editor));
+        saveOperation(id, Action.LOST, editor, customerVO.getLostReason());
+        return customer;
     }
 
-    private void saveUpdateOperation(User editor, Long id) {
+    @Transactional
+    public Customer retrieve(Long id, User editor) {
 
-        operationRepository.saveAndFlush(createUpdateCustomerOperation(editor, id));
+        Customer customer = repository.saveAndFlush(retrieveCustomer(repository.getById(id), editor));
+        saveOperation(id, Action.RETRIEVE, editor, null);
+        return customer;
     }
 
-    private Operation createAddCustomerOperation(User creator, Long id) {
+    private Customer retrieveCustomer(Customer customer, User editor) {
 
-        Operation operation = new Operation();
-        operation.setModule(Operation.Module.CUSTOMER);
-        operation.setModuleId(String.valueOf(id));
-        operation.setAction(Customer.Action.CREATE.name());
-        operation.setCreator(creator);
-        operation.setEditor(creator);
-        return operation;
+        customer.setStatus(Status.COOPERATING);
+        customer.setEditor(editor);
+        customer.setLastUpdateTime(LocalDateTime.now());
+        return customer;
     }
 
-    private Operation createUpdateCustomerOperation(User editor, Long id) {
+    private Customer lostCustomer(Customer customer, User editor) {
 
-        Operation operation = new Operation();
-        operation.setModule(Operation.Module.CUSTOMER);
-        operation.setModuleId(String.valueOf(id));
-        operation.setAction(Customer.Action.UPDATE.name());
-        operation.setCreator(editor);
-        operation.setEditor(editor);
-        return operation;
+        customer.setStatus(Status.LOST);
+        customer.setEditor(editor);
+        customer.setLastUpdateTime(LocalDateTime.now());
+        return customer;
     }
 
     private Customer updateCustomer(Customer customer, CustomerVO customerVO, User editor) {
@@ -109,6 +112,23 @@ public class CustomerService {
         customer.setCreator(creator);
         customer.setEditor(creator);
         return customer;
+    }
+
+    private void saveOperation(Long id, Action action, User creator, String remark) {
+
+        operationRepository.saveAndFlush(createOperation(id, action, creator, remark));
+    }
+
+    private Operation createOperation(Long id, Action action, User creator, String remark) {
+
+        Operation operation = new Operation();
+        operation.setModule(Operation.Module.CUSTOMER);
+        operation.setAction(action.name());
+        operation.setModuleId(String.valueOf(id));
+        operation.setRemark(remark);
+        operation.setCreator(creator);
+        operation.setEditor(creator);
+        return operation;
     }
 
     private void composeCustomer(CustomerVO customerVO, Customer customer) {
