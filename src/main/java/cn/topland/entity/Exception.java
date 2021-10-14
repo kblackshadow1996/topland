@@ -119,10 +119,9 @@ public class Exception extends RecordEntity {
     private Boolean critical;
 
     /**
-     * 状态
+     * 是否已处理
      */
-    @Enumerated(EnumType.STRING)
-    private Status status;
+    private Boolean resolved;
 
     /**
      * 解决日期
@@ -153,12 +152,6 @@ public class Exception extends RecordEntity {
      * 是否实施最优解
      */
     private Boolean optimal;
-
-    public enum Status {
-
-        RESOLVED, // 已解决
-        UNRESOLVED // 待处理
-    }
 
     public enum Action {
 

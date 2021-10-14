@@ -74,6 +74,7 @@ public class ExceptionService {
         exception.setActualLossCondition(exceptionVO.getActualLossCondition());
         exception.setOptimal(exception.getOptimal());
         exception.setOptimalSolution(exception.getOptimalSolution());
+        exception.setResolved(true);
         exception.setEditor(editor);
         exception.setLastUpdateTime(LocalDateTime.now());
         return exception;
