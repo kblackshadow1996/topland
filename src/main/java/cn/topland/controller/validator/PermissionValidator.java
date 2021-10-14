@@ -27,6 +27,10 @@ public class PermissionValidator {
 
     private static final String CONTRACT = "contract";
 
+    private static final String SETTLEMENT_CONTRACT = "settlement_contract";
+
+    private static final String PACKAGE = "package";
+
     private static final String ACTION_CREATE = "create";
 
     private static final String ACTION_UPDATE = "update";
@@ -97,6 +101,21 @@ public class PermissionValidator {
     public void validateContractReviewPermissions(Role role) throws AccessException {
 
         validateRole(hasPermission(role, CONTRACT, ACTION_UPDATE, "status"));
+    }
+
+    public void validateSettlementCreatePermissions(Role role) throws AccessException {
+
+        validateRole(hasPermission(role, SETTLEMENT_CONTRACT, ACTION_UPDATE));
+    }
+
+    public void validatePackageCreatePermissions(Role role) throws AccessException {
+
+        validateRole(hasPermission(role, PACKAGE, ACTION_CREATE));
+    }
+
+    public void validatePackageUpdatePermissions(Role role) throws AccessException {
+
+        validateRole(hasPermission(role, PACKAGE, ACTION_UPDATE));
     }
 
     private boolean hasPermission(Role role, String collection, String action, String fields) throws AccessException {

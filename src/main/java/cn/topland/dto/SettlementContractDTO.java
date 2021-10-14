@@ -1,6 +1,5 @@
-package cn.topland.vo;
+package cn.topland.dto;
 
-import cn.topland.entity.SettlementContract;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +11,9 @@ import java.util.List;
 
 @Setter
 @Getter
-public class SettlementContractVO implements Serializable {
+public class SettlementContractDTO implements Serializable {
+
+    private Long id;
 
     private String identity;
 
@@ -25,14 +26,9 @@ public class SettlementContractVO implements Serializable {
 
     private String remark;
 
-    private List<AttachmentVO> attachments;
+    private List<AttachmentDTO> attachments;
 
     private Long contract;
 
     private Long creator;
-
-    private SettlementContract.Action action;
-
-    @JsonProperty("review_comments")
-    private String reviewComments;
 }

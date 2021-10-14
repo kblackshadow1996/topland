@@ -38,6 +38,25 @@ public class SettlementContractService {
         return contract;
     }
 
+    @Transactional
+    public SettlementContract review(Long id, SettlementContractVO contractVO, User editor) {
+
+        SettlementContract contract = repository.saveAndFlush(reviewSettlementContract(id, contractVO, editor));
+        saveOperation(id, contractVO.getAction(), editor, contractVO.getReviewComments());
+        return contract;
+    }
+
+    private SettlementContract reviewSettlementContract(Long id, SettlementContractVO contractVO, User editor) {
+
+        SettlementContract contract = repository.getById(id);
+        Action action = contractVO.getAction();
+        Status status = Action.APPROVE == action ? Status.APPROVED : Status.REJECTED;
+        contract.setStatus(status);
+        contract.setEditor(editor);
+        contract.setLastUpdateTime(LocalDateTime.now());
+        return contract;
+    }
+
     private SettlementContract createContract(SettlementContractVO contractVO, List<Attachment> attachments, User creator) {
 
         SettlementContract contract = new SettlementContract();

@@ -47,25 +47,15 @@ public class ContractService {
     @Transactional
     public Contract review(Long id, ContractVO contractVO, User editor) {
 
-        Contract contract = repository.getById(id);
-        Action action = contractVO.getAction();
-        Status status = Action.APPROVE == action ? Status.APPROVED : Status.REJECTED;
-        contract.setStatus(status);
-        saveOperation(id, action, editor, contractVO.getReviewComments());
-        return repository.saveAndFlush(contract);
+        Contract contract = repository.saveAndFlush(reviewContract(id, contractVO, editor));
+        saveOperation(id, contractVO.getAction(), editor, contractVO.getReviewComments());
+        return contract;
     }
 
     @Transactional
     public Contract receivePaper(Long id, ContractVO contractVO, List<Attachment> attachments, User creator) {
 
-        Contract contract = repository.getById(id);
-        // 上传附件
-        contract.setAttachments(attachments);
-        contract.setPaperDate(contractVO.getPaperDate());
-        contract.setCreator(creator);
-        contract.setLastUpdateTime(LocalDateTime.now());
-
-        return repository.saveAndFlush(contract);
+        return repository.saveAndFlush(receiveContractPaper(id, contractVO, attachments, creator));
     }
 
     private void saveOperation(Long id, Action action, User creator, String remark) {
@@ -83,6 +73,28 @@ public class ContractService {
         operation.setCreator(creator);
         operation.setEditor(creator);
         return operation;
+    }
+
+    private Contract receiveContractPaper(Long id, ContractVO contractVO, List<Attachment> attachments, User creator) {
+
+        Contract contract = repository.getById(id);
+        // 上传附件
+        contract.setAttachments(attachments);
+        contract.setPaperDate(contractVO.getPaperDate());
+        contract.setEditor(creator);
+        contract.setLastUpdateTime(LocalDateTime.now());
+        return contract;
+    }
+
+    private Contract reviewContract(Long id, ContractVO contractVO, User editor) {
+
+        Contract contract = repository.getById(id);
+        Action action = contractVO.getAction();
+        Status status = Action.APPROVE == action ? Status.APPROVED : Status.REJECTED;
+        contract.setStatus(status);
+        contract.setEditor(editor);
+        contract.setLastUpdateTime(LocalDateTime.now());
+        return contract;
     }
 
     private Contract createContract(ContractVO contractVO, User creator) {
