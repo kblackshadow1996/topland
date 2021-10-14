@@ -1,7 +1,7 @@
-package cn.topland.vo;
+package cn.topland.dto;
 
-import cn.topland.entity.Department;
 import cn.topland.entity.Exception;
+import cn.topland.entity.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,18 +13,20 @@ import java.util.List;
 
 @Setter
 @Getter
-public class ExceptionVO implements Serializable {
+public class ExceptionDTO implements Serializable {
+
+    private Long id;
 
     private Exception.Attribute attribute;
 
-    private Long type;
+    private List<Long> orders;
+
+    private ExceptionType type;
 
     @JsonProperty(value = "department_source")
     private Department.Source departmentSource;
 
     private Long department;
-
-    private List<Long> orders;
 
     private List<Long> owners;
 
@@ -34,7 +36,7 @@ public class ExceptionVO implements Serializable {
 
     private String complaint;
 
-    private List<AttachmentVO> attachments;
+    private List<AttachmentDTO> attachments;
 
     @JsonProperty(value = "self_check")
     private String selfCheck;
@@ -46,6 +48,8 @@ public class ExceptionVO implements Serializable {
 
     @JsonProperty(value = "estimated_loss_condition")
     private String estimatedLossCondition;
+
+    private Boolean critical;
 
     private Exception.Status status;
 

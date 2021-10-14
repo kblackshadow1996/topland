@@ -26,8 +26,8 @@ public class PackageConverter extends BaseConverter<Package, PackageDTO> {
         dto.setName(pkg.getName());
         dto.setRemark(pkg.getRemark());
         dto.setServices(serviceConverter.toDTOs(pkg.getServices()));
-        dto.setCreator(getUserId(pkg.getCreator()));
-        dto.setEditor(getUserId(pkg.getEditor()));
+        dto.setCreator(getId(pkg.getCreator()));
+        dto.setEditor(getId(pkg.getEditor()));
         dto.setCreateTime(pkg.getCreateTime());
         dto.setLastUpdateTime(pkg.getLastUpdateTime());
         return dto;

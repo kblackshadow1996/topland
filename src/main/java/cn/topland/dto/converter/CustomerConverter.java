@@ -26,7 +26,7 @@ public class CustomerConverter extends BaseConverter<Customer, CustomerDTO> {
         CustomerDTO dto = new CustomerDTO();
         dto.setId(customer.getId());
         dto.setName(customer.getName());
-        dto.setSeller(getUserId(customer.getSeller()));
+        dto.setSeller(getId(customer.getSeller()));
         dto.setBusiness(customer.getBusiness());
         dto.setType(customer.getType());
         dto.setParent(toDTO(customer.getParent()));
@@ -46,8 +46,8 @@ public class CustomerConverter extends BaseConverter<Customer, CustomerDTO> {
         dto.setContacts(contactConverter.toDTOs(customer.getContacts()));
 
         // 创建信息
-        dto.setCreator(getUserId(customer.getCreator()));
-        dto.setEditor(getUserId(customer.getEditor()));
+        dto.setCreator(getId(customer.getCreator()));
+        dto.setEditor(getId(customer.getEditor()));
         dto.setCreateTime(customer.getCreateTime());
         dto.setLastUpdateTime(customer.getLastUpdateTime());
         return dto;

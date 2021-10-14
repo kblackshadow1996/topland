@@ -53,6 +53,9 @@ public class Brand extends RecordEntity {
     @JoinColumn(name = "customer")
     private Customer customer;
 
+    @OneToMany(mappedBy = "brand")
+    private List<Order> orders;
+
     public enum Action {
 
         CREATE, // 新建

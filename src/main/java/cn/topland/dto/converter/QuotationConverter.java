@@ -1,8 +1,8 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.QuotationDTO;
-import cn.topland.entity.Package;
-import cn.topland.entity.*;
+import cn.topland.entity.Quotation;
+import cn.topland.entity.QuotationComment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,12 +26,12 @@ public class QuotationConverter extends BaseConverter<Quotation, QuotationDTO> {
         dto.setId(quotation.getId());
         dto.setTitle(quotation.getTitle());
         dto.setIdentity(quotation.getIdentity());
-        dto.setSeller(getUserId(quotation.getSeller()));
+        dto.setSeller(getId(quotation.getSeller()));
         dto.setSubtotal(quotation.getSubtotal());
         dto.setDiscount(quotation.getDiscount());
-        dto.setCustomer(getCustomerId(quotation.getCustomer()));
-        dto.setBrand(getBrandId(quotation.getBrand()));
-        dto.setServicePackage(getPackageId(quotation.getServicePackage()));
+        dto.setCustomer(getId(quotation.getCustomer()));
+        dto.setBrand(getId(quotation.getBrand()));
+        dto.setServicePackage(getId(quotation.getServicePackage()));
         dto.setServices(quotationServiceConverter.toDTOs(quotation.getServices()));
         dto.setExplanations(quotation.getExplanations());
 
@@ -40,31 +40,10 @@ public class QuotationConverter extends BaseConverter<Quotation, QuotationDTO> {
         dto.setDiscountComment(comment.getDiscountComment());
         dto.setTotalComment(comment.getTotalComment());
 
-        dto.setCreator(getUserId(quotation.getCreator()));
-        dto.setEditor(getUserId(quotation.getEditor()));
+        dto.setCreator(getId(quotation.getCreator()));
+        dto.setEditor(getId(quotation.getEditor()));
         dto.setCreateTime(quotation.getCreateTime());
         dto.setLastUpdateTime(quotation.getLastUpdateTime());
         return dto;
-    }
-
-    private Long getPackageId(Package servicePackage) {
-
-        return servicePackage != null
-                ? servicePackage.getId()
-                : null;
-    }
-
-    private Long getCustomerId(Customer customer) {
-
-        return customer != null
-                ? customer.getId()
-                : null;
-    }
-
-    private Long getBrandId(Brand brand) {
-
-        return brand != null
-                ? brand.getId()
-                : null;
     }
 }

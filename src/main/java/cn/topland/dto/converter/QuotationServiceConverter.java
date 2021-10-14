@@ -32,18 +32,11 @@ public class QuotationServiceConverter extends BaseConverter<QuotationService, Q
 
         QuotationServiceDTO dto = new QuotationServiceDTO();
         dto.setId(quotationService.getId());
-        dto.setService(getServiceId(quotationService.getService()));
+        dto.setService(getId(quotationService.getService()));
         dto.setUnit(quotationService.getUnit());
         dto.setAmount(quotationService.getAmount());
         dto.setPrice(quotationService.getPrice());
         dto.setExplanation(quotationService.getExplanation());
         return dto;
-    }
-
-    private Long getServiceId(Service service) {
-
-        return service != null
-                ? service.getId()
-                : null;
     }
 }

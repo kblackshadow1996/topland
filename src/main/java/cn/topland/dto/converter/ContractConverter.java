@@ -41,37 +41,16 @@ public class ContractConverter extends BaseConverter<Contract, ContractDTO> {
         dto.setAttachments(attachmentConverter.toDTOs(contract.getAttachments()));
 
         // 关联信息
-        dto.setOrder(getOrderId(contract.getOrder()));
-        dto.setCustomer(getCustomerId(contract.getCustomer()));
-        dto.setBrand(getBrandId(contract.getBrand()));
-        dto.setSeller(getUserId(contract.getSeller()));
+        dto.setOrder(getId(contract.getOrder()));
+        dto.setCustomer(getId(contract.getCustomer()));
+        dto.setBrand(getId(contract.getBrand()));
+        dto.setSeller(getId(contract.getSeller()));
 
         // 创建信息
-        dto.setCreator(getUserId(contract.getCreator()));
-        dto.setEditor(getUserId(contract.getEditor()));
+        dto.setCreator(getId(contract.getCreator()));
+        dto.setEditor(getId(contract.getEditor()));
         dto.setCreateTime(contract.getCreateTime());
         dto.setLastUpdateTime(contract.getLastUpdateTime());
         return dto;
-    }
-
-    private Long getOrderId(Order order) {
-
-        return order != null
-                ? order.getId()
-                : null;
-    }
-
-    private Long getBrandId(Brand brand) {
-
-        return brand != null
-                ? brand.getId()
-                : null;
-    }
-
-    private Long getCustomerId(Customer customer) {
-
-        return customer != null
-                ? customer.getId()
-                : null;
     }
 }

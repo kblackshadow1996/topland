@@ -32,14 +32,7 @@ public class AttachmentConverter extends BaseConverter<Attachment, AttachmentDTO
 
         AttachmentDTO dto = new AttachmentDTO();
         dto.setId(attachment.getId());
-        dto.setFile(getFileId(attachment.getFile()));
+        dto.setFile(getId(attachment.getFile()));
         return dto;
-    }
-
-    private String getFileId(DirectusFiles file) {
-
-        return file != null
-                ? file.getId()
-                : null;
     }
 }

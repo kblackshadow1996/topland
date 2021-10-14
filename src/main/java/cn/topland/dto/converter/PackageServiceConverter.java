@@ -31,18 +31,11 @@ public class PackageServiceConverter extends BaseConverter<PackageService, Packa
     private PackageServiceDTO composePackageServiceDTO(PackageService service) {
 
         PackageServiceDTO dto = new PackageServiceDTO();
-        dto.setService(getService(service.getService()));
+        dto.setService(getId(service.getService()));
         dto.setId(service.getId());
         dto.setUnit(service.getUnit());
         dto.setPrice(service.getPrice());
         dto.setDelivery(service.getDelivery());
         return dto;
-    }
-
-    private Long getService(Service service) {
-
-        return service != null
-                ? service.getId()
-                : null;
     }
 }

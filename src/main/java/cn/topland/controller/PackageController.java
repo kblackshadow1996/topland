@@ -1,7 +1,7 @@
 package cn.topland.controller;
 
 import cn.topland.controller.validator.PermissionValidator;
-import cn.topland.dao.PackageServiceService;
+import cn.topland.service.PackageServiceService;
 import cn.topland.dto.converter.PackageConverter;
 import cn.topland.entity.Package;
 import cn.topland.entity.User;

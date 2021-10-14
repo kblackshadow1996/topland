@@ -26,18 +26,11 @@ public class SettlementContractConverter extends BaseConverter<SettlementContrac
         dto.setId(settlementContract.getId());
         dto.setIdentity(settlementContract.getIdentity());
         dto.setContractDate(settlementContract.getContractDate());
-        dto.setCreator(getUserId(settlementContract.getCreator()));
+        dto.setCreator(getId(settlementContract.getCreator()));
         dto.setReceivable(settlementContract.getReceivable());
         dto.setRemark(settlementContract.getRemark());
-        dto.setOrder(getOrder(settlementContract.getOrder()));
+        dto.setOrder(getId(settlementContract.getOrder()));
         dto.setAttachments(attachmentConverter.toDTOs(settlementContract.getAttachments()));
         return dto;
-    }
-
-    private Long getOrder(Order order) {
-
-        return order != null
-                ? order.getId()
-                : null;
     }
 }

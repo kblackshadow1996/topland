@@ -6,7 +6,9 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.List;
 
 /**
  * 异常类型
@@ -33,4 +35,7 @@ public class ExceptionType extends SimpleIdEntity {
      * 启用状态
      */
     private Boolean active;
+
+    @OneToMany(mappedBy = "type")
+    private List<Exception> exceptions;
 }

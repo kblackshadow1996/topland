@@ -28,7 +28,7 @@ public class Exception extends RecordEntity {
     /**
      * 订单
      */
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinTable(name = "exception_order",
             joinColumns = {@JoinColumn(name = "exception_id")}, inverseJoinColumns = {@JoinColumn(name = "order_id")})
     private List<Order> orders;
@@ -53,9 +53,15 @@ public class Exception extends RecordEntity {
     private Department department;
 
     /**
+     * 部门来源
+     */
+    @Enumerated(value = EnumType.STRING)
+    private Department.Source departmentSource;
+
+    /**
      * 责任人
      */
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinTable(name = "exception_owner",
             joinColumns = {@JoinColumn(name = "exception_id")}, inverseJoinColumns = {@JoinColumn(name = "user_id")})
     private List<User> owners;
@@ -63,7 +69,7 @@ public class Exception extends RecordEntity {
     /**
      * 抄送人
      */
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinTable(name = "exception_copy",
             joinColumns = {@JoinColumn(name = "exception_id")}, inverseJoinColumns = {@JoinColumn(name = "user_id")})
     private List<User> copies;
@@ -108,10 +114,9 @@ public class Exception extends RecordEntity {
     private String estimatedLossCondition;
 
     /**
-     * 等级
+     * 是否重大异常
      */
-    @Enumerated(EnumType.STRING)
-    private Level level;
+    private Boolean critical;
 
     /**
      * 状态
@@ -148,12 +153,6 @@ public class Exception extends RecordEntity {
      * 是否实施最优解
      */
     private Boolean optimal;
-
-    public enum Level {
-
-        NORMAL,
-        CRITICAL // 重大
-    }
 
     public enum Status {
 

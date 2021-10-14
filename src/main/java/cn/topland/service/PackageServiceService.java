@@ -1,5 +1,7 @@
-package cn.topland.dao;
+package cn.topland.service;
 
+import cn.topland.dao.PackageServiceRepository;
+import cn.topland.dao.ServiceRepository;
 import cn.topland.entity.IdEntity;
 import cn.topland.entity.PackageService;
 import cn.topland.vo.PackageServiceVO;
