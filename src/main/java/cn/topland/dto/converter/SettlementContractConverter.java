@@ -1,7 +1,6 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.SettlementContractDTO;
-import cn.topland.entity.Order;
 import cn.topland.entity.SettlementContract;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -1,13 +1,9 @@
 package cn.topland.dto.converter;
 
 import cn.topland.entity.IdEntity;
-import cn.topland.entity.RecordEntity;
-import cn.topland.entity.User;
 import cn.topland.entity.UuidEntity;
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public abstract class BaseConverter<T, R> {
 

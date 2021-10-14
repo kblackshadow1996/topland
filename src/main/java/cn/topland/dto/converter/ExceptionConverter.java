@@ -1,8 +1,9 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.ExceptionDTO;
-import cn.topland.entity.*;
 import cn.topland.entity.Exception;
+import cn.topland.entity.Order;
+import cn.topland.entity.User;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

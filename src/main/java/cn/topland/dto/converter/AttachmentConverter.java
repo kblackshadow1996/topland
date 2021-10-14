@@ -2,7 +2,6 @@ package cn.topland.dto.converter;
 
 import cn.topland.dto.AttachmentDTO;
 import cn.topland.entity.Attachment;
-import cn.topland.entity.DirectusFiles;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 

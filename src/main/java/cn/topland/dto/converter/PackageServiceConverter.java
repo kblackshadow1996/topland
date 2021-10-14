@@ -2,7 +2,6 @@ package cn.topland.dto.converter;
 
 import cn.topland.dto.PackageServiceDTO;
 import cn.topland.entity.PackageService;
-import cn.topland.entity.Service;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 

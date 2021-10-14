@@ -1,10 +1,7 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.ContractDTO;
-import cn.topland.entity.Brand;
 import cn.topland.entity.Contract;
-import cn.topland.entity.Customer;
-import cn.topland.entity.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
