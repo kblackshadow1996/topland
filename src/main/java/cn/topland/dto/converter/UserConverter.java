@@ -1,9 +1,9 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.UserDTO;
+import cn.topland.entity.Department;
 import cn.topland.entity.User;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -11,9 +11,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class UserConverter extends BaseConverter<User, UserDTO> {
-
-    @Autowired
-    private DepartmentConverter departmentConverter;
 
     @Override
     public List<UserDTO> toDTOs(List<User> users) {
@@ -48,7 +45,7 @@ public class UserConverter extends BaseConverter<User, UserDTO> {
 
         userDTO.setExternalPosition(user.getExternalPosition());
         userDTO.setInternalPosition(user.getInternalPosition());
-        userDTO.setDepartments(departmentConverter.toDTOs(user.getDepartments()));
+        userDTO.setDepartments(listDepartmentIds(user.getDepartments()));
         userDTO.setLeadDepartments(user.getLeadDepartments());
 
         // directus登录信息, 用于创建及登录
@@ -57,5 +54,12 @@ public class UserConverter extends BaseConverter<User, UserDTO> {
         userDTO.setDirectusPassword(user.getDirectusPassword());
 
         return userDTO;
+    }
+
+    private List<Long> listDepartmentIds(List<Department> departments) {
+
+        return CollectionUtils.isEmpty(departments)
+                ? List.of()
+                : departments.stream().map(this::getId).collect(Collectors.toList());
     }
 }

@@ -42,7 +42,7 @@ public class QuotationDTO implements Serializable {
 
     private String explanations;
 
-    private List<QuotationServiceDTO> services;
+    private List<Long> services;
 
     private Long seller;
 

@@ -31,6 +31,8 @@ public class PermissionValidator {
 
     private static final String PACKAGE = "package";
 
+    private static final String EXCEPTION = "exception";
+
     private static final String ACTION_CREATE = "create";
 
     private static final String ACTION_UPDATE = "update";
@@ -118,6 +120,21 @@ public class PermissionValidator {
         validateRole(hasPermission(role, PACKAGE, ACTION_UPDATE));
     }
 
+    public void validateExceptionCreatePermissions(Role role) throws AccessException {
+
+        validateRole(hasPermission(role, EXCEPTION, ACTION_CREATE));
+    }
+
+    public void validateExceptionUpdatePermissions(Role role) throws AccessException {
+
+        validateRole(hasPermission(role, EXCEPTION, ACTION_UPDATE, "type"));
+    }
+
+    public void validateExceptionSolvePermissions(Role role) throws AccessException {
+
+        validateRole(hasPermission(role, EXCEPTION, ACTION_UPDATE, "status"));
+    }
+
     private boolean hasPermission(Role role, String collection, String action, String fields) throws AccessException {
 
         if (role == null) {
@@ -148,7 +165,7 @@ public class PermissionValidator {
 
         return collection.equals(permission.getCollection())
                 && action.equals(permission.getAction())
-                && permission.getFields().contains(fields);
+                && (permission.getFields().contains(fields) || "*".equals(permission.getFields()));
     }
 
     private void validateRole(boolean hasPermission) throws AccessException {

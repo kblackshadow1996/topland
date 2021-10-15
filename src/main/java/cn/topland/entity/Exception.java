@@ -56,7 +56,7 @@ public class Exception extends RecordEntity {
      * 部门来源
      */
     @Enumerated(value = EnumType.STRING)
-    private Department.Source departmentSource;
+    private DepartmentSource departmentSource;
 
     /**
      * 责任人
@@ -165,5 +165,11 @@ public class Exception extends RecordEntity {
 
         INTERNAL, // 内部异常
         ORDER // 订单异常
+    }
+
+    public enum DepartmentSource {
+
+        SUPPLIER, // 供应商
+        INTERNAL // 内部
     }
 }

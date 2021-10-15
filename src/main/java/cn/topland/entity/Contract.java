@@ -1,7 +1,6 @@
 package cn.topland.entity;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -14,7 +13,6 @@ import java.util.List;
  */
 @Setter
 @Getter
-@NoArgsConstructor
 @Entity
 @Table(name = "contract")
 public class Contract extends RecordEntity {
@@ -34,14 +32,14 @@ public class Contract extends RecordEntity {
     /**
      * 客户
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer")
     private Customer customer;
 
     /**
      * 品牌
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand")
     private Brand brand;
 
@@ -83,7 +81,7 @@ public class Contract extends RecordEntity {
     /**
      * 销售
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller")
     private User seller;
 
@@ -95,28 +93,28 @@ public class Contract extends RecordEntity {
     /**
      * 关联订单
      */
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "`order`")
     private Order order;
 
     /**
      * 结算合同
      */
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "contract")
     private List<SettlementContract> settlements;
 
     /**
      * 附件directus_files的id，以分号隔开
      */
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "contract")
     private List<Attachment> attachments;
 
     /**
      * 收款记录
      */
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_contract")
     private List<Receive> receives;
 

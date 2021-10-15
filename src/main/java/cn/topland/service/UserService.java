@@ -13,6 +13,7 @@ import cn.topland.util.InternalException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -61,6 +62,7 @@ public class UserService {
     /**
      * 按部门同步(只同步部门直属人员)
      */
+    @Transactional
     public List<User> syncWeworkUser(String deptId, User creator) throws Exception {
 
         // 用于关联用户部门
@@ -80,6 +82,7 @@ public class UserService {
     /**
      * 同步所有
      */
+    @Transactional
     public List<User> syncAllWeworkUser(User creator) throws InternalException {
 
         List<Department> departments = deptRepository.listAllDeptIds(Department.Source.WEWORK);

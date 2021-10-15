@@ -40,6 +40,11 @@ public class ExceptionService {
     @Autowired
     private OperationRepository operationRepository;
 
+    public Exception get(Long id) {
+
+        return repository.getById(id);
+    }
+
     @Transactional
     public List<Exception> add(List<ExceptionVO> exceptionVOs, List<Attachment> attachments, User creator) {
 
@@ -49,8 +54,9 @@ public class ExceptionService {
     }
 
     @Transactional
-    public Exception update(Exception exception, ExceptionVO exceptionVO, List<Attachment> attachments, User editor) {
+    public Exception update(Long id, ExceptionVO exceptionVO, List<Attachment> attachments, User editor) {
 
+        Exception exception = repository.getById(id);
         Exception exp = repository.saveAndFlush(updateException(exception, exceptionVO, attachments, editor));
         saveUpdateOperation(exception.getId(), editor);
         return exp;
@@ -110,6 +116,7 @@ public class ExceptionService {
 
     private void composeException(Exception exception, ExceptionVO exceptionVO, List<Attachment> attachments) {
 
+        exception.setCreateDate(exceptionVO.getCreateDate());
         exception.setOrders(listOrders(exceptionVO.getOrders()));
         exception.setAttribute(exceptionVO.getAttribute());
         exception.setType(getType(exceptionVO.getType()));
@@ -143,41 +150,51 @@ public class ExceptionService {
 
         exceptions.forEach(exception -> {
 
-            exception.getOrders().stream()
-                    .max(Comparator.comparingLong(order -> countByBrandAndType(order.getBrand(), exception.getType())))
-                    .ifPresent(order -> {
+            if (CollectionUtils.isNotEmpty(exception.getOrders())) {
 
-                        if (countByBrandAndType(order.getBrand(), exception.getType()) + exceptions.indexOf(exception) > 1) {
+                exception.getOrders().stream()
+                        .max(Comparator.comparingLong(order -> countByBrandAndType(order.getBrand(), exception.getType())))
+                        .ifPresent(order -> {
 
-                            exception.setCritical(true);
-                        }
-                    });
+                            if (countByBrandAndType(order.getBrand(), exception.getType()) + exceptions.indexOf(exception) > 1) {
+
+                                exception.setCritical(true);
+                            }
+                        });
+            }
         });
     }
 
     private long countByBrandAndType(Brand brand, ExceptionType type) {
 
-        return brand.getOrders().stream().mapToLong(order -> {
+        if (brand != null && CollectionUtils.isNotEmpty(brand.getOrders())) {
 
-            return order.getExceptions().stream()
-                    .filter(exception -> type.equals(exception.getType()))
-                    .count();
-        }).sum();
+            return brand.getOrders().stream().mapToLong(order -> {
+
+                return order.getExceptions().stream()
+                        .filter(exception -> type.equals(exception.getType()))
+                        .count();
+            }).sum();
+        }
+        return 0;
     }
 
     private void checkIfCriticalByOrder(List<Exception> exceptions) {
 
         exceptions.forEach(exception -> {
 
-            exception.getOrders().stream()
-                    .max(Comparator.comparingInt(order -> order.getExceptions().size()))
-                    .ifPresent(order -> {
+            if (CollectionUtils.isNotEmpty(exception.getOrders())) {
 
-                        if (order.getExceptions().size() + exceptions.indexOf(exception) > 1) {
+                exception.getOrders().stream()
+                        .max(Comparator.comparingInt(order -> order.getExceptions().size()))
+                        .ifPresent(order -> {
 
-                            exception.setCritical(true);
-                        }
-                    });
+                            if (order.getExceptions().size() + exceptions.indexOf(exception) > 1) {
+
+                                exception.setCritical(true);
+                            }
+                        });
+            }
         });
     }
 
@@ -185,7 +202,7 @@ public class ExceptionService {
 
         exceptions.forEach(exception -> {
 
-            if (exception.getType().getExceptions().size() + exceptions.indexOf(exception) > 2) {
+            if (exception.getType() != null && exception.getType().getExceptions().size() + exceptions.indexOf(exception) > 2) {
 
                 exception.setCritical(true);
             }
@@ -196,7 +213,7 @@ public class ExceptionService {
 
         exceptions.forEach(exception -> {
 
-            if (exception.getEstimatedLoss().compareTo(new BigDecimal("1000.00")) > 0) {
+            if (exception.getEstimatedLoss() != null && exception.getEstimatedLoss().compareTo(new BigDecimal("1000.00")) > 0) {
 
                 exception.setCritical(true);
             }
@@ -269,8 +286,8 @@ public class ExceptionService {
     private List<Order> listOrders(List<Long> orderIds) {
 
         return CollectionUtils.isEmpty(orderIds)
-                ? orderRepository.findAllById(orderIds)
-                : List.of();
+                ? List.of()
+                : orderRepository.findAllById(orderIds);
     }
 
     private Department getDepartment(Long department) {

@@ -3,14 +3,15 @@ package cn.topland.dto.converter;
 import cn.topland.dto.QuotationDTO;
 import cn.topland.entity.Quotation;
 import cn.topland.entity.QuotationComment;
-import org.springframework.beans.factory.annotation.Autowired;
+import cn.topland.entity.QuotationService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class QuotationConverter extends BaseConverter<Quotation, QuotationDTO> {
-
-    @Autowired
-    private QuotationServiceConverter quotationServiceConverter;
 
     @Override
     public QuotationDTO toDTO(Quotation quotation) {
@@ -32,7 +33,7 @@ public class QuotationConverter extends BaseConverter<Quotation, QuotationDTO> {
         dto.setCustomer(getId(quotation.getCustomer()));
         dto.setBrand(getId(quotation.getBrand()));
         dto.setServicePackage(getId(quotation.getServicePackage()));
-        dto.setServices(quotationServiceConverter.toDTOs(quotation.getServices()));
+        dto.setServices(listServiceIds(quotation.getServices()));
         dto.setExplanations(quotation.getExplanations());
 
         QuotationComment comment = quotation.getComment();
@@ -45,5 +46,12 @@ public class QuotationConverter extends BaseConverter<Quotation, QuotationDTO> {
         dto.setCreateTime(quotation.getCreateTime());
         dto.setLastUpdateTime(quotation.getLastUpdateTime());
         return dto;
+    }
+
+    private List<Long> listServiceIds(List<QuotationService> services) {
+
+        return CollectionUtils.isEmpty(services)
+                ? List.of()
+                : services.stream().map(this::getId).collect(Collectors.toList());
     }
 }

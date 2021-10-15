@@ -48,7 +48,7 @@ public class ContractService {
     public Contract review(Long id, ContractVO contractVO, User editor) {
 
         Contract contract = repository.saveAndFlush(reviewContract(id, contractVO, editor));
-        saveOperation(id, contractVO.getAction(), editor, contractVO.getReviewComments());
+        saveOperation(id, contractVO.getAction(), editor, contractVO.getReviewComment());
         return contract;
     }
 

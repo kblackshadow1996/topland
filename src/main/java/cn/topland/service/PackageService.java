@@ -37,6 +37,7 @@ public class PackageService {
     private Package updatePackage(Package pkg, PackageVO packageVO, List<cn.topland.entity.PackageService> services, User editor) {
 
         composePackage(pkg, packageVO);
+        pkg.setServices(services);
         pkg.setEditor(editor);
         pkg.setLastUpdateTime(LocalDateTime.now());
         return pkg;

@@ -48,5 +48,6 @@ public class CustomerVO implements Serializable {
 
     private Long creator;
 
+    @JsonProperty("lost_reason")
     private String lostReason;
 }

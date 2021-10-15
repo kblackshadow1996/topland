@@ -15,7 +15,7 @@ public class PackageDTO implements Serializable {
 
     private Long id;
 
-    private List<PackageServiceDTO> services;
+    private List<Long> services;
 
     private String name;
 

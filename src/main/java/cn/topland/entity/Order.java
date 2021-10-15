@@ -21,42 +21,42 @@ public class Order extends RecordEntity {
     /**
      * 客户
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer")
     private Customer customer;
 
     /**
      * 品牌
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand")
     private Brand brand;
 
     /**
      * 联系人
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contact")
     private Contact contact;
 
     /**
      * 策划
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "planner")
     private User planner;
 
     /**
      * 制片
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "producer")
     private User producer;
 
     /**
      * 销售经理
      */
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller")
     private User seller;
 
@@ -68,6 +68,6 @@ public class Order extends RecordEntity {
     /**
      * 异常
      */
-    @ManyToMany(mappedBy = "orders")
+    @ManyToMany(mappedBy = "orders", fetch = FetchType.LAZY)
     private List<Exception> exceptions;
 }

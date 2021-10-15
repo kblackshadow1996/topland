@@ -26,7 +26,7 @@ public class SettlementContractDTO implements Serializable {
 
     private String remark;
 
-    private List<AttachmentDTO> attachments;
+    private List<Long> attachments;
 
     private Long contract;
 

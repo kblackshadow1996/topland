@@ -1,7 +1,7 @@
 package cn.topland.vo;
 
-import cn.topland.entity.Department;
 import cn.topland.entity.Exception;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +20,7 @@ public class ExceptionVO implements Serializable {
     private Long type;
 
     @JsonProperty(value = "department_source")
-    private Department.Source departmentSource;
+    private Exception.DepartmentSource departmentSource;
 
     private Long department;
 
@@ -47,11 +47,11 @@ public class ExceptionVO implements Serializable {
     @JsonProperty(value = "estimated_loss_condition")
     private String estimatedLossCondition;
 
-    private Exception.Status status;
-
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonProperty(value = "create_date")
     private LocalDate createDate;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonProperty(value = "close_date")
     private LocalDate closeDate;
 
@@ -67,4 +67,6 @@ public class ExceptionVO implements Serializable {
     private String optimalSolution;
 
     private Boolean optimal;
+
+    private Long creator;
 }

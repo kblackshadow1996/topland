@@ -62,7 +62,6 @@ public class Department extends RecordEntity {
     public enum Source {
 
         WEWORK, // 企业微信
-        SUPPLIER, // 供应商
         OTHER
     }
 

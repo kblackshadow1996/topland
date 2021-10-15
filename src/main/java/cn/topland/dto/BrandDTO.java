@@ -23,7 +23,7 @@ public class BrandDTO implements Serializable {
 
     private String business;
 
-    private List<ContactDTO> contracts;
+    private List<Long> contacts;
 
     private Long creator;
 

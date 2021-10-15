@@ -1,5 +1,6 @@
 package cn.topland.dto;
 
+import cn.topland.entity.Customer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -27,7 +28,9 @@ public class CustomerDTO implements Serializable {
 
     private Type type;
 
-    private CustomerDTO parent;
+    private Customer.Status status;
+
+    private Long parent;
 
     private Source source;
 
@@ -48,7 +51,7 @@ public class CustomerDTO implements Serializable {
 
     private String account;
 
-    private List<ContactDTO> contacts;
+    private List<Long> contacts;
 
     private Long creator;
 

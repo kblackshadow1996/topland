@@ -1,6 +1,7 @@
 package cn.topland.vo;
 
 import cn.topland.entity.Contract;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,8 +15,6 @@ import java.util.List;
 @Getter
 public class ContractVO implements Serializable {
 
-    private String identity;
-
     private Contract.Type type;
 
     private Long customer;
@@ -23,15 +22,19 @@ public class ContractVO implements Serializable {
     private Long brand;
 
     @JsonProperty(value = "contract_date")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate contractDate;
 
     @JsonProperty(value = "paper_date")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate paperDate;
 
     @JsonProperty(value = "start_date")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
 
     @JsonProperty(value = "end_date")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
 
     private BigDecimal margin;
@@ -52,6 +55,6 @@ public class ContractVO implements Serializable {
 
     private Contract.Action action;
 
-    @JsonProperty("review_comments")
-    private String reviewComments;
+    @JsonProperty("review_comment")
+    private String reviewComment;
 }

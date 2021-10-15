@@ -22,10 +22,10 @@ public class ExceptionDTO implements Serializable {
 
     private List<Long> orders;
 
-    private ExceptionType type;
+    private Long type;
 
     @JsonProperty(value = "department_source")
-    private Department.Source departmentSource;
+    private Exception.DepartmentSource departmentSource;
 
     private Long department;
 
@@ -37,7 +37,7 @@ public class ExceptionDTO implements Serializable {
 
     private String complaint;
 
-    private List<AttachmentDTO> attachments;
+    private List<Long> attachments;
 
     @JsonProperty(value = "self_check")
     private String selfCheck;
@@ -52,7 +52,7 @@ public class ExceptionDTO implements Serializable {
 
     private Boolean critical;
 
-    private Exception.Status status;
+    private Boolean resolved;
 
     @JsonProperty(value = "create_date")
     private LocalDate createDate;

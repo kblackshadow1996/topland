@@ -1,15 +1,16 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.ContractDTO;
+import cn.topland.entity.Attachment;
 import cn.topland.entity.Contract;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class ContractConverter extends BaseConverter<Contract, ContractDTO> {
-
-    @Autowired
-    private AttachmentConverter attachmentConverter;
 
     @Override
     public ContractDTO toDTO(Contract contract) {
@@ -35,7 +36,7 @@ public class ContractConverter extends BaseConverter<Contract, ContractDTO> {
         dto.setStatus(contract.getStatus());
         dto.setType(contract.getType());
         dto.setRemark(contract.getRemark());
-        dto.setAttachments(attachmentConverter.toDTOs(contract.getAttachments()));
+        dto.setAttachments(listAttachmentIds(contract.getAttachments()));
 
         // 关联信息
         dto.setOrder(getId(contract.getOrder()));
@@ -49,5 +50,12 @@ public class ContractConverter extends BaseConverter<Contract, ContractDTO> {
         dto.setCreateTime(contract.getCreateTime());
         dto.setLastUpdateTime(contract.getLastUpdateTime());
         return dto;
+    }
+
+    private List<Long> listAttachmentIds(List<Attachment> attachments) {
+
+        return CollectionUtils.isEmpty(attachments)
+                ? List.of()
+                : attachments.stream().map(this::getId).collect(Collectors.toList());
     }
 }

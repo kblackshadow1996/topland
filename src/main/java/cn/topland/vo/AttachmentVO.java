@@ -9,5 +9,7 @@ import java.io.Serializable;
 @Getter
 public class AttachmentVO implements Serializable {
 
+    private Long id;
+
     private String file;
 }

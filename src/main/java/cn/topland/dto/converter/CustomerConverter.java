@@ -1,16 +1,17 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.CustomerDTO;
+import cn.topland.entity.Contact;
 import cn.topland.entity.Customer;
 import cn.topland.entity.Invoice;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class CustomerConverter extends BaseConverter<Customer, CustomerDTO> {
-
-    @Autowired
-    private ContactConverter contactConverter;
 
     @Override
     public CustomerDTO toDTO(Customer customer) {
@@ -29,7 +30,8 @@ public class CustomerConverter extends BaseConverter<Customer, CustomerDTO> {
         dto.setSeller(getId(customer.getSeller()));
         dto.setBusiness(customer.getBusiness());
         dto.setType(customer.getType());
-        dto.setParent(toDTO(customer.getParent()));
+        dto.setStatus(customer.getStatus());
+        dto.setParent(getId(customer.getParent()));
         dto.setSource(customer.getSource());
 
         // 发票
@@ -43,7 +45,7 @@ public class CustomerConverter extends BaseConverter<Customer, CustomerDTO> {
         dto.setBank(invoice.getBank());
 
         // 联系人
-        dto.setContacts(contactConverter.toDTOs(customer.getContacts()));
+        dto.setContacts(listContactIds(customer.getContacts()));
 
         // 创建信息
         dto.setCreator(getId(customer.getCreator()));
@@ -51,5 +53,12 @@ public class CustomerConverter extends BaseConverter<Customer, CustomerDTO> {
         dto.setCreateTime(customer.getCreateTime());
         dto.setLastUpdateTime(customer.getLastUpdateTime());
         return dto;
+    }
+
+    private List<Long> listContactIds(List<Contact> contacts) {
+
+        return CollectionUtils.isEmpty(contacts)
+                ? List.of()
+                : contacts.stream().map(this::getId).collect(Collectors.toList());
     }
 }

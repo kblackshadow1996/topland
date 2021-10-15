@@ -29,13 +29,13 @@ public class ContractDTO implements Serializable {
     @JsonProperty(value = "contract_date")
     private LocalDate contractDate;
 
-    @JsonProperty(value = "contract_date")
+    @JsonProperty(value = "paper_date")
     private LocalDate paperDate;
 
-    @JsonProperty(value = "contract_date")
+    @JsonProperty(value = "start_date")
     private LocalDate startDate;
 
-    @JsonProperty(value = "contract_date")
+    @JsonProperty(value = "end_date")
     private LocalDate endDate;
 
     private BigDecimal margin;
@@ -50,7 +50,7 @@ public class ContractDTO implements Serializable {
 
     private Long order;
 
-    private List<AttachmentDTO> attachments;
+    private List<Long> attachments;
 
     private Contract.Status status;
 

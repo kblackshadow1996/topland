@@ -1,15 +1,16 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.SettlementContractDTO;
+import cn.topland.entity.Attachment;
 import cn.topland.entity.SettlementContract;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class SettlementContractConverter extends BaseConverter<SettlementContract, SettlementContractDTO> {
-
-    @Autowired
-    private AttachmentConverter attachmentConverter;
 
     @Override
     public SettlementContractDTO toDTO(SettlementContract settlementContract) {
@@ -29,7 +30,14 @@ public class SettlementContractConverter extends BaseConverter<SettlementContrac
         dto.setReceivable(settlementContract.getReceivable());
         dto.setRemark(settlementContract.getRemark());
         dto.setOrder(getId(settlementContract.getOrder()));
-        dto.setAttachments(attachmentConverter.toDTOs(settlementContract.getAttachments()));
+        dto.setAttachments(listAttachmentIds(settlementContract.getAttachments()));
         return dto;
+    }
+
+    private List<Long> listAttachmentIds(List<Attachment> attachments) {
+
+        return CollectionUtils.isEmpty(attachments)
+                ? List.of()
+                : attachments.stream().map(this::getId).collect(Collectors.toList());
     }
 }

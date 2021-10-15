@@ -1,11 +1,11 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.ExceptionDTO;
+import cn.topland.entity.Attachment;
 import cn.topland.entity.Exception;
 import cn.topland.entity.Order;
 import cn.topland.entity.User;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,9 +13,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class ExceptionConverter extends BaseConverter<Exception, ExceptionDTO> {
-
-    @Autowired
-    private AttachmentConverter attachmentConverter;
 
     @Override
     public List<ExceptionDTO> toDTOs(List<Exception> exceptions) {
@@ -38,20 +35,21 @@ public class ExceptionConverter extends BaseConverter<Exception, ExceptionDTO> {
         ExceptionDTO dto = new ExceptionDTO();
         dto.setId(exception.getId());
         dto.setAttribute(exception.getAttribute());
-        dto.setType(exception.getType());
+        dto.setType(getId(exception.getType()));
+        dto.setDepartmentSource(exception.getDepartmentSource());
         dto.setDepartment(getId(exception.getDepartment()));
         dto.setOrders(listOrderIds(exception.getOrders()));
         dto.setOwners(listUserIds(exception.getOwners()));
         dto.setOwners(listUserIds(exception.getOwners()));
         dto.setJudge(getId(exception.getJudge()));
         dto.setComplaint(exception.getComplaint());
-        dto.setAttachments(attachmentConverter.toDTOs(exception.getAttachments()));
+        dto.setAttachments(listAttachmentIds(exception.getAttachments()));
         dto.setSelfCheck(exception.getSelfCheck());
         dto.setNarrative(exception.getNarrative());
         dto.setEstimatedLoss(exception.getEstimatedLoss());
         dto.setEstimatedLossCondition(exception.getEstimatedLossCondition());
         dto.setCritical(exception.getCritical());
-        dto.setStatus(exception.getStatus());
+        dto.setResolved(exception.getResolved());
         dto.setCreateDate(exception.getCreateDate());
         dto.setCloseDate(exception.getCloseDate());
         dto.setActualLoss(exception.getActualLoss());
@@ -61,6 +59,13 @@ public class ExceptionConverter extends BaseConverter<Exception, ExceptionDTO> {
         dto.setOptimalSolution(exception.getOptimalSolution());
 
         return dto;
+    }
+
+    private List<Long> listAttachmentIds(List<Attachment> attachments) {
+
+        return CollectionUtils.isEmpty(attachments)
+                ? List.of()
+                : attachments.stream().map(this::getId).collect(Collectors.toList());
     }
 
     protected List<Long> listUserIds(List<User> users) {

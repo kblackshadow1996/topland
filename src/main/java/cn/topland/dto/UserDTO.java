@@ -30,7 +30,7 @@ public class UserDTO implements Serializable {
     @JsonProperty(value = "internal_position")
     private String internalPosition;
 
-    private List<DepartmentDTO> departments;
+    private List<Long> departments;
 
     @JsonProperty(value = "lead_departments")
     private String leadDepartments;
