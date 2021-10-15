@@ -11,7 +11,6 @@ import cn.topland.service.UserService;
 import cn.topland.util.AccessException;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
-import cn.topland.util.UniqueException;
 import cn.topland.vo.BrandVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -38,46 +37,22 @@ public class BrandController {
     private BrandConverter brandConverter;
 
     @PostMapping("/add")
-    public Response add(@RequestBody BrandVO brandVO) {
+    public Response add(@RequestBody BrandVO brandVO) throws AccessException {
 
-        try {
-
-            User user = userService.get(brandVO.getCreator());
-            validator.validateBrandCreatePermissions(user.getRole());
-            return Responses.success(brandConverter.toDTO(
-                    brandService.add(brandVO, contactService.createContacts(brandVO.getContacts()), user))
-            );
-        } catch (AccessException e) {
-
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
-        } catch (UniqueException e) {
-
-            return Responses.fail(Response.FAILED_VALIDATION, e.getMessage());
-        } catch (Exception e) {
-
-            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        User user = userService.get(brandVO.getCreator());
+        validator.validateBrandCreatePermissions(user.getRole());
+        return Responses.success(brandConverter.toDTO(
+                brandService.add(brandVO, contactService.createContacts(brandVO.getContacts()), user))
+        );
     }
 
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody BrandVO brandVO) {
+    public Response update(@PathVariable Long id, @RequestBody BrandVO brandVO) throws AccessException {
 
-        try {
-
-            User user = userService.get(brandVO.getCreator());
-            validator.validateBrandUpdatePermissions(user.getRole());
-            Brand brand = brandService.get(id);
-            List<Contact> contacts = contactService.updateContacts(brand.getContacts(), brandVO.getContacts());
-            return Responses.success(brandConverter.toDTO(brandService.update(brand, brandVO, contacts, user)));
-        } catch (AccessException e) {
-
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
-        } catch (UniqueException e) {
-
-            return Responses.fail(Response.FAILED_VALIDATION, e.getMessage());
-        } catch (Exception e) {
-
-            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        User user = userService.get(brandVO.getCreator());
+        validator.validateBrandUpdatePermissions(user.getRole());
+        Brand brand = brandService.get(id);
+        List<Contact> contacts = contactService.updateContacts(brand.getContacts(), brandVO.getContacts());
+        return Responses.success(brandConverter.toDTO(brandService.update(brand, brandVO, contacts, user)));
     }
 }

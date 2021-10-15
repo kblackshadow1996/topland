@@ -4,7 +4,7 @@ import cn.topland.dao.CustomerRepository;
 import cn.topland.dao.OperationRepository;
 import cn.topland.dao.UserRepository;
 import cn.topland.entity.*;
-import cn.topland.util.UniqueException;
+import cn.topland.util.DataViolateException;
 import cn.topland.vo.CustomerVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -35,7 +35,7 @@ public class CustomerService {
     }
 
     @Transactional
-    public Customer add(CustomerVO customerVO, List<Contact> contacts, User creator) throws UniqueException {
+    public Customer add(CustomerVO customerVO, List<Contact> contacts, User creator) throws DataViolateException {
 
         try {
 
@@ -44,7 +44,7 @@ public class CustomerService {
             return customer;
         } catch (DataIntegrityViolationException e) {
 
-            throw new UniqueException();
+            throw new DataViolateException();
         }
     }
 
@@ -58,7 +58,7 @@ public class CustomerService {
             return customer;
         } catch (DataIntegrityViolationException e) {
 
-            throw new UniqueException();
+            throw new DataViolateException();
         }
     }
 

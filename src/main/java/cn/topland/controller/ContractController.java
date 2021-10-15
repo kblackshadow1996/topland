@@ -33,55 +33,28 @@ public class ContractController {
     private ContractConverter contractConverter;
 
     @PostMapping("/add")
-    public Response add(@RequestBody ContractVO contractVO) {
+    public Response add(@RequestBody ContractVO contractVO) throws AccessException {
 
-        try {
-
-            User user = userService.get(contractVO.getCreator());
-            validator.validateContractCreatePermissions(user.getRole());
-            return Responses.success(contractConverter.toDTO(contractService.add(contractVO, user)));
-        } catch (AccessException e) {
-
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
-        } catch (Exception e) {
-
-            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        User user = userService.get(contractVO.getCreator());
+        validator.validateContractCreatePermissions(user.getRole());
+        return Responses.success(contractConverter.toDTO(contractService.add(contractVO, user)));
     }
 
     @PatchMapping("/receive-paper/{id}")
-    public Response receivePaper(@PathVariable Long id, @RequestBody ContractVO contractVO) {
+    public Response receivePaper(@PathVariable Long id, @RequestBody ContractVO contractVO) throws AccessException {
 
-        try {
-
-            User user = userService.get(contractVO.getCreator());
-            validator.validateContractReceivePaperPermissions(user.getRole());
-            return Responses.success(contractConverter.toDTO(
-                    contractService.receivePaper(id, contractVO, attachmentService.upload(contractVO.getAttachments()), user)
-            ));
-        } catch (AccessException e) {
-
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
-        } catch (Exception e) {
-
-            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        User user = userService.get(contractVO.getCreator());
+        validator.validateContractReceivePaperPermissions(user.getRole());
+        return Responses.success(contractConverter.toDTO(
+                contractService.receivePaper(id, contractVO, attachmentService.upload(contractVO.getAttachments()), user)
+        ));
     }
 
     @PatchMapping("/review/{id}")
-    public Response review(@PathVariable Long id, @RequestBody ContractVO contractVO) {
+    public Response review(@PathVariable Long id, @RequestBody ContractVO contractVO) throws AccessException {
 
-        try {
-
-            User user = userService.get(contractVO.getCreator());
-            validator.validateContractReviewPermissions(user.getRole());
-            return Responses.success(contractConverter.toDTO(contractService.review(id, contractVO, user)));
-        } catch (AccessException e) {
-
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
-        } catch (Exception e) {
-
-            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        User user = userService.get(contractVO.getCreator());
+        validator.validateContractReviewPermissions(user.getRole());
+        return Responses.success(contractConverter.toDTO(contractService.review(id, contractVO, user)));
     }
 }

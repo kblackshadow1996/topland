@@ -5,6 +5,7 @@ import cn.topland.dto.converter.UserConverter;
 import cn.topland.entity.User;
 import cn.topland.service.UserService;
 import cn.topland.util.AccessException;
+import cn.topland.util.InternalException;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,36 +27,18 @@ public class UserController {
     private PermissionValidator validator;
 
     @PostMapping("/wework/sync/all")
-    public Response syncAll(Long userId) {
+    public Response syncAll(Long userId) throws AccessException, InternalException {
 
-        try {
-
-            User user = userService.get(userId);
-            validator.validateUserPermissions(user.getRole());
-            return Responses.success(userConverter.toDTOs(userService.syncAllWeworkUser(user)));
-        } catch (AccessException e) {
-
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
-        } catch (Exception e) {
-
-            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        User user = userService.get(userId);
+        validator.validateUserPermissions(user.getRole());
+        return Responses.success(userConverter.toDTOs(userService.syncAllWeworkUser(user)));
     }
 
     @PostMapping(value = "/wework/sync")
-    public Response sync(String deptId, Long userId) {
+    public Response sync(String deptId, Long userId) throws AccessException, InternalException {
 
-        try {
-
-            User user = userService.get(userId);
-            validator.validateUserPermissions(user.getRole());
-            return Responses.success(userConverter.toDTOs(userService.syncWeworkUser(deptId, user)));
-        } catch (AccessException e) {
-
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
-        } catch (Exception e) {
-
-            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        User user = userService.get(userId);
+        validator.validateUserPermissions(user.getRole());
+        return Responses.success(userConverter.toDTOs(userService.syncWeworkUser(deptId, user)));
     }
 }

@@ -5,7 +5,7 @@ import cn.topland.dao.CustomerRepository;
 import cn.topland.dao.OperationRepository;
 import cn.topland.dao.UserRepository;
 import cn.topland.entity.*;
-import cn.topland.util.UniqueException;
+import cn.topland.util.DataViolateException;
 import cn.topland.vo.BrandVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -47,7 +47,7 @@ public class BrandService {
             return brand;
         } catch (DataIntegrityViolationException e) {
 
-            throw new UniqueException();
+            throw new DataViolateException();
         }
     }
 
@@ -61,7 +61,7 @@ public class BrandService {
             return brand;
         } catch (DataIntegrityViolationException e) {
 
-            throw new UniqueException();
+            throw new DataViolateException();
         }
     }
 

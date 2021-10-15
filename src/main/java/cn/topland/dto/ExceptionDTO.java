@@ -1,8 +1,6 @@
 package cn.topland.dto;
 
-import cn.topland.entity.Department;
 import cn.topland.entity.Exception;
-import cn.topland.entity.ExceptionType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;

@@ -39,62 +39,35 @@ public class ExceptionController {
     private ExceptionConverter exceptionConverter;
 
     @PostMapping("/add")
-    public Response add(@RequestBody List<ExceptionVO> exceptionVOs) {
+    public Response add(@RequestBody List<ExceptionVO> exceptionVOs) throws AccessException {
 
-        try {
-
-            User user = userService.get(exceptionVOs.get(0).getCreator());
-            validator.validateExceptionCreatePermissions(user.getRole());
-            List<Attachment> attachments = uploadAttachments(exceptionVOs);
-            return Responses.success(exceptionConverter.toDTOs(
-                    exceptionService.add(exceptionVOs, attachments, user)
-            ));
-        } catch (AccessException e) {
-
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
-        } catch (Exception e) {
-
-            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        User user = userService.get(exceptionVOs.get(0).getCreator());
+        validator.validateExceptionCreatePermissions(user.getRole());
+        List<Attachment> attachments = uploadAttachments(exceptionVOs);
+        return Responses.success(exceptionConverter.toDTOs(
+                exceptionService.add(exceptionVOs, attachments, user)
+        ));
     }
 
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody ExceptionVO exceptionVO) {
+    public Response update(@PathVariable Long id, @RequestBody ExceptionVO exceptionVO) throws AccessException {
 
-        try {
-
-            User user = userService.get(exceptionVO.getCreator());
-            validator.validateExceptionUpdatePermissions(user.getRole());
-            List<Attachment> attachments = attachmentService.upload(exceptionVO.getAttachments());
-            return Responses.success(exceptionConverter.toDTO(
-                    exceptionService.update(id, exceptionVO, attachments, user)
-            ));
-        } catch (AccessException e) {
-
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
-        } catch (Exception e) {
-
-            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        User user = userService.get(exceptionVO.getCreator());
+        validator.validateExceptionUpdatePermissions(user.getRole());
+        List<Attachment> attachments = attachmentService.upload(exceptionVO.getAttachments());
+        return Responses.success(exceptionConverter.toDTO(
+                exceptionService.update(id, exceptionVO, attachments, user)
+        ));
     }
 
     @PatchMapping("/solve/{id}")
-    public Response solve(@PathVariable Long id, @RequestBody ExceptionVO exceptionVO) {
+    public Response solve(@PathVariable Long id, @RequestBody ExceptionVO exceptionVO) throws AccessException {
 
-        try {
-
-            User user = userService.get(exceptionVO.getCreator());
-            validator.validateExceptionSolvePermissions(user.getRole());
-            return Responses.success(exceptionConverter.toDTO(
-                    exceptionService.solve(id, exceptionVO, user)
-            ));
-        } catch (AccessException e) {
-
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
-        } catch (Exception e) {
-
-            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        User user = userService.get(exceptionVO.getCreator());
+        validator.validateExceptionSolvePermissions(user.getRole());
+        return Responses.success(exceptionConverter.toDTO(
+                exceptionService.solve(id, exceptionVO, user)
+        ));
     }
 
     private List<Attachment> uploadAttachments(List<ExceptionVO> exceptionVOs) {

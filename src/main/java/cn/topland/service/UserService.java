@@ -63,7 +63,7 @@ public class UserService {
      * 按部门同步(只同步部门直属人员)
      */
     @Transactional
-    public List<User> syncWeworkUser(String deptId, User creator) throws Exception {
+    public List<User> syncWeworkUser(String deptId, User creator) throws InternalException {
 
         // 用于关联用户部门
         List<Department> departments = deptRepository.listAllDeptIds(Department.Source.WEWORK);

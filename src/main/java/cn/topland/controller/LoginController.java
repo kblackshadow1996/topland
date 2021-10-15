@@ -30,31 +30,17 @@ public class LoginController {
     @GetMapping("/wework/config")
     public Response weworkConfig() {
 
-        try {
-
-            return Responses.success(weworkConfig);
-        } catch (Exception e) {
-
-            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        return Responses.success(weworkConfig);
     }
 
     @GetMapping(value = "/wework/login")
-    public Response loginByWework(String code, String state) {
+    public Response loginByWework(String code, String state) throws AccessException, InternalException {
 
-        try {
+        if (StringUtils.isNotBlank(code) && StringUtils.equals(state, weworkConfig.getState())) {
 
-            if (StringUtils.isNotBlank(code) && StringUtils.equals(state, weworkConfig.getState())) {
-
-                return Responses.success(converter.toDTO(userService.loginByWework(code)));
-            }
-            return Responses.fail(Response.INTERNAL_SERVER_ERROR, "扫描二维码失败");
-        } catch (AccessException e) {
-
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
-        } catch (InternalException e) {
-
-            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
+            return Responses.success(converter.toDTO(userService.loginByWework(code)));
         }
+        return Responses.fail(Response.INTERNAL_SERVER_ERROR, "扫描二维码失败");
+
     }
 }

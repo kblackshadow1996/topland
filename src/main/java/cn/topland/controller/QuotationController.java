@@ -48,37 +48,19 @@ public class QuotationController {
     }
 
     @PostMapping("/add")
-    public Response add(@RequestBody QuotationVO quotationVO) {
+    public Response add(@RequestBody QuotationVO quotationVO) throws AccessException {
 
-        try {
-
-            User user = userService.get(quotationVO.getCreator());
-            validator.validateQuotationCreatePermission(user.getRole());
-            return Responses.success(quotationConverter.toDTO(quotationService.add(quotationVO, user)));
-        } catch (AccessException e) {
-
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
-        } catch (Exception e) {
-
-            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        User user = userService.get(quotationVO.getCreator());
+        validator.validateQuotationCreatePermission(user.getRole());
+        return Responses.success(quotationConverter.toDTO(quotationService.add(quotationVO, user)));
     }
 
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody QuotationVO quotationVO) {
+    public Response update(@PathVariable Long id, @RequestBody QuotationVO quotationVO) throws AccessException {
 
-        try {
-
-            User user = userService.get(quotationVO.getCreator());
-            validator.validateQuotationUpdatePermission(user.getRole());
-            return Responses.success(quotationConverter.toDTO(quotationService.update(id, quotationVO, user)));
-        } catch (AccessException e) {
-
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
-        } catch (Exception e) {
-
-            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        User user = userService.get(quotationVO.getCreator());
+        validator.validateQuotationUpdatePermission(user.getRole());
+        return Responses.success(quotationConverter.toDTO(quotationService.update(id, quotationVO, user)));
     }
 
     private String readHtml(String html) {

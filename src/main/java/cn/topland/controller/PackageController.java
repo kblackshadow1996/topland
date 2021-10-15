@@ -36,39 +36,21 @@ public class PackageController {
     private PackageConverter packageConverter;
 
     @PostMapping("/add")
-    public Response add(@RequestBody PackageVO packageVO) {
+    public Response add(@RequestBody PackageVO packageVO) throws AccessException {
 
-        try {
-
-            User user = userService.get(packageVO.getCreator());
-            validator.validatePackageCreatePermissions(user.getRole());
-            List<cn.topland.entity.PackageService> services = packageServiceService.add(packageVO.getServices());
-            return Responses.success(packageConverter.toDTO(packageService.add(packageVO, services, user)));
-        } catch (AccessException e) {
-
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
-        } catch (Exception e) {
-
-            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        User user = userService.get(packageVO.getCreator());
+        validator.validatePackageCreatePermissions(user.getRole());
+        List<cn.topland.entity.PackageService> services = packageServiceService.add(packageVO.getServices());
+        return Responses.success(packageConverter.toDTO(packageService.add(packageVO, services, user)));
     }
 
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody PackageVO packageVO) {
+    public Response update(@PathVariable Long id, @RequestBody PackageVO packageVO) throws AccessException {
 
-        try {
-
-            User user = userService.get(packageVO.getCreator());
-            validator.validatePackageUpdatePermissions(user.getRole());
-            Package pkg = packageService.get(id);
-            List<cn.topland.entity.PackageService> services = packageServiceService.update(pkg.getServices(), packageVO.getServices());
-            return Responses.success(packageConverter.toDTO(packageService.update(pkg, packageVO, services, user)));
-        } catch (AccessException e) {
-
-            return Responses.fail(Response.FORBIDDEN, e.getMessage());
-        } catch (Exception e) {
-
-            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        User user = userService.get(packageVO.getCreator());
+        validator.validatePackageUpdatePermissions(user.getRole());
+        Package pkg = packageService.get(id);
+        List<cn.topland.entity.PackageService> services = packageServiceService.update(pkg.getServices(), packageVO.getServices());
+        return Responses.success(packageConverter.toDTO(packageService.update(pkg, packageVO, services, user)));
     }
 }
