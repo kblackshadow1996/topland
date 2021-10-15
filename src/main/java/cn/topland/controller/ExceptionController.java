@@ -54,7 +54,7 @@ public class ExceptionController {
 
         User user = userService.get(exceptionVO.getCreator());
         validator.validateExceptionUpdatePermissions(user.getRole());
-        List<Attachment> attachments = attachmentService.upload(exceptionVO.getAttachments());
+        List<Attachment> attachments = uploadAttachments(List.of(exceptionVO));
         return Responses.success(exceptionConverter.toDTO(
                 exceptionService.update(id, exceptionVO, attachments, user)
         ));
