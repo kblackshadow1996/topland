@@ -3,7 +3,6 @@ package cn.topland.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
@@ -14,7 +13,6 @@ import static cn.topland.entity.User.Source;
 
 @Setter
 @Getter
-@NoArgsConstructor
 public class UserDTO implements Serializable {
 
     private Long id;

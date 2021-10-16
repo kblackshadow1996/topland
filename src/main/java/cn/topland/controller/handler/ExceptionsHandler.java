@@ -1,6 +1,10 @@
 package cn.topland.controller.handler;
 
-import cn.topland.util.*;
+import cn.topland.util.AccessException;
+import cn.topland.util.InternalException;
+import cn.topland.util.Response;
+import cn.topland.util.Responses;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -22,8 +26,8 @@ public class ExceptionsHandler {
         return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
-    @ExceptionHandler(value = DataViolateException.class)
-    public Response handleUniqueException(DataViolateException e) {
+    @ExceptionHandler(value = DataIntegrityViolationException.class)
+    public Response handleUniqueException(DataIntegrityViolationException e) {
 
         return Responses.fail(Response.FAILED_VALIDATION, e.getMessage());
     }

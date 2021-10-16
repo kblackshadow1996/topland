@@ -21,11 +21,6 @@ import java.util.Objects;
 public class DirectusPermissions extends SimpleIdEntity {
 
     /**
-     * 角色
-     */
-    private String role;
-
-    /**
      * 数据集
      */
     private String collection;
@@ -78,8 +73,7 @@ public class DirectusPermissions extends SimpleIdEntity {
 
     private boolean equalsTo(DirectusPermissions that) {
 
-        return Objects.equals(this.role, that.role)
-                && Objects.equals(this.collection, that.collection)
+        return Objects.equals(this.collection, that.collection)
                 && Objects.equals(this.action, that.action)
                 && Objects.equals(this.permissions, that.permissions)
                 && Objects.equals(this.validation, that.validation)
@@ -90,6 +84,6 @@ public class DirectusPermissions extends SimpleIdEntity {
     @Override
     public int hashCode() {
 
-        return Objects.hash(role, collection, action, permissions, validation, presets, fields);
+        return Objects.hash(collection, action, permissions, validation, presets, fields);
     }
 }

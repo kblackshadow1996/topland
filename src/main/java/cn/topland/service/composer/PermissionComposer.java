@@ -1,17 +1,13 @@
-package cn.topland.dto.composer;
+package cn.topland.service.composer;
 
-import cn.topland.dto.PermissionDTO;
-import cn.topland.dto.converter.PermissionConverter;
 import cn.topland.entity.Authority;
+import cn.topland.entity.DirectusPermissions;
 import cn.topland.entity.Permission;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static cn.topland.dto.PermissionDTO.Operation;
 
 /**
  * 组装directus_permissions数据
@@ -19,54 +15,34 @@ import static cn.topland.dto.PermissionDTO.Operation;
 @Component
 public class PermissionComposer {
 
-    @Autowired
-    private PermissionConverter converter;
+    public List<DirectusPermissions> compose(List<Authority> authorities) {
 
-    public List<PermissionDTO> compose(List<Authority> oldAuths, List<Authority> newAuths, String directusRole) {
-
-        List<Permission> oldPermissions = getPermissions(oldAuths);
-        List<Permission> newPermissions = getPermissions(newAuths);
-        return distinctPermissions(oldPermissions, newPermissions, directusRole);
+        return createPermissions(getPermissions(authorities));
     }
 
-    private List<PermissionDTO> distinctPermissions(List<Permission> oldPermissions, List<Permission> newPermissions, String directusRole) {
+    public List<DirectusPermissions> createPermissions(Collection<Permission> permissions) {
 
-        List<PermissionDTO> permissions = new ArrayList<>();
-        List<Permission> intersection = (List<Permission>) CollectionUtils.intersection(oldPermissions, newPermissions);
-        // 新增权限
-        permissions.addAll(createPermissions(CollectionUtils.removeAll(newPermissions, intersection)));
-        // 删除权限
-        permissions.addAll(deletePermissions(CollectionUtils.removeAll(oldPermissions, intersection)));
-        // 角色
-        permissions.forEach(p -> {
-
-            p.setRole(directusRole);
-        });
-        return permissions;
+        return permissions.stream().map(this::createPermission).collect(Collectors.toList());
     }
 
-    private List<PermissionDTO> createPermissions(Collection<Permission> permissions) {
+    private DirectusPermissions createPermission(Permission p) {
 
-        return permissions.stream().map(p -> {
-
-            PermissionDTO permission = converter.toDTO(p);
-            permission.setOperation(Operation.CREATE);
-            return permission;
-        }).collect(Collectors.toList());
-    }
-
-    private List<PermissionDTO> deletePermissions(Collection<Permission> permissions) {
-
-        return permissions.stream().map(p -> {
-
-            PermissionDTO permission = converter.toDTO(p);
-            permission.setOperation(Operation.DELETE);
-            return permission;
-        }).collect(Collectors.toList());
+        DirectusPermissions directusPermission = new DirectusPermissions();
+        directusPermission.setCollection(p.getCollection());
+        directusPermission.setAction(p.getAction());
+        directusPermission.setPermissions(p.getPermissions());
+        directusPermission.setPresets(p.getPresets());
+        directusPermission.setValidation(p.getValidation());
+        directusPermission.setFields(p.getFields());
+        return directusPermission;
     }
 
     private List<Permission> getPermissions(List<Authority> auths) {
 
+        if (CollectionUtils.isEmpty(auths)) {
+
+            return List.of();
+        }
         List<Permission> permissions = new ArrayList<>();
         auths.forEach(auth -> {
 

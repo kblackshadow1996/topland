@@ -33,6 +33,8 @@ public class PermissionValidator {
 
     private static final String EXCEPTION = "exception";
 
+    private static final String ROLE = "role";
+
     private static final String ACTION_CREATE = "create";
 
     private static final String ACTION_UPDATE = "update";
@@ -48,6 +50,11 @@ public class PermissionValidator {
     public void validateUserPermissions(Role role) throws AccessException {
 
         validateRole(hasPermission(role, USER, ACTION_CREATE));
+    }
+
+    public void validateUserAuthPermissions(Role role) throws AccessException {
+
+        validateRole(hasPermission(role, USER, ACTION_UPDATE, "role"));
     }
 
     public void validateCustomerCreatePermissions(Role role) throws AccessException {
@@ -133,6 +140,16 @@ public class PermissionValidator {
     public void validateExceptionSolvePermissions(Role role) throws AccessException {
 
         validateRole(hasPermission(role, EXCEPTION, ACTION_UPDATE, "status"));
+    }
+
+    public void validateRoleCreatePermissions(Role role) throws AccessException {
+
+        validateRole(hasPermission(role, ROLE, ACTION_CREATE));
+    }
+
+    public void validateRoleUpdatePermissions(Role role) throws AccessException {
+
+        validateRole(hasPermission(role, ROLE, ACTION_UPDATE));
     }
 
     private boolean hasPermission(Role role, String collection, String action, String fields) throws AccessException {

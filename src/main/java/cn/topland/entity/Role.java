@@ -17,6 +17,9 @@ import java.util.List;
 @Table(name = "role")
 public class Role extends RecordEntity {
 
+    @Column(unique = true)
+    private String name;
+
     /**
      * directus角色
      */

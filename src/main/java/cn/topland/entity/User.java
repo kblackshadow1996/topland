@@ -3,7 +3,6 @@ package cn.topland.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang3.RandomStringUtils;
 
 import javax.persistence.*;
 import java.util.List;
@@ -93,10 +92,14 @@ public class User extends RecordEntity {
     private DirectusUsers directusUser;
 
     /**
+     * directus邮箱
+     */
+    private String directusEmail;
+    /**
      * directus登录密码，directus_users中已经将密码加密，
      * 存明文密码方便登录
      */
-    private String directusPassword = getRandomPassword();
+    private String directusPassword;
 
     @Enumerated(EnumType.STRING)
     private DataAuth auth;
@@ -105,27 +108,8 @@ public class User extends RecordEntity {
     @JoinColumn(name = "role")
     private Role role;
 
-    private String getRandomPassword() {
-
-        return RandomStringUtils.randomAlphanumeric(8);
-    }
-
-    public String getDirectusId() {
-
-        return Objects.isNull(directusUser)
-                ? null
-                : directusUser.getId();
-    }
-
-    public String getDirectusEmail() {
-
-        return Objects.isNull(directusUser)
-                ? generateEmail()
-                : directusUser.getEmail();
-    }
-
     // 根据用户来源，用户三方id及固定邮箱域名创建如"wework_weekend@topland.cn"
-    private String generateEmail() {
+    public String generateEmail() {
 
         return source.name().toLowerCase(Locale.ROOT) + "_" + userId + EMAIL_HOST;
     }

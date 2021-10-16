@@ -8,10 +8,9 @@ import cn.topland.util.AccessException;
 import cn.topland.util.InternalException;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
+import cn.topland.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -40,5 +39,21 @@ public class UserController {
         User user = userService.get(userId);
         validator.validateUserPermissions(user.getRole());
         return Responses.success(userConverter.toDTOs(userService.syncWeworkUser(deptId, user)));
+    }
+
+    @PatchMapping(value = "/auth/{id}")
+    public Response auth(@PathVariable Long id, @RequestBody UserVO userVO) throws AccessException {
+
+        User user = userService.get(userVO.getCreator());
+        validator.validateUserAuthPermissions(user.getRole());
+        return Responses.success(userConverter.toDTO(userService.auth(id, userVO)));
+    }
+
+    @PatchMapping(value = "/auth")
+    public Response auth(@RequestBody UserVO userVO) throws AccessException {
+
+        User user = userService.get(userVO.getCreator());
+        validator.validateUserAuthPermissions(user.getRole());
+        return Responses.success(userConverter.toDTOs(userService.auth(userVO)));
     }
 }

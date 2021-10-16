@@ -4,10 +4,8 @@ import cn.topland.dao.CustomerRepository;
 import cn.topland.dao.OperationRepository;
 import cn.topland.dao.UserRepository;
 import cn.topland.entity.*;
-import cn.topland.util.DataViolateException;
 import cn.topland.vo.CustomerVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,31 +33,19 @@ public class CustomerService {
     }
 
     @Transactional
-    public Customer add(CustomerVO customerVO, List<Contact> contacts, User creator) throws DataViolateException {
+    public Customer add(CustomerVO customerVO, List<Contact> contacts, User creator) {
 
-        try {
-
-            Customer customer = repository.saveAndFlush(createCustomer(customerVO, contacts, creator));
-            saveOperation(customer.getId(), Action.CREATE, creator, null);
-            return customer;
-        } catch (DataIntegrityViolationException e) {
-
-            throw new DataViolateException();
-        }
+        Customer customer = repository.saveAndFlush(createCustomer(customerVO, contacts, creator));
+        saveOperation(customer.getId(), Action.CREATE, creator, null);
+        return customer;
     }
 
     @Transactional
     public Customer update(Customer customer, CustomerVO customerVO, List<Contact> contacts, User editor) {
 
-        try {
-
-            repository.saveAndFlush(updateCustomer(customer, customerVO, contacts, editor));
-            saveOperation(customer.getId(), Action.UPDATE, editor, null);
-            return customer;
-        } catch (DataIntegrityViolationException e) {
-
-            throw new DataViolateException();
-        }
+        repository.saveAndFlush(updateCustomer(customer, customerVO, contacts, editor));
+        saveOperation(customer.getId(), Action.UPDATE, editor, null);
+        return customer;
     }
 
     @Transactional

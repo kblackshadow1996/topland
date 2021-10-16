@@ -4,7 +4,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.List;
 
 /**
@@ -25,7 +27,6 @@ public class Authority extends SimpleIdEntity {
     /**
      * 组装directus_permissions的字段对象
      */
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "authority")
+    @OneToMany(mappedBy = "authority")
     List<Permission> permissions;
 }

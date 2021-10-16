@@ -1,17 +1,20 @@
 package cn.topland.service;
 
 import cn.topland.dao.DepartmentRepository;
+import cn.topland.dao.DirectusUsersRepository;
+import cn.topland.dao.RoleRepository;
 import cn.topland.dao.UserRepository;
-import cn.topland.entity.Department;
-import cn.topland.entity.User;
+import cn.topland.entity.*;
 import cn.topland.gateway.WeworkGateway;
 import cn.topland.gateway.response.UserInfo;
 import cn.topland.gateway.response.WeworkUser;
 import cn.topland.service.parser.WeworkUserParser;
 import cn.topland.util.AccessException;
 import cn.topland.util.InternalException;
+import cn.topland.vo.UserVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,12 @@ import static cn.topland.entity.User.Source;
 @Service
 public class UserService {
 
+    @Value("${directus.root.email}")
+    private String ROOT_EMAIL;
+
+    @Value("${directus.root.password}")
+    private String ROOT_PASSWORD;
+
     @Autowired
     private WeworkGateway weworkGateway;
 
@@ -30,7 +39,13 @@ public class UserService {
     private UserRepository repository;
 
     @Autowired
+    private DirectusUsersRepository directusUsersRepository;
+
+    @Autowired
     private DepartmentRepository deptRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Autowired
     private WeworkUserParser userParser;
@@ -96,6 +111,43 @@ public class UserService {
         return repository.saveAllAndFlush(mergeUsers);
     }
 
+    // 授权
+    @Transactional
+    public User auth(Long id, UserVO userVO) {
+
+        User user = repository.getById(id);
+        Role role = roleRepository.getById(userVO.getRole());
+        user.setDirectusUser(authDirectusUser(user.getDirectusUser(), role.getRole()));
+        return repository.saveAndFlush(authUser(user, userVO, role));
+    }
+
+    @Transactional
+    public List<User> auth(UserVO userVO) {
+
+        return repository.saveAllAndFlush(authUsers(userVO));
+    }
+
+    private List<User> authUsers(UserVO userVO) {
+
+        List<User> users = repository.findAllById(userVO.getUsers());
+        Role role = roleRepository.getById(userVO.getRole());
+        combineWithDirectus(users, role.getRole());
+        return users.stream().map(user -> authUser(user, userVO, role)).collect(Collectors.toList());
+    }
+
+    private User authUser(User user, UserVO userVO, Role role) {
+
+        user.setAuth(userVO.getAuth());
+        user.setRole(role);
+        return user;
+    }
+
+    private DirectusUsers authDirectusUser(DirectusUsers directusUser, DirectusRoles role) {
+
+        directusUser.setRole(role);
+        return directusUsersRepository.saveAndFlush(directusUser);
+    }
+
     // 如果离职自动被禁用
     private void forbiddenResigns(List<User> persistUsers, List<User> users) {
 
@@ -123,6 +175,8 @@ public class UserService {
     private List<User> syncUsers(List<User> persistUsers, List<User> users, Map<String, List<Department>> userDeptMap, User creator) {
 
         Map<String, User> userMap = persistUsers.stream().collect(Collectors.toMap(User::getUserId, u -> u));
+        // 系统初始化创建的管理员用户
+        DirectusUsers root = directusUsersRepository.findByEmail(ROOT_EMAIL);
         users.forEach(user -> {
 
             if (userMap.containsKey(user.getUserId())) {
@@ -130,18 +184,51 @@ public class UserService {
                 updateUser(userMap.get(user.getUserId()), user);
             } else {
 
-                userMap.put(user.getUserId(), createUser(user, userDeptMap.get(user.getUserId()), creator));
+                userMap.put(user.getUserId(), createUser(user, userDeptMap.get(user.getUserId()), creator, root));
             }
         });
-        return new ArrayList<>(userMap.values());
+
+        List<User> mergeUsers = new ArrayList<>(userMap.values());
+        combineWithDirectus(mergeUsers, null);
+        return mergeUsers;
     }
 
-    private User createUser(User user, List<Department> departments, User creator) {
+    private void combineWithDirectus(List<User> users, DirectusRoles role) {
+
+        List<DirectusUsers> directusUsers = listDirectusUsers(users).stream().map(directusUser -> {
+
+            directusUser.setRole(role);
+            return directusUser;
+        }).collect(Collectors.toList());
+        Map<String, DirectusUsers> directusUsersMap = directusUsersRepository.saveAllAndFlush(directusUsers).stream()
+                .collect(Collectors.toMap(DirectusUsers::getEmail, u -> u));
+        users.forEach(user -> {
+
+            user.setDirectusUser(directusUsersMap.get(user.getDirectusEmail()));
+        });
+    }
+
+    private List<DirectusUsers> listDirectusUsers(Collection<User> users) {
+
+        return users.stream().map(User::getDirectusUser).collect(Collectors.toList());
+    }
+
+    private User createUser(User user, List<Department> departments, User creator, DirectusUsers root) {
 
         user.setCreator(creator);
         user.setEditor(creator);
+        user.setDirectusPassword(ROOT_PASSWORD);
         user.setDepartments(departments);
+        user.setDirectusUser(createDirectusUser(root, user.generateEmail()));
         return user;
+    }
+
+    private DirectusUsers createDirectusUser(DirectusUsers root, String email) {
+
+        DirectusUsers users = new DirectusUsers();
+        users.setEmail(email);
+        users.setPassword(root.getPassword());
+        return users;
     }
 
     private void updateUser(User persistUser, User user) {

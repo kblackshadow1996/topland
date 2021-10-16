@@ -7,9 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Objects;
 
 /**
@@ -58,6 +56,10 @@ public class Permission extends SimpleIdEntity implements Cloneable {
      * 字段
      */
     private String fields;
+
+    @ManyToOne
+    @JoinColumn(name = "authority")
+    private Authority authority;
 
     @Override
     public boolean equals(Object that) {

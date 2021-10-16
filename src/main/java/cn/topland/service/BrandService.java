@@ -5,10 +5,8 @@ import cn.topland.dao.CustomerRepository;
 import cn.topland.dao.OperationRepository;
 import cn.topland.dao.UserRepository;
 import cn.topland.entity.*;
-import cn.topland.util.DataViolateException;
 import cn.topland.vo.BrandVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,29 +38,17 @@ public class BrandService {
     @Transactional
     public Brand add(BrandVO brandVO, List<Contact> contacts, User creator) {
 
-        try {
-
-            Brand brand = repository.saveAndFlush(createBrand(brandVO, contacts, creator));
-            saveOperation(brand.getId(), Action.CREATE, creator);
-            return brand;
-        } catch (DataIntegrityViolationException e) {
-
-            throw new DataViolateException();
-        }
+        Brand brand = repository.saveAndFlush(createBrand(brandVO, contacts, creator));
+        saveOperation(brand.getId(), Action.CREATE, creator);
+        return brand;
     }
 
     @Transactional
     public Brand update(Brand brand, BrandVO brandVO, List<Contact> contacts, User editor) {
 
-        try {
-
-            repository.saveAndFlush(updateBrand(brand, brandVO, contacts, editor));
-            saveOperation(brand.getId(), Action.UPDATE, editor);
-            return brand;
-        } catch (DataIntegrityViolationException e) {
-
-            throw new DataViolateException();
-        }
+        repository.saveAndFlush(updateBrand(brand, brandVO, contacts, editor));
+        saveOperation(brand.getId(), Action.UPDATE, editor);
+        return brand;
     }
 
     private Brand updateBrand(Brand brand, BrandVO brandVO, List<Contact> contacts, User editor) {

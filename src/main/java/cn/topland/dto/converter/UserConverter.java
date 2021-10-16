@@ -49,7 +49,7 @@ public class UserConverter extends BaseConverter<User, UserDTO> {
         userDTO.setLeadDepartments(user.getLeadDepartments());
 
         // directus登录信息, 用于创建及登录
-        userDTO.setDirectusUserId(user.getDirectusId());
+        userDTO.setDirectusUserId(getId(user.getDirectusUser()));
         userDTO.setDirectusEmail(user.getDirectusEmail());
         userDTO.setDirectusPassword(user.getDirectusPassword());
 

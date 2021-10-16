@@ -1,20 +1,16 @@
 package cn.topland.controller;
 
-import cn.topland.dto.composer.PermissionComposer;
-import cn.topland.entity.Authority;
-import cn.topland.entity.Role;
-import cn.topland.service.AuthorityService;
+import cn.topland.controller.validator.PermissionValidator;
+import cn.topland.dto.converter.RoleConverter;
+import cn.topland.entity.User;
 import cn.topland.service.RoleService;
+import cn.topland.service.UserService;
+import cn.topland.util.AccessException;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
-import org.apache.commons.collections4.CollectionUtils;
+import cn.topland.vo.RoleVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("role")
@@ -24,22 +20,27 @@ public class RoleController {
     private RoleService roleService;
 
     @Autowired
-    private AuthorityService authorityService;
+    private UserService userService;
 
     @Autowired
-    private PermissionComposer composer;
+    private PermissionValidator validator;
 
-    @GetMapping(value = "/auth")
-    public Response auth(Long roleId, @RequestParam("auths") List<Long> auths) {
+    @Autowired
+    private RoleConverter roleConverter;
 
-        Role role = roleService.get(roleId);
-        return Responses.success(composer.compose(getAuths(role), authorityService.findByIds(auths), role.getRole().getId()));
+    @PostMapping("/add")
+    public Response add(@RequestBody RoleVO roleVO) throws AccessException {
+
+        User user = userService.get(roleVO.getCreator());
+        validator.validateRoleCreatePermissions(user.getRole());
+        return Responses.success(roleConverter.toDTO(roleService.add(roleVO, user)));
     }
 
-    private List<Authority> getAuths(Role role) {
+    @PatchMapping("/update/{id}")
+    public Response update(@PathVariable Long id, @RequestBody RoleVO roleVO) throws AccessException {
 
-        return CollectionUtils.isEmpty(role.getAuthorities())
-                ? List.of()
-                : role.getAuthorities();
+        User user = userService.get(roleVO.getCreator());
+        validator.validateRoleUpdatePermissions(user.getRole());
+        return Responses.success(roleConverter.toDTO(roleService.update(id, roleVO, user)));
     }
 }
