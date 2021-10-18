@@ -1,5 +1,6 @@
 package cn.topland.dto;
 
+import cn.topland.entity.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -45,6 +46,10 @@ public class UserDTO implements Serializable {
     private Boolean active;
 
     private String remark;
+
+    private Long role;
+
+    private User.DataAuth auth;
 
     @JsonProperty(value = "create_time")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")

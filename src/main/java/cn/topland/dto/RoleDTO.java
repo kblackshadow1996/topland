@@ -21,7 +21,7 @@ public class RoleDTO implements Serializable {
 
     private String remark;
 
-    private List<Long> authority;
+    private List<Long> authorities;
 
     private Long creator;
 

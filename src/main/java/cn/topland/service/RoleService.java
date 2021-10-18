@@ -53,7 +53,7 @@ public class RoleService {
 
         Role role = repository.getById(id);
         List<Authority> authorities = authorityRepository.findAllById(roleVO.getAuthorities());
-        List<DirectusPermissions> permissions = updatePermissions(role.getAuthorities(), authorities);
+        List<DirectusPermissions> permissions = updatePermissions(role.getRole().getPermissions(), authorities);
         DirectusRoles directusRole = updateDirectusRoles(role.getRole(), roleVO, permissions);
         return repository.saveAndFlush(updateRole(role, roleVO, authorities, directusRole, editor));
     }
@@ -73,10 +73,9 @@ public class RoleService {
         return directusRolesRepository.saveAndFlush(role);
     }
 
-    private List<DirectusPermissions> updatePermissions(List<Authority> oldAuths, List<Authority> newAuths) {
+    private List<DirectusPermissions> updatePermissions(List<DirectusPermissions> oldPermissions, List<Authority> newAuths) {
 
-        List<DirectusPermissions> oldPermissions = permissionComposer.compose(oldAuths);
-        List<DirectusPermissions> newPermissions = permissionComposer.compose(newAuths);
+        List<DirectusPermissions> newPermissions = createWithDefaultPermissions(newAuths);
         List<DirectusPermissions> intersection = (List<DirectusPermissions>) CollectionUtils.intersection(oldPermissions, newPermissions);
         List<DirectusPermissions> retain = (List<DirectusPermissions>) CollectionUtils.retainAll(oldPermissions, intersection);
         // 需要删除的部分
@@ -96,11 +95,17 @@ public class RoleService {
 
     private List<DirectusPermissions> createPermissions(List<Authority> authorities) {
 
-        List<DirectusPermissions> directusPermissions = permissionComposer.compose(authorities);
-        directusPermissions.addAll(permissionComposer.createPermissions(listDefaultPermissions()));
+        List<DirectusPermissions> directusPermissions = createWithDefaultPermissions(authorities);
         return CollectionUtils.isNotEmpty(directusPermissions)
                 ? directusPermissionsRepository.saveAllAndFlush(directusPermissions)
-                : List.of();
+                : null;
+    }
+
+    private List<DirectusPermissions> createWithDefaultPermissions(List<Authority> authorities) {
+
+        List<DirectusPermissions> directusPermissions = permissionComposer.compose(authorities);
+        directusPermissions.addAll(permissionComposer.createPermissions(listDefaultPermissions()));
+        return directusPermissions;
     }
 
     private List<Permission> listDefaultPermissions() {
