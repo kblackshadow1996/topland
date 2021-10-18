@@ -121,7 +121,7 @@ public class User extends RecordEntity {
 
     public enum DataAuth {
 
-        ACCOUNT,
+        USER,
         ALL
     }
 }
