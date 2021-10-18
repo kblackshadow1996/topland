@@ -10,4 +10,4 @@ VOLUME /usr/local/tmp
 
 ADD build/libs/topland-1.0.0.jar topland.jar
 
-ENTRYPOINT ("java", "-jar", "-Xmx1024m", "-Xms1024m", "topland.jar")
+ENTRYPOINT ("java", "-jar", "-Xmx1024m", "-Xms1024m", "-Dfile.encoding=UTF-8", "topland.jar")
