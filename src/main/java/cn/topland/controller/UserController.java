@@ -26,17 +26,17 @@ public class UserController {
     private PermissionValidator validator;
 
     @PostMapping("/wework/sync/all")
-    public Response syncAll(Long userId) throws AccessException, InternalException {
+    public Response syncAll(Long creator) throws AccessException, InternalException {
 
-        User user = userService.get(userId);
+        User user = userService.get(creator);
         validator.validateUserPermissions(user.getRole());
         return Responses.success(userConverter.toDTOs(userService.syncAllWeworkUser(user)));
     }
 
     @PostMapping(value = "/wework/sync")
-    public Response sync(String deptId, Long userId) throws AccessException, InternalException {
+    public Response sync(String deptId, Long creator) throws AccessException, InternalException {
 
-        User user = userService.get(userId);
+        User user = userService.get(creator);
         validator.validateUserPermissions(user.getRole());
         return Responses.success(userConverter.toDTOs(userService.syncWeworkUser(deptId, user)));
     }

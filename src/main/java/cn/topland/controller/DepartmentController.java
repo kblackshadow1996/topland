@@ -1,6 +1,7 @@
 package cn.topland.controller;
 
 import cn.topland.controller.validator.PermissionValidator;
+import cn.topland.dto.converter.DepartmentConverter;
 import cn.topland.entity.User;
 import cn.topland.service.DepartmentService;
 import cn.topland.service.UserService;
@@ -27,20 +28,23 @@ public class DepartmentController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private DepartmentConverter departmentConverter;
+
     @SneakyThrows
     @PostMapping("/wework/sync/all")
-    public Response syncAllWeworkDept(Long userId) {
+    public Response syncAllWeworkDept(Long creator) {
 
-        User user = userService.get(userId);
+        User user = userService.get(creator);
         validator.validDepartmentPermissions(user.getRole());
-        return Responses.success(departmentService.syncAllWeworkDept(user));
+        return Responses.success(departmentConverter.toDTOs(departmentService.syncAllWeworkDept(user)));
     }
 
     @PostMapping("/wework/sync/{deptId}")
-    public Response syncWeworkDept(@PathVariable String deptId, Long userId) throws AccessException {
+    public Response syncWeworkDept(@PathVariable String deptId, Long creator) throws AccessException {
 
-        User user = userService.get(userId);
+        User user = userService.get(creator);
         validator.validDepartmentPermissions(user.getRole());
-        return Responses.success(departmentService.syncWeworkDept(deptId, userService.get(userId)));
+        return Responses.success(departmentConverter.toDTOs(departmentService.syncWeworkDept(deptId, user)));
     }
 }

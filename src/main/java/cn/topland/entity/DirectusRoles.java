@@ -17,7 +17,7 @@ public class DirectusRoles extends UuidEntity {
 
     private String name;
 
-    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "role")
     private List<DirectusPermissions> permissions;
 }

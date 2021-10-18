@@ -58,7 +58,7 @@ public class ExceptionService {
 
         Exception exception = repository.getById(id);
         Exception exp = repository.saveAndFlush(updateException(exception, exceptionVO, attachments, editor));
-        saveUpdateOperation(exception.getId(), editor);
+        saveUpdateOperation(id, editor);
         return exp;
     }
 
@@ -127,7 +127,7 @@ public class ExceptionService {
         exception.setCopies(listUsers(exceptionVO.getCopies()));
         exception.setJudge(getUser(exceptionVO.getJudge()));
         exception.setComplaint(exceptionVO.getComplaint());
-        exception.setAttachments(attachments);
+        exception.setAttachments(CollectionUtils.isEmpty(attachments) ? null : attachments);
         exception.setSelfCheck(exceptionVO.getSelfCheck());
         exception.setNarrative(exceptionVO.getNarrative());
         exception.setEstimatedLoss(exceptionVO.getEstimatedLoss());
@@ -232,7 +232,7 @@ public class ExceptionService {
 
     private void saveSolveOperation(Long id, User editor, boolean isUpdate) {
 
-        Action action = isUpdate ? Action.CREATE_SOLUTION : Action.UPDATE_SOLUTION;
+        Action action = isUpdate ? Action.UPDATE_SOLUTION : Action.CREATE_SOLUTION;
         operationRepository.saveAndFlush(createOperation(action, id, editor));
     }
 

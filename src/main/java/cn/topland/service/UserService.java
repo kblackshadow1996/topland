@@ -195,17 +195,16 @@ public class UserService {
 
     private void combineWithDirectus(List<User> users, DirectusRoles role) {
 
-        List<DirectusUsers> directusUsers = listDirectusUsers(users).stream().map(directusUser -> {
+        if (CollectionUtils.isNotEmpty(users)) {
 
-            directusUser.setRole(role);
-            return directusUser;
-        }).collect(Collectors.toList());
-        Map<String, DirectusUsers> directusUsersMap = directusUsersRepository.saveAllAndFlush(directusUsers).stream()
-                .collect(Collectors.toMap(DirectusUsers::getEmail, u -> u));
-        users.forEach(user -> {
+            List<DirectusUsers> directusUsers = listDirectusUsers(users).stream().peek(directusUser -> directusUser.setRole(role)).collect(Collectors.toList());
+            Map<String, DirectusUsers> directusUsersMap = directusUsersRepository.saveAllAndFlush(directusUsers).stream()
+                    .collect(Collectors.toMap(DirectusUsers::getEmail, u -> u));
+            users.forEach(user -> {
 
-            user.setDirectusUser(directusUsersMap.get(user.getDirectusEmail()));
-        });
+                user.setDirectusUser(directusUsersMap.get(user.getDirectusEmail()));
+            });
+        }
     }
 
     private List<DirectusUsers> listDirectusUsers(Collection<User> users) {
@@ -218,8 +217,10 @@ public class UserService {
         user.setCreator(creator);
         user.setEditor(creator);
         user.setDirectusPassword(ROOT_PASSWORD);
+        String directusEmail = user.generateEmail();
+        user.setDirectusEmail(directusEmail);
+        user.setDirectusUser(createDirectusUser(root, directusEmail));
         user.setDepartments(departments);
-        user.setDirectusUser(createDirectusUser(root, user.generateEmail()));
         return user;
     }
 

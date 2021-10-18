@@ -2,9 +2,7 @@ package cn.topland.controller.validator;
 
 import cn.topland.entity.DirectusPermissions;
 import cn.topland.entity.Role;
-import cn.topland.service.DirectusPermissionsService;
 import cn.topland.util.AccessException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -38,9 +36,6 @@ public class PermissionValidator {
     private static final String ACTION_CREATE = "create";
 
     private static final String ACTION_UPDATE = "update";
-
-    @Autowired
-    private DirectusPermissionsService directusPermissionsService;
 
     public void validDepartmentPermissions(Role role) throws AccessException {
 
@@ -158,7 +153,7 @@ public class PermissionValidator {
 
             throw new AccessException();
         }
-        List<DirectusPermissions> directusPermissions = directusPermissionsService.listRolesPermissions(role.getRole().getId());
+        List<DirectusPermissions> directusPermissions = role.getRole().getPermissions();
         return directusPermissions.stream().anyMatch(p -> matchCollectionActionFields(p, collection, action, fields));
     }
 
@@ -168,7 +163,7 @@ public class PermissionValidator {
 
             throw new AccessException();
         }
-        List<DirectusPermissions> directusPermissions = directusPermissionsService.listRolesPermissions(role.getRole().getId());
+        List<DirectusPermissions> directusPermissions = role.getRole().getPermissions();
         return directusPermissions.stream().anyMatch(p -> matchCollectionAction(p, collection, action));
     }
 

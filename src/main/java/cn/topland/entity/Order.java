@@ -15,7 +15,7 @@ public class Order extends RecordEntity {
     /**
      * 编号
      */
-    @Column(name = "unique")
+    @Column(unique = true)
     private String identity;
 
     /**

@@ -32,9 +32,9 @@ public class ExceptionsHandler {
         return Responses.fail(Response.FAILED_VALIDATION, e.getMessage());
     }
 
-    @ExceptionHandler(value = Exception.class)
-    public Response handleInternalException(Exception e) {
-
-        return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
-    }
+//    @ExceptionHandler(value = Exception.class)
+//    public Response handleInternalException(Exception e) {
+//
+//        return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
+//    }
 }
