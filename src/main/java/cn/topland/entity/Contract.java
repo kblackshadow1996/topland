@@ -100,8 +100,7 @@ public class Contract extends RecordEntity {
     /**
      * 结算合同
      */
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "contract")
+    @OneToMany(mappedBy = "contract")
     private List<SettlementContract> settlements;
 
     /**

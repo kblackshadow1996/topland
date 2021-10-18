@@ -1,5 +1,6 @@
 package cn.topland.dto;
 
+import cn.topland.entity.SettlementContract;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,8 @@ public class SettlementContractDTO implements Serializable {
     private Long order;
 
     private String remark;
+
+    private SettlementContract.Status status;
 
     private List<Long> attachments;
 

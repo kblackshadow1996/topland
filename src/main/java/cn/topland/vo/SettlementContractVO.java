@@ -1,6 +1,7 @@
 package cn.topland.vo;
 
 import cn.topland.entity.SettlementContract;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,8 +15,7 @@ import java.util.List;
 @Getter
 public class SettlementContractVO implements Serializable {
 
-    private String identity;
-
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonProperty(value = "contract_date")
     private LocalDate contractDate;
 

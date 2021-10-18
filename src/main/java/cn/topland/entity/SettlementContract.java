@@ -67,6 +67,10 @@ public class SettlementContract extends RecordEntity {
     @Enumerated(value = EnumType.STRING)
     private Status status;
 
+    @ManyToOne
+    @JoinColumn(name = "contract")
+    private Contract contract;
+
     public enum Status {
 
         REVIEWING,

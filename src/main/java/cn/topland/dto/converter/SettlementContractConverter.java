@@ -26,9 +26,11 @@ public class SettlementContractConverter extends BaseConverter<SettlementContrac
         dto.setId(settlementContract.getId());
         dto.setIdentity(settlementContract.getIdentity());
         dto.setContractDate(settlementContract.getContractDate());
+        dto.setContract(getId(settlementContract.getContract()));
         dto.setCreator(getId(settlementContract.getCreator()));
         dto.setReceivable(settlementContract.getReceivable());
         dto.setRemark(settlementContract.getRemark());
+        dto.setStatus(settlementContract.getStatus());
         dto.setOrder(getId(settlementContract.getOrder()));
         dto.setAttachments(listAttachmentIds(settlementContract.getAttachments()));
         return dto;

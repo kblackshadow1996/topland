@@ -1,5 +1,6 @@
 package cn.topland.service;
 
+import cn.topland.dao.ContractRepository;
 import cn.topland.dao.OperationRepository;
 import cn.topland.dao.OrderRepository;
 import cn.topland.dao.SettlementContractRepository;
@@ -23,6 +24,9 @@ public class SettlementContractService {
 
     @Autowired
     private SettlementContractRepository repository;
+
+    @Autowired
+    private ContractRepository contractRepository;
 
     @Autowired
     private OrderRepository orderRepository;
@@ -62,6 +66,7 @@ public class SettlementContractService {
         SettlementContract contract = new SettlementContract();
         contract.setContractDate(contractVO.getContractDate());
         contract.setIdentity(createIdentity(creator));
+        contract.setContract(contractRepository.getById(contractVO.getContract()));
         contract.setAttachments(attachments);
         contract.setReceivable(contractVO.getReceivable());
         contract.setRemark(contractVO.getRemark());
