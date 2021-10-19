@@ -121,7 +121,6 @@ public class ExceptionService {
         exception.setAttribute(exceptionVO.getAttribute());
         exception.setType(getType(exceptionVO.getType()));
         exception.setCreateDate(exceptionVO.getCreateDate());
-        exception.setDepartmentSource(exceptionVO.getDepartmentSource());
         exception.setDepartment(getDepartment(exceptionVO.getDepartment()));
         exception.setOwners(listUsers(exceptionVO.getOwners()));
         exception.setCopies(listUsers(exceptionVO.getCopies()));
