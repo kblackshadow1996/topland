@@ -10,7 +10,9 @@ import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.util.StringReader;
 import cn.topland.vo.QuotationVO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -35,8 +37,8 @@ public class QuotationController {
     @Autowired
     private QuotationConverter quotationConverter;
 
-    @GetMapping(value = "/pdf/download")
-    public Response downloadPdf(String html, String title, String identity, LocalDate date) {
+    @GetMapping(value = "/pdf")
+    public Response downloadPdf(String html, String title, String identity, @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
 
         try {
 

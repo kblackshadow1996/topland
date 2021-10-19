@@ -35,7 +35,7 @@ public class QuotationPdfOperation implements PdfOperation {
 
     private static final String QUOTATION_DATE_PREFIX = "报价日期:";
 
-    private static final String LOGO = "./src/main/resources/img/logo.png";
+    private static final String LOGO = "/usr/local/data/img/logo.png";
 
     private static final float LOGO_WIDTH = 58;
 
@@ -54,7 +54,7 @@ public class QuotationPdfOperation implements PdfOperation {
      */
     static {
 
-        PdfFontFactory.register("/fonts/微软雅黑.ttf");
+        PdfFontFactory.register("/usr/local/data/fonts/微软雅黑.ttf");
     }
 
     /**
