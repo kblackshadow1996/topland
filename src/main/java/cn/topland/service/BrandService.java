@@ -5,6 +5,7 @@ import cn.topland.dao.CustomerRepository;
 import cn.topland.dao.OperationRepository;
 import cn.topland.dao.UserRepository;
 import cn.topland.entity.*;
+import cn.topland.util.UniqueException;
 import cn.topland.vo.BrandVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ public class BrandService {
     @Transactional
     public Brand add(BrandVO brandVO, List<Contact> contacts, User creator) {
 
+        validateNameUnique(brandVO.getName());
         Brand brand = repository.saveAndFlush(createBrand(brandVO, contacts, creator));
         saveOperation(brand.getId(), Action.CREATE, creator);
         return brand;
@@ -46,9 +48,26 @@ public class BrandService {
     @Transactional
     public Brand update(Brand brand, BrandVO brandVO, List<Contact> contacts, User editor) {
 
+        validateNameUnique(brandVO.getName(), brand.getId());
         repository.saveAndFlush(updateBrand(brand, brandVO, contacts, editor));
         saveOperation(brand.getId(), Action.UPDATE, editor);
         return brand;
+    }
+
+    private void validateNameUnique(String name) {
+
+        if (repository.existsByName(name)) {
+
+            throw new UniqueException("brand", "name", name);
+        }
+    }
+
+    private void validateNameUnique(String name, Long id) {
+
+        if (repository.existsByNameAndIdNot(name, id)) {
+
+            throw new UniqueException("brand", "name", name);
+        }
     }
 
     private Brand updateBrand(Brand brand, BrandVO brandVO, List<Contact> contacts, User editor) {

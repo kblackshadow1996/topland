@@ -20,6 +20,8 @@ public class Response implements Serializable {
 
     public static final String FORBIDDEN = "FORBIDDEN";
 
+    public static final String RECORD_NOT_UNIQUE = "RECORD_NOT_UNIQUE";
+
     public static final String FAILED_VALIDATION = "FAILED_VALIDATION";
 
     private String code;
@@ -39,6 +41,12 @@ public class Response implements Serializable {
 
         errors = new ArrayList<>();
         Errors error = new Errors(message, new Errors.Extensions(code));
+        errors.add(error);
+    }
+
+    public Response(Errors error) {
+
+        errors = new ArrayList<>();
         errors.add(error);
     }
 }

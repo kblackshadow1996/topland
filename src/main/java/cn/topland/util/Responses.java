@@ -14,4 +14,9 @@ public final class Responses {
 
         return new Response(code, message);
     }
+
+    public static Response fail(String message, Errors.Extensions extensions) {
+
+        return new Response(new Errors(message, extensions));
+    }
 }

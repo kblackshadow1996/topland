@@ -21,9 +21,23 @@ public class Errors implements Serializable {
 
         private String code;
 
+        private String collection;
+
+        private String field;
+
+        private String invalid;
+
         public Extensions(String code) {
 
             this.code = code;
+        }
+
+        public Extensions(String code, String collection, String field, String invalid) {
+
+            this.code = code;
+            this.collection = collection;
+            this.field = field;
+            this.invalid = invalid;
         }
     }
 }

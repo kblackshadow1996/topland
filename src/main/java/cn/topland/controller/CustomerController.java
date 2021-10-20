@@ -11,6 +11,7 @@ import cn.topland.service.UserService;
 import cn.topland.util.AccessException;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
+import cn.topland.util.UniqueException;
 import cn.topland.vo.CustomerVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class CustomerController {
     private CustomerConverter customerConverter;
 
     @PostMapping("/add")
-    public Response add(@RequestBody CustomerVO customerVO) throws AccessException {
+    public Response add(@RequestBody CustomerVO customerVO) throws AccessException, UniqueException {
 
         User user = userService.get(customerVO.getCreator());
         validator.validateCustomerCreatePermissions(user.getRole());
@@ -47,7 +48,7 @@ public class CustomerController {
     }
 
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody CustomerVO customerVO) throws AccessException {
+    public Response update(@PathVariable Long id, @RequestBody CustomerVO customerVO) throws AccessException, UniqueException {
 
         User user = userService.get(customerVO.getCreator());
         validator.validateCustomerUpdatePermissions(user.getRole());

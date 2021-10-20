@@ -4,6 +4,7 @@ import cn.topland.dao.CustomerRepository;
 import cn.topland.dao.OperationRepository;
 import cn.topland.dao.UserRepository;
 import cn.topland.entity.*;
+import cn.topland.util.UniqueException;
 import cn.topland.vo.CustomerVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,16 +34,18 @@ public class CustomerService {
     }
 
     @Transactional
-    public Customer add(CustomerVO customerVO, List<Contact> contacts, User creator) {
+    public Customer add(CustomerVO customerVO, List<Contact> contacts, User creator) throws UniqueException {
 
+        validateNameUnique(customerVO.getName());
         Customer customer = repository.saveAndFlush(createCustomer(customerVO, contacts, creator));
         saveOperation(customer.getId(), Action.CREATE, creator, null);
         return customer;
     }
 
     @Transactional
-    public Customer update(Customer customer, CustomerVO customerVO, List<Contact> contacts, User editor) {
+    public Customer update(Customer customer, CustomerVO customerVO, List<Contact> contacts, User editor) throws UniqueException {
 
+        validateNameUnique(customerVO.getName(), customer.getId());
         repository.saveAndFlush(updateCustomer(customer, customerVO, contacts, editor));
         saveOperation(customer.getId(), Action.UPDATE, editor, null);
         return customer;
@@ -62,6 +65,22 @@ public class CustomerService {
         Customer customer = repository.saveAndFlush(retrieveCustomer(repository.getById(id), editor));
         saveOperation(id, Action.RETRIEVE, editor, null);
         return customer;
+    }
+
+    private void validateNameUnique(String name, Long id) throws UniqueException {
+
+        if (repository.existsByNameAndIdNot(name, id)) {
+
+            throw new UniqueException("customer", "name", name);
+        }
+    }
+
+    private void validateNameUnique(String name) throws UniqueException {
+
+        if (repository.existsByName(name)) {
+
+            throw new UniqueException("customer", "name", name);
+        }
     }
 
     private Customer retrieveCustomer(Customer customer, User editor) {
