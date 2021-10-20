@@ -22,9 +22,6 @@ public class ExceptionDTO implements Serializable {
 
     private Long type;
 
-    @JsonProperty(value = "department_source")
-    private Exception.DepartmentSource departmentSource;
-
     private Long department;
 
     private List<Long> owners;

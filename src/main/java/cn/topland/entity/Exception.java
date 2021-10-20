@@ -53,12 +53,6 @@ public class Exception extends RecordEntity {
     private Department department;
 
     /**
-     * 部门来源
-     */
-    @Enumerated(value = EnumType.STRING)
-    private DepartmentSource departmentSource;
-
-    /**
      * 责任人
      */
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
@@ -165,11 +159,5 @@ public class Exception extends RecordEntity {
 
         INTERNAL, // 内部异常
         ORDER // 订单异常
-    }
-
-    public enum DepartmentSource {
-
-        SUPPLIER, // 供应商
-        INTERNAL // 内部
     }
 }

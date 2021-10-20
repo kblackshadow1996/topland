@@ -36,7 +36,6 @@ public class ExceptionConverter extends BaseConverter<Exception, ExceptionDTO> {
         dto.setId(exception.getId());
         dto.setAttribute(exception.getAttribute());
         dto.setType(getId(exception.getType()));
-        dto.setDepartmentSource(exception.getDepartmentSource());
         dto.setDepartment(getId(exception.getDepartment()));
         dto.setOrders(listOrderIds(exception.getOrders()));
         dto.setOwners(listUserIds(exception.getOwners()));
