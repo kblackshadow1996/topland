@@ -23,9 +23,6 @@ public final class WeworkConfig implements Serializable {
     @Value("${wework.agent-secret}")
     private String agentSecret;
 
-    @Value("${wework.redirect-url}")
-    private String redirectUrl;
-
     /**
      * 防止跨域攻击
      */

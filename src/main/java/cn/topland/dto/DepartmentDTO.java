@@ -20,8 +20,7 @@ public class DepartmentDTO implements Serializable {
     @JsonProperty(value = "dept_id")
     private String deptId;
 
-    @JsonProperty(value = "parent_dept_id")
-    private String parentDeptId;
+    private Long parent;
 
     private Long sort;
 

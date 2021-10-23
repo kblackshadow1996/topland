@@ -34,7 +34,7 @@ public class DepartmentConverter extends BaseConverter<Department, DepartmentDTO
         dto.setName(department.getName());
         dto.setSort(department.getSort());
         dto.setDeptId(department.getDeptId());
-        dto.setParentDeptId(department.getParentDeptId());
+        dto.setParent(getId(department.getParent()));
         dto.setType(department.getType());
         dto.setSource(department.getSource());
         dto.setCreator(getId(department.getCreator()));

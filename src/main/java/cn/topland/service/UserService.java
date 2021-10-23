@@ -252,10 +252,9 @@ public class UserService {
 
     private Department filterTopDept(List<Department> departments) {
 
-        List<String> deptIds = departments.stream().map(Department::getDeptId).collect(Collectors.toList());
         // 顶层组织没有父组织
         return departments.stream()
-                .filter(dept -> !deptIds.contains(dept.getParentDeptId()))
+                .filter(dept -> dept.getParent() == null)
                 .findFirst().get();
     }
 

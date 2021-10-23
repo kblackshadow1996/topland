@@ -3,9 +3,13 @@ package cn.topland.service;
 import cn.topland.dao.*;
 import cn.topland.entity.*;
 import cn.topland.service.composer.PermissionComposer;
+import cn.topland.util.AccessException;
+import cn.topland.util.UniqueException;
 import cn.topland.vo.RoleVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +18,11 @@ import java.util.Collection;
 import java.util.List;
 
 @Service
+@PropertySource(value = "classpath:data.properties", encoding = "utf-8")
 public class RoleService {
+
+    @Value("${admin.role.name}")
+    private String ADMIN;
 
     @Autowired
     private RoleRepository repository;
@@ -42,6 +50,7 @@ public class RoleService {
     @Transactional
     public Role add(RoleVO roleVO, User creator) {
 
+        validateNameUnique(roleVO.getName());
         List<Authority> authorities = authorityRepository.findAllById(roleVO.getAuthorities());
         List<DirectusPermissions> permissions = createPermissions(authorities);
         DirectusRoles directusRole = createDirectusRoles(roleVO, permissions);
@@ -49,13 +58,39 @@ public class RoleService {
     }
 
     @Transactional
-    public Role update(Long id, RoleVO roleVO, User editor) {
+    public Role update(Long id, RoleVO roleVO, User editor) throws AccessException {
 
+        validateNameUnique(roleVO.getName(), id);
         Role role = repository.getById(id);
+        validateAdmin(role.getName());
         List<Authority> authorities = authorityRepository.findAllById(roleVO.getAuthorities());
         List<DirectusPermissions> permissions = updatePermissions(role.getRole().getPermissions(), authorities);
         DirectusRoles directusRole = updateDirectusRoles(role.getRole(), roleVO, permissions);
         return repository.saveAndFlush(updateRole(role, roleVO, authorities, directusRole, editor));
+    }
+
+    private void validateAdmin(String name) throws AccessException {
+
+        if (ADMIN.equals(name)) {
+
+            throw new AccessException();
+        }
+    }
+
+    private void validateNameUnique(String name) {
+
+        if (repository.existsByName(name)) {
+
+            throw new UniqueException("role", "name", name);
+        }
+    }
+
+    private void validateNameUnique(String name, Long id) {
+
+        if (repository.existsByNameAndIdNot(name, id)) {
+
+            throw new UniqueException("role", "name", name);
+        }
     }
 
     private Role updateRole(Role role, RoleVO roleVO, List<Authority> authorities, DirectusRoles directusRole, User editor) {

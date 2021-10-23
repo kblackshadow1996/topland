@@ -159,7 +159,7 @@ public class PermissionValidator {
 
     private boolean hasPermission(Role role, String collection, String action) throws AccessException {
 
-        if (role == null) {
+        if (role == null || "".equals(role.getName())) {
 
             throw new AccessException();
         }

@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * 组织
@@ -20,12 +17,6 @@ import javax.persistence.Table;
 @Table(name = "department")
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer"})
 public class Department extends RecordEntity {
-
-    public Department(Long id, String deptId, String parentDeptId) {
-        this.id = id;
-        this.deptId = deptId;
-        this.parentDeptId = parentDeptId;
-    }
 
     /**
      * 名称
@@ -40,6 +31,11 @@ public class Department extends RecordEntity {
     /**
      * 父组织id
      */
+    @ManyToOne
+    @JoinColumn(name = "parent")
+    private Department parent;
+
+    @Transient
     private String parentDeptId;
 
     /**

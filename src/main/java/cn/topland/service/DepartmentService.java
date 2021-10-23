@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.topland.entity.Department.Source;
@@ -70,7 +67,26 @@ public class DepartmentService {
                 deptMap.put(dept.getDeptId(), createDept(dept, user));
             }
         });
-        return new ArrayList<>(deptMap.values());
+        return setParents(new ArrayList<>(deptMap.values()));
+    }
+
+    private List<Department> setParents(List<Department> departments) {
+
+        Map<String, Department> deptMap = departments.stream().collect(Collectors.toMap(Department::getDeptId, d -> d));
+        List<String> parents = departments.stream().map(Department::getParentDeptId).collect(Collectors.toList());
+        Map<String, Department> parentMap = new HashMap<>();
+        parents.forEach(p -> {
+
+            if (deptMap.containsKey(p)) {
+
+                parentMap.put(p, deptMap.get(p));
+            }
+        });
+        departments.forEach(dept -> {
+
+            dept.setParent(parentMap.get(dept.getParentDeptId()));
+        });
+        return departments;
     }
 
     private Map<String, Department> getSortedDepartmentByIds(List<Department> persistDepartments) {

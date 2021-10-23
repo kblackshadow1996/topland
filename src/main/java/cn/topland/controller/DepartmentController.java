@@ -31,9 +31,8 @@ public class DepartmentController {
     @Autowired
     private DepartmentConverter departmentConverter;
 
-    @SneakyThrows
     @PostMapping("/wework/sync/all")
-    public Response syncAllWeworkDept(Long creator) {
+    public Response syncAllWeworkDept(Long creator) throws AccessException {
 
         User user = userService.get(creator);
         validator.validDepartmentPermissions(user.getRole());

@@ -1,5 +1,6 @@
 package cn.topland.util;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,7 @@ public class Errors implements Serializable {
 
     @Getter
     @Setter
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Extensions {
 
         private String code;

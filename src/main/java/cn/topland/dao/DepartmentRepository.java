@@ -13,7 +13,7 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
     @Query(value = "select dept from Department dept where dept.source=?2 and dept.deptId in ?1")
     List<Department> findByDeptIds(List<String> deptIds, Department.Source source);
 
-    @Query(value = "select new cn.topland.entity.Department(dept.id,dept.deptId,dept.parentDeptId) from Department dept where dept.source=?1")
+    @Query(value = "select dept from Department dept where dept.source=?1")
     List<Department> listAllDeptIds(Department.Source source);
 
     @Query(value = "select dept from Department dept where dept.source=?1")
