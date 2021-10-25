@@ -13,8 +13,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
-public class UsersGateway {
+public class UsersGateway extends BaseGateway {
 
     @Value("${directus.users}")
     private String USERS_URI;
@@ -45,7 +43,7 @@ public class UsersGateway {
         Map<String, DirectusUsers> usersMap = directusUsers.stream().collect(Collectors.toMap(DirectusUsers::getEmail, u -> u));
         if (CollectionUtils.isNotEmpty(users)) {
 
-            Reply result = directus.post(USERS_URI, tokenParam(accessToken), composeCreateUsers(users));
+            Reply result = directus.post(USERS_URI, tokenParam(accessToken), composeUsers(users));
             if (result.isSuccessful()) {
 
                 JsonUtils.read(result.getContent()).path("data").forEach(user -> {
@@ -60,7 +58,7 @@ public class UsersGateway {
         return new ArrayList<>(usersMap.values());
     }
 
-    private JsonNode composeCreateUsers(List<DirectusUsers> directusUsers) {
+    private JsonNode composeUsers(List<DirectusUsers> directusUsers) {
 
         ArrayNode array = JsonNodeFactory.instance.arrayNode();
         directusUsers.forEach(user -> {
@@ -83,12 +81,5 @@ public class UsersGateway {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         node.put("role", directusUser.getRole().getId());
         return node;
-    }
-
-    private MultiValueMap<String, String> tokenParam(String accessToken) {
-
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("access_token", accessToken);
-        return params;
     }
 }

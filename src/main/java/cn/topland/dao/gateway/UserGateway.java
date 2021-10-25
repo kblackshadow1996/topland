@@ -16,8 +16,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
-public class UserGateway {
+public class UserGateway extends BaseGateway {
 
     @Value("${directus.items.user}")
     private String USER_URI;
@@ -42,7 +40,7 @@ public class UserGateway {
     @Autowired
     private DirectusGateway directus;
 
-    private static final TypeReference<List<UserDO>> USER_DOS = new TypeReference<>() {
+    private static final TypeReference<List<UserDO>> USERS = new TypeReference<>() {
     };
 
     public UserDO login(User user) throws AccessException, InternalException {
@@ -53,6 +51,15 @@ public class UserGateway {
             return cacheToken(user, JsonUtils.parse(result.getContent()));
         }
         throw new AccessException("账号异常");
+    }
+
+    public void logout(User user) throws InternalException {
+
+        Reply result = directus.post(LOGOUT_URI, null, user.logoutInfo());
+        if (!result.isSuccessful()) {
+
+            throw new InternalException("logout failed");
+        }
     }
 
     public void refreshToken(User user) throws InternalException {
@@ -79,7 +86,7 @@ public class UserGateway {
         if (result.isSuccessful()) {
 
             String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
-            return JsonUtils.parse(data, USER_DOS);
+            return JsonUtils.parse(data, USERS);
         }
         throw new InternalException("授权失败");
     }
@@ -116,7 +123,7 @@ public class UserGateway {
         for (User user : users) {
 
             // 更新用户只能单个进行
-            Reply result = directus.patch(USER_URI + "/" + user.getId(), tokenParam(accessToken), composeUpdateUser(user));
+            Reply result = directus.patch(USER_URI + "/" + user.getId(), tokenParam(accessToken), composeUser(user));
             if (result.isSuccessful()) {
 
                 userDOs.add(JsonUtils.parse(JsonUtils.read(result.getContent()).path("data").toPrettyString(), UserDO.class));
@@ -130,11 +137,11 @@ public class UserGateway {
 
     private List<UserDO> addUsers(List<User> users, String accessToken) throws InternalException {
 
-        Reply result = directus.post(USER_URI, tokenParam(accessToken), composeCreateUsers(users));
+        Reply result = directus.post(USER_URI, tokenParam(accessToken), composeUsers(users));
         if (result.isSuccessful()) {
 
             String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
-            return JsonUtils.parse(data, USER_DOS);
+            return JsonUtils.parse(data, USERS);
         }
         throw new InternalException("同步创建用户失败");
     }
@@ -163,36 +170,14 @@ public class UserGateway {
         throw new InternalException("缓存token失败");
     }
 
-    private MultiValueMap<String, String> tokenParam(String accessToken) {
-
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("access_token", accessToken);
-        return params;
-    }
-
-    private JsonNode composeCreateUsers(List<User> users) {
+    private JsonNode composeUsers(List<User> users) {
 
         ArrayNode array = JsonNodeFactory.instance.arrayNode();
         users.forEach(user -> {
 
-            array.add(composeCreateUser(user));
+            array.add(composeUser(user));
         });
         return array;
-    }
-
-    private JsonNode composeCreateUser(User user) {
-
-        ObjectNode node = composeUser(user);
-        node.put("creator", user.getCreator().getId());
-        node.put("editor", user.getEditor().getId());
-        return node;
-    }
-
-    private JsonNode composeUpdateUser(User user) {
-
-        ObjectNode node = composeUser(user);
-        node.put("editor", user.getEditor().getId());
-        return node;
     }
 
     private ObjectNode composeUser(User user) {
@@ -212,6 +197,8 @@ public class UserGateway {
         node.put("directus_user", user.getDirectusUser().getId());
         node.put("directus_email", user.getDirectusEmail());
         node.put("directus_password", user.getDirectusPassword());
+        node.put("creator", user.getCreator().getId());
+        node.put("editor", user.getEditor().getId());
         return node;
     }
 

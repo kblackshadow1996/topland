@@ -1,31 +1,14 @@
 package cn.topland.entity.directus;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Setter
 @Getter
-public class UserDO implements Serializable {
-
-    private Long id;
-
-    private Long creator;
-
-    private Long editor;
-
-    @JsonProperty(value = "create_time")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createTime;
-
-    @JsonProperty(value = "last_update_time")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime lastUpdateTime;
+public class UserDO extends DirectusRecordEntity {
 
     private String name;
 

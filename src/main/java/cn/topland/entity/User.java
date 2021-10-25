@@ -129,6 +129,13 @@ public class User extends RecordEntity {
         return loginInfo;
     }
 
+    public JsonNode logoutInfo() {
+
+        ObjectNode logoutInfo = JsonNodeFactory.instance.objectNode();
+        logoutInfo.put("refresh_token", refreshToken);
+        return logoutInfo;
+    }
+
     // 根据用户来源，用户三方id及固定邮箱域名创建如"wework_weekend@topland.cn"
     public String generateEmail() {
 
