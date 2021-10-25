@@ -199,6 +199,8 @@ public class UserGateway extends BaseGateway {
         node.put("directus_password", user.getDirectusPassword());
         node.put("creator", user.getCreator().getId());
         node.put("editor", user.getEditor().getId());
+        node.put("create_time", FORMATTER.format(user.getCreateTime()));
+        node.put("last_update_time", FORMATTER.format(user.getLastUpdateTime()));
         return node;
     }
 

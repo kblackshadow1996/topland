@@ -2,8 +2,11 @@ package cn.topland.service;
 
 import cn.topland.dao.PackageServiceRepository;
 import cn.topland.dao.ServiceRepository;
+import cn.topland.dao.gateway.PackageServiceGateway;
 import cn.topland.entity.IdEntity;
 import cn.topland.entity.PackageService;
+import cn.topland.entity.directus.PackageServiceDO;
+import cn.topland.util.exception.InternalException;
 import cn.topland.vo.PackageServiceVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,21 @@ public class PackageServiceService {
     @Autowired
     private ServiceRepository serviceRepository;
 
+    @Autowired
+    private PackageServiceGateway packageServiceGateway;
+
+    @Transactional
+    public List<PackageServiceDO> add(Long pkgId, List<PackageServiceVO> serviceVOs, String token) throws InternalException {
+
+        return packageServiceGateway.saveAll(createServices(pkgId, serviceVOs), token);
+    }
+
+    @Transactional
+    public List<PackageServiceDO> update(Long pkgId, List<PackageService> services, List<PackageServiceVO> serviceVOs, String token) {
+
+        return packageServiceGateway.updateAll(updateServices(pkgId, services, serviceVOs), token);
+    }
+
     @Transactional
     public List<PackageService> add(List<PackageServiceVO> serviceVOs) {
 
@@ -34,6 +52,18 @@ public class PackageServiceService {
         return repository.saveAllAndFlush(updateServices(services, serviceVOs));
     }
 
+    private List<PackageService> updateServices(Long pkgId, List<PackageService> services, List<PackageServiceVO> serviceVOs) {
+
+        Map<Long, cn.topland.entity.Service> serviceMap = getServices(serviceVOs);
+        Map<Long, PackageService> packageServiceMap = services.stream().collect(Collectors.toMap(IdEntity::getId, p -> p));
+        return serviceVOs.stream().map(serviceVO -> {
+
+            return packageServiceMap.containsKey(serviceVO.getId())
+                    ? updateService(packageServiceMap.get(serviceVO.getId()), serviceVO, serviceMap.get(serviceVO.getService()))
+                    : createService(pkgId, serviceVO, serviceMap.get(serviceVO.getService()));
+        }).collect(Collectors.toList());
+    }
+
     private List<PackageService> updateServices(List<PackageService> services, List<PackageServiceVO> serviceVOs) {
 
         Map<Long, cn.topland.entity.Service> serviceMap = getServices(serviceVOs);
@@ -44,6 +74,14 @@ public class PackageServiceService {
                     ? updateService(packageServiceMap.get(serviceVO.getId()), serviceVO, serviceMap.get(serviceVO.getService()))
                     : createService(serviceVO, serviceMap.get(serviceVO.getService()));
         }).collect(Collectors.toList());
+    }
+
+    private List<PackageService> createServices(Long pkgId, List<PackageServiceVO> serviceVOs) {
+
+        Map<Long, cn.topland.entity.Service> serviceMap = getServices(serviceVOs);
+        return serviceVOs.stream()
+                .map(serviceVO -> createService(pkgId, serviceVO, serviceMap.get(serviceVO.getService())))
+                .collect(Collectors.toList());
     }
 
     private List<PackageService> createServices(List<PackageServiceVO> serviceVOs) {
@@ -61,6 +99,11 @@ public class PackageServiceService {
                 collect(Collectors.toMap(IdEntity::getId, s -> s));
     }
 
+    private PackageService createService(Long pkgId, PackageServiceVO serviceVO, cn.topland.entity.Service service) {
+
+        return composePackageService(pkgId, serviceVO, service, new PackageService());
+    }
+
     private PackageService createService(PackageServiceVO serviceVO, cn.topland.entity.Service service) {
 
         return composePackageService(serviceVO, service, new PackageService());
@@ -72,6 +115,16 @@ public class PackageServiceService {
         packageService.setUnit(serviceVO.getUnit());
         packageService.setDelivery(serviceVO.getDelivery());
         packageService.setPrice(serviceVO.getPrice());
+        return packageService;
+    }
+
+    private PackageService composePackageService(Long pkgId, PackageServiceVO serviceVO, cn.topland.entity.Service service, PackageService packageService) {
+
+        packageService.setPkgId(pkgId);
+        packageService.setService(service);
+        packageService.setPrice(serviceVO.getPrice());
+        packageService.setUnit(serviceVO.getUnit());
+        packageService.setDelivery(serviceVO.getDelivery());
         return packageService;
     }
 

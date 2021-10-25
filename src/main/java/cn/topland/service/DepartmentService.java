@@ -42,10 +42,9 @@ public class DepartmentService {
 
         List<Department> departments = departmentParser.parse(filterUpdateDepartments(deptId));
         List<Department> persistDepartments = repository.findByDeptIds(getDeptIds(departments), Source.WEWORK);
-        Department parent = getParent(departments, deptId);
 
         List<Department> mergeDepartments = syncDepartments(persistDepartments, departments, user);
-        return departmentGateway.saveAll(mergeDepartments, parent, user.getAccessToken());
+        return departmentGateway.saveAll(mergeDepartments, getParent(deptId), user.getAccessToken());
     }
 
     /**
@@ -61,7 +60,7 @@ public class DepartmentService {
         return departmentGateway.saveAll(mergeDepartments, null, user.getAccessToken());
     }
 
-    private Department getParent(List<Department> departments, String deptId) {
+    private Department getParent(String deptId) {
 
         Department dept = repository.findByDeptIdAndSource(deptId, Source.WEWORK);
         return dept.getParent() != null

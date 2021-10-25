@@ -167,6 +167,8 @@ public class DepartmentGateway extends BaseGateway {
         node.put("source", department.getSource().name());
         node.put("creator", department.getCreator().getId());
         node.put("editor", department.getEditor().getId());
+        node.put("create_time", FORMATTER.format(department.getCreateTime()));
+        node.put("last_update_time", FORMATTER.format(department.getLastUpdateTime()));
         return node;
     }
 }

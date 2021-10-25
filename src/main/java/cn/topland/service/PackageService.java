@@ -1,8 +1,11 @@
 package cn.topland.service;
 
 import cn.topland.dao.PackageRepository;
+import cn.topland.dao.gateway.PackageGateway;
 import cn.topland.entity.Package;
 import cn.topland.entity.User;
+import cn.topland.entity.directus.PackageDO;
+import cn.topland.util.exception.InternalException;
 import cn.topland.vo.PackageVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,9 +20,24 @@ public class PackageService {
     @Autowired
     private PackageRepository repository;
 
+    @Autowired
+    private PackageGateway packageGateway;
+
     public Package get(Long id) {
 
         return repository.getById(id);
+    }
+
+    @Transactional
+    public PackageDO add(PackageVO packageVO, User creator) throws InternalException {
+
+        return packageGateway.save(createPackage(packageVO, creator), creator.getAccessToken());
+    }
+
+    @Transactional
+    public PackageDO update(Package pkg, PackageVO packageVO, User editor) throws InternalException {
+
+        return packageGateway.update(updatePackage(pkg, packageVO, editor), editor.getAccessToken());
     }
 
     @Transactional
@@ -32,6 +50,23 @@ public class PackageService {
     public Package update(Package pkg, PackageVO packageVO, List<cn.topland.entity.PackageService> services, User editor) {
 
         return repository.saveAndFlush(updatePackage(pkg, packageVO, services, editor));
+    }
+
+    private Package createPackage(PackageVO packageVO, User creator) {
+
+        Package pkg = new Package();
+        composePackage(pkg, packageVO);
+        pkg.setCreator(creator);
+        pkg.setEditor(creator);
+        return pkg;
+    }
+
+    private Package updatePackage(Package pkg, PackageVO packageVO, User editor) {
+
+        composePackage(pkg, packageVO);
+        pkg.setEditor(editor);
+        pkg.setLastUpdateTime(LocalDateTime.now());
+        return pkg;
     }
 
     private Package updatePackage(Package pkg, PackageVO packageVO, List<cn.topland.entity.PackageService> services, User editor) {
