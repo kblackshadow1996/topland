@@ -42,10 +42,10 @@ public class DepartmentService {
 
         List<Department> departments = departmentParser.parse(filterUpdateDepartments(deptId));
         List<Department> persistDepartments = repository.findByDeptIds(getDeptIds(departments), Source.WEWORK);
-        addParent(persistDepartments, deptId);
+        Department parent = getParent(departments, deptId);
 
         List<Department> mergeDepartments = syncDepartments(persistDepartments, departments, user);
-        return departmentGateway.saveAll(mergeDepartments, user.getAccessToken());
+        return departmentGateway.saveAll(mergeDepartments, parent, user.getAccessToken());
     }
 
     /**
@@ -58,16 +58,15 @@ public class DepartmentService {
         List<Department> persistDepartments = repository.findBySource(Source.WEWORK);
 
         List<Department> mergeDepartments = syncDepartments(persistDepartments, departments, user);
-        return departmentGateway.saveAll(mergeDepartments, user.getAccessToken());
+        return departmentGateway.saveAll(mergeDepartments, null, user.getAccessToken());
     }
 
-    private void addParent(List<Department> departments, String deptId) {
+    private Department getParent(List<Department> departments, String deptId) {
 
         Department dept = repository.findByDeptIdAndSource(deptId, Source.WEWORK);
-        Department parent = dept.getParent() != null
+        return dept.getParent() != null
                 ? repository.findByDeptIdAndSource(dept.getParent().getDeptId(), Source.WEWORK)
                 : null;
-        departments.add(parent);
     }
 
     private List<Department> syncDepartments(List<Department> persistDepartments, List<Department> departments, User user) {
@@ -78,7 +77,6 @@ public class DepartmentService {
             if (deptMap.containsKey(dept.getDeptId())) {
 
                 updateDept(deptMap.get(dept.getDeptId()), dept);
-
             } else {
 
                 deptMap.put(dept.getDeptId(), createDept(dept, user));
@@ -125,6 +123,7 @@ public class DepartmentService {
 
     private void updateDept(Department persistDept, Department dept) {
 
+        persistDept.setParentDeptId(dept.getParentDeptId());
         persistDept.setName(dept.getName());
         persistDept.setSort(dept.getSort());
         persistDept.setLastUpdateTime(LocalDateTime.now());

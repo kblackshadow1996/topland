@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -34,11 +35,11 @@ public class DepartmentGateway extends BaseGateway {
     private static final TypeReference<List<DepartmentDO>> DEPARTMENTS = new TypeReference<>() {
     };
 
-    public List<DepartmentDO> saveAll(List<Department> departments, String accessToken) throws InternalException {
+    public List<DepartmentDO> saveAll(List<Department> departments, Department parent, String accessToken) throws InternalException {
 
         List<DepartmentDO> departmentDOs = addDepartments(getCreateDepartments(departments), accessToken);
         departmentDOs.addAll(toDOs(getUpdateDepartments(departments)));
-        mappingParentDept(departmentDOs, getParent(departments));
+        mappingParentDept(departmentDOs, getParent(departments), parent);
         return updateWithParent(departmentDOs, accessToken);
     }
 
@@ -49,7 +50,6 @@ public class DepartmentGateway extends BaseGateway {
 
             Reply result = directus.patch(DEPARTMENT_URI + "/" + dept.getId(), tokenParam(accessToken), dept.toJson());
             if (result.isSuccessful()) {
-
 
                 String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
                 departments.add(JsonUtils.parse(data, DepartmentDO.class));
@@ -63,7 +63,12 @@ public class DepartmentGateway extends BaseGateway {
 
     private Map<String, String> getParent(List<Department> departments) {
 
-        return departments.stream().collect(Collectors.toMap(Department::getDeptId, Department::getParentDeptId));
+        Map<String, String> parentMap = new HashMap<>();
+        for (Department department : departments) {
+
+            parentMap.put(department.getDeptId(), department.getParentDeptId());
+        }
+        return parentMap;
     }
 
     private List<DepartmentDO> toDOs(List<Department> departments) {
@@ -77,6 +82,7 @@ public class DepartmentGateway extends BaseGateway {
         department.setId(dept.getId());
         department.setName(dept.getName());
         department.setDeptId(dept.getDeptId());
+        department.setParent(getParent(dept.getParent()));
         department.setSort(dept.getSort());
         department.setSource(dept.getSource().name());
         department.setType(dept.getType().name());
@@ -87,14 +93,25 @@ public class DepartmentGateway extends BaseGateway {
         return department;
     }
 
-    private void mappingParentDept(List<DepartmentDO> deptDOs, Map<String, String> parentMap) {
+    private Long getParent(Department parent) {
+
+        return parent != null
+                ? parent.getId()
+                : null;
+    }
+
+    private void mappingParentDept(List<DepartmentDO> deptDOs, Map<String, String> parentMap, Department parentDept) {
 
         // 得到部门deptId与其父部门id的关系映射
         Map<String, Long> deptMap = deptDOs.stream().collect(Collectors.toMap(DepartmentDO::getDeptId, DirectusIdEntity::getId));
+        if (parentDept != null) {
+
+            deptMap.put(parentDept.getDeptId(), parentDept.getId());
+        }
         Map<String, Long> parentDeptMap = new HashMap<>();
         parentMap.forEach((dept, parent) -> {
 
-            parentDeptMap.put(dept, deptMap.get(parentMap.get(parent)));
+            parentDeptMap.put(dept, deptMap.get(parent));
         });
         deptDOs.forEach(dept -> {
 
@@ -104,13 +121,20 @@ public class DepartmentGateway extends BaseGateway {
 
     private List<DepartmentDO> addDepartments(List<Department> departments, String accessToken) throws InternalException {
 
-        Reply result = directus.post(DEPARTMENT_URI, tokenParam(accessToken), composeDepartments(departments));
-        if (result.isSuccessful()) {
+        List<DepartmentDO> dos = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(departments)) {
 
-            String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
-            return JsonUtils.parse(data, DEPARTMENTS);
+            Reply result = directus.post(DEPARTMENT_URI, tokenParam(accessToken), composeDepartments(departments));
+            if (result.isSuccessful()) {
+
+                String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+                dos = JsonUtils.parse(data, DEPARTMENTS);
+            } else {
+
+                throw new InternalException("同步新增部门错误");
+            }
         }
-        throw new InternalException("同步新增部门错误");
+        return dos;
     }
 
     private List<Department> getCreateDepartments(List<Department> departments) {
