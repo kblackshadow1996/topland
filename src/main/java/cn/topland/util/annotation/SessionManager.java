@@ -2,6 +2,7 @@ package cn.topland.util.annotation;
 
 import cn.topland.entity.User;
 import cn.topland.service.UserService;
+import cn.topland.util.exception.QueryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +19,7 @@ public class SessionManager {
     @Autowired
     private UserService userService;
 
-    public User getUser(HttpSession httpSession) {
+    public User getUser(HttpSession httpSession) throws QueryException {
 
         return hasUser(httpSession) ? userService.get(getAttribute(httpSession, SESSION_USER)) : null;
     }

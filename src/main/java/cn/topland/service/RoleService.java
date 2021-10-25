@@ -3,8 +3,8 @@ package cn.topland.service;
 import cn.topland.dao.*;
 import cn.topland.entity.*;
 import cn.topland.service.composer.PermissionComposer;
-import cn.topland.util.AccessException;
-import cn.topland.util.UniqueException;
+import cn.topland.util.exception.AccessException;
+import cn.topland.util.exception.UniqueException;
 import cn.topland.vo.RoleVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +73,7 @@ public class RoleService {
 
         if (ADMIN.equals(name)) {
 
-            throw new AccessException();
+            throw new AccessException("[管理员]角色不可修改");
         }
     }
 
@@ -81,7 +81,7 @@ public class RoleService {
 
         if (repository.existsByName(name)) {
 
-            throw new UniqueException("role", "name", name);
+            throw new UniqueException("角色名称" + "[" + name + "]" + "重复");
         }
     }
 
@@ -89,7 +89,7 @@ public class RoleService {
 
         if (repository.existsByNameAndIdNot(name, id)) {
 
-            throw new UniqueException("role", "name", name);
+            throw new UniqueException("角色名称" + "[" + name + "]" + "重复");
         }
     }
 

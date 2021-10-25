@@ -1,7 +1,5 @@
-package cn.topland.dto;
+package cn.topland.entity.directus;
 
-import cn.topland.entity.User;
-import cn.topland.entity.directus.Buffer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -11,18 +9,31 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static cn.topland.entity.User.Source;
-
 @Setter
 @Getter
-public class UserDTO implements Serializable {
+public class UserDO implements Serializable {
 
     private Long id;
 
-    @JsonProperty(value = "user_id")
-    private String userId;
+    private Long creator;
+
+    private Long editor;
+
+    @JsonProperty(value = "create_time")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime createTime;
+
+    @JsonProperty(value = "last_update_time")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime lastUpdateTime;
 
     private String name;
+
+    @JsonProperty(value = "employee_id")
+    private String employeeId;
+
+    @JsonProperty(value = "user_id")
+    private String userId;
 
     @JsonProperty(value = "external_position")
     private String externalPosition;
@@ -32,31 +43,20 @@ public class UserDTO implements Serializable {
 
     private List<Long> departments;
 
-    @JsonProperty(value = "lead_departments")
-    private String leadDepartments;
-
-    private String source;
-
-    @JsonProperty(value = "employee_id")
-    private String employeeId;
-
     private String mobile;
 
+    private String email;
+
     private String avatar;
+
+    @JsonProperty(value = "lead_departments")
+    private String leadDepartments;
 
     private Buffer active;
 
     private String remark;
 
-    private Long role;
-
-    private String auth;
-
-    @JsonProperty(value = "create_time")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createTime;
-
-    private Long creator;
+    private String source;
 
     @JsonProperty(value = "directus_user")
     private String directusUser;
@@ -72,4 +72,8 @@ public class UserDTO implements Serializable {
 
     @JsonProperty(value = "refresh_token")
     private String refreshToken;
+
+    private String auth;
+
+    private Long role;
 }

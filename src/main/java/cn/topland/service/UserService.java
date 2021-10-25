@@ -4,13 +4,18 @@ import cn.topland.dao.DepartmentRepository;
 import cn.topland.dao.DirectusUsersRepository;
 import cn.topland.dao.RoleRepository;
 import cn.topland.dao.UserRepository;
+import cn.topland.dao.gateway.UserGateway;
+import cn.topland.dao.gateway.UsersGateway;
 import cn.topland.entity.*;
+import cn.topland.entity.directus.UserDO;
 import cn.topland.gateway.WeworkGateway;
 import cn.topland.gateway.response.UserInfo;
 import cn.topland.gateway.response.WeworkUser;
 import cn.topland.service.parser.WeworkUserParser;
-import cn.topland.util.AccessException;
-import cn.topland.util.InternalException;
+import cn.topland.util.exception.AccessException;
+import cn.topland.util.exception.ExternalException;
+import cn.topland.util.exception.InternalException;
+import cn.topland.util.exception.QueryException;
 import cn.topland.vo.UserVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,15 +56,30 @@ public class UserService {
     @Autowired
     private WeworkUserParser userParser;
 
-    public User get(Long id) {
+    @Autowired
+    private UserGateway userGateway;
 
+    @Autowired
+    private UsersGateway usersGateway;
+
+    public User get(Long id) throws QueryException {
+
+        if (id == null || !repository.existsById(id)) {
+
+            throw new QueryException("用户不存在");
+        }
         return repository.getById(id);
+    }
+
+    public List<User> list(List<Long> ids) {
+
+        return repository.findAllById(ids);
     }
 
     /**
      * 企业微信登录
      */
-    public User loginByWework(String code) throws AccessException, InternalException {
+    public UserDO loginByWework(String code) throws AccessException, ExternalException, InternalException {
 
         UserInfo userInfo = weworkGateway.getUserInfo(code);
         if (Objects.nonNull(userInfo)) {
@@ -69,16 +90,16 @@ public class UserService {
 
                 return loginByWeworkUser(user);
             }
-            throw new InternalException("获取微信用户失败");
+            throw new AccessException("该用户未同步到系统,请同步后重试");
         }
-        throw new InternalException("获取微信用户信息失败");
+        throw new ExternalException("企业微信服务异常");
     }
 
     /**
      * 按部门同步(只同步部门直属人员)
      */
     @Transactional
-    public List<User> syncWeworkUser(String deptId, User creator) throws InternalException {
+    public List<UserDO> syncWeworkUser(String deptId, User creator) throws InternalException {
 
         // 用于关联用户部门
         List<Department> departments = deptRepository.listAllDeptIds(Department.Source.WEWORK);
@@ -91,14 +112,14 @@ public class UserService {
         List<User> deptUsers = getUserOfDepartment(allUsers, deptId);
 
         List<User> mergeUsers = syncUsers(deptUsers, users, mappingUserDept(weworkUsers, departments), creator);
-        return repository.saveAllAndFlush(mergeUsers);
+        return userGateway.saveAll(mergeUsers, creator.getAccessToken());
     }
 
     /**
      * 同步所有
      */
     @Transactional
-    public List<User> syncAllWeworkUser(User creator) throws InternalException {
+    public List<UserDO> syncAllWeworkUser(User creator) throws InternalException {
 
         List<Department> departments = deptRepository.listAllDeptIds(Department.Source.WEWORK);
         checkIfSyncDept(departments);
@@ -108,44 +129,49 @@ public class UserService {
         forbiddenResigns(persistUsers, users);
 
         List<User> mergeUsers = syncUsers(persistUsers, users, mappingUserDept(weworkUsers, departments), creator);
-        return repository.saveAllAndFlush(mergeUsers);
+        return userGateway.saveAll(mergeUsers, creator.getAccessToken());
     }
 
     // 授权
     @Transactional
-    public User auth(Long id, UserVO userVO) {
+    public UserDO auth(Long id, UserVO userVO) throws InternalException {
 
-        User user = repository.getById(id);
+        User creator = repository.getById(userVO.getCreator());
         Role role = roleRepository.getById(userVO.getRole());
-        user.setDirectusUser(authDirectusUser(user.getDirectusUser(), role.getRole()));
-        return repository.saveAndFlush(authUser(user, userVO, role));
+        User user = authUser(repository.getById(id), userVO, role, creator);
+        user.setDirectusUser(authDirectusUser(user.getDirectusUser(), role.getRole(), creator.getAccessToken()));
+        return userGateway.auth(List.of(user), creator.getAccessToken()).get(0);
     }
 
     @Transactional
-    public List<User> auth(UserVO userVO) {
+    public List<UserDO> auth(UserVO userVO) throws InternalException {
 
-        return repository.saveAllAndFlush(authUsers(userVO));
+        User creator = repository.getById(userVO.getCreator());
+        return userGateway.auth(authUsers(userVO, creator), creator.getAccessToken());
     }
 
-    private List<User> authUsers(UserVO userVO) {
+    private List<User> authUsers(UserVO userVO, User creator) throws InternalException {
 
         List<User> users = repository.findAllById(userVO.getUsers());
         Role role = roleRepository.getById(userVO.getRole());
-        combineWithDirectus(users, role.getRole());
-        return users.stream().map(user -> authUser(user, userVO, role)).collect(Collectors.toList());
+        combineWithDirectus(users, role.getRole(), creator.getAccessToken());
+        return users.stream().map(user -> authUser(user, userVO, role, creator)).collect(Collectors.toList());
     }
 
-    private User authUser(User user, UserVO userVO, Role role) {
+    private User authUser(User user, UserVO userVO, Role role, User creator) {
 
         user.setAuth(userVO.getAuth());
         user.setRole(role);
+        user.setEditor(creator);
+        user.setLastUpdateTime(LocalDateTime.now());
         return user;
     }
 
-    private DirectusUsers authDirectusUser(DirectusUsers directusUser, DirectusRoles role) {
+    private DirectusUsers authDirectusUser(DirectusUsers directusUser, DirectusRoles role, String accessToken) throws InternalException {
 
         directusUser.setRole(role);
-        return directusUsersRepository.saveAndFlush(directusUser);
+        usersGateway.auth(directusUser, accessToken);
+        return directusUsersRepository.getById(directusUser.getId());
     }
 
     // 如果离职自动被禁用
@@ -172,7 +198,8 @@ public class UserService {
         return userDeptMap;
     }
 
-    private List<User> syncUsers(List<User> persistUsers, List<User> users, Map<String, List<Department>> userDeptMap, User creator) {
+    private List<User> syncUsers(List<User> persistUsers, List<User> users, Map<String, List<Department>> userDeptMap, User creator)
+            throws InternalException {
 
         Map<String, User> userMap = persistUsers.stream().collect(Collectors.toMap(User::getUserId, u -> u));
         // 系统初始化创建的管理员用户
@@ -189,16 +216,16 @@ public class UserService {
         });
 
         List<User> mergeUsers = new ArrayList<>(userMap.values());
-        combineWithDirectus(mergeUsers, null);
+        combineWithDirectus(mergeUsers, null, creator.getAccessToken());
         return mergeUsers;
     }
 
-    private void combineWithDirectus(List<User> users, DirectusRoles role) {
+    private void combineWithDirectus(List<User> users, DirectusRoles role, String accessToken) throws InternalException {
 
         if (CollectionUtils.isNotEmpty(users)) {
 
             List<DirectusUsers> directusUsers = listDirectusUsers(users).stream().peek(directusUser -> directusUser.setRole(role)).collect(Collectors.toList());
-            Map<String, DirectusUsers> directusUsersMap = directusUsersRepository.saveAllAndFlush(directusUsers).stream()
+            Map<String, DirectusUsers> directusUsersMap = usersGateway.saveAll(directusUsers, accessToken).stream()
                     .collect(Collectors.toMap(DirectusUsers::getEmail, u -> u));
             users.forEach(user -> {
 
@@ -227,6 +254,7 @@ public class UserService {
     private DirectusUsers createDirectusUser(DirectusUsers root, String email) {
 
         DirectusUsers users = new DirectusUsers();
+        users.setId(null);
         users.setEmail(email);
         users.setPassword(root.getPassword());
         return users;
@@ -239,6 +267,7 @@ public class UserService {
         persistUser.setEmail(user.getEmail());
         persistUser.setAvatar(user.getAvatar());
         persistUser.setExternalPosition(user.getExternalPosition());
+        persistUser.setInternalPosition(user.getInternalPosition());
         persistUser.setActive(user.getActive() && persistUser.getActive());
         persistUser.setLeadDepartments(user.getLeadDepartments());
     }
@@ -258,14 +287,15 @@ public class UserService {
                 .findFirst().get();
     }
 
-    private User loginByWeworkUser(User user) throws AccessException {
+    private UserDO loginByWeworkUser(User user) throws AccessException, InternalException {
 
         if (user.getActive()) { // 启用
 
-            return user;
+            // TODO directus登录设置token
+            return userGateway.login(user);
         } else { // 禁用
 
-            throw new AccessException();
+            throw new AccessException("该用户已被禁用,请联系管理员");
         }
     }
 

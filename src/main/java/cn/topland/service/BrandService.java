@@ -5,7 +5,8 @@ import cn.topland.dao.CustomerRepository;
 import cn.topland.dao.OperationRepository;
 import cn.topland.dao.UserRepository;
 import cn.topland.entity.*;
-import cn.topland.util.UniqueException;
+import cn.topland.util.exception.QueryException;
+import cn.topland.util.exception.UniqueException;
 import cn.topland.vo.BrandVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,8 +32,12 @@ public class BrandService {
     @Autowired
     private CustomerRepository customerRepository;
 
-    public Brand get(Long id) {
+    public Brand get(Long id) throws QueryException {
 
+        if (id == null || !repository.existsById(id)) {
+
+            throw new QueryException("品牌不存在");
+        }
         return repository.getById(id);
     }
 
@@ -58,7 +63,7 @@ public class BrandService {
 
         if (repository.existsByName(name)) {
 
-            throw new UniqueException("brand", "name", name);
+            throw new UniqueException("品牌名称" + "[" + name + "]" + "重复");
         }
     }
 
@@ -66,7 +71,7 @@ public class BrandService {
 
         if (repository.existsByNameAndIdNot(name, id)) {
 
-            throw new UniqueException("brand", "name", name);
+            throw new UniqueException("品牌名称" + "[" + name + "]" + "重复");
         }
     }
 

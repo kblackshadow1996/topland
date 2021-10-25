@@ -14,6 +14,22 @@ repositories {
     mavenCentral()
 }
 
+def env = project.getProperties().get("env") ?: "dev"
+bootJar {
+
+    if ("dev" == env) {
+
+        exclude("**/prod")
+    } else {
+
+        delete("**/application.properties")
+        copy {
+            from("**/${env}/application-${env}.properties")
+            into("**/application.properties")
+        }
+    }
+}
+
 dependencies {
 
     implementation('org.springframework.boot:spring-boot-starter-web:2.5.4') {

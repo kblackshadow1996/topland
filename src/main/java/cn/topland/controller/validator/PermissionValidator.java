@@ -2,7 +2,9 @@ package cn.topland.controller.validator;
 
 import cn.topland.entity.DirectusPermissions;
 import cn.topland.entity.Role;
-import cn.topland.util.AccessException;
+import cn.topland.entity.User;
+import cn.topland.util.exception.AccessException;
+import cn.topland.util.exception.InvalidException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -37,121 +39,149 @@ public class PermissionValidator {
 
     private static final String ACTION_UPDATE = "update";
 
-    public void validDepartmentPermissions(Role role) throws AccessException {
+    public void validDepartmentPermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, DEPARTMENT, ACTION_CREATE));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), DEPARTMENT, ACTION_CREATE));
     }
 
-    public void validateUserPermissions(Role role) throws AccessException {
+    public void validateUserPermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, USER, ACTION_CREATE));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), USER, ACTION_CREATE));
     }
 
-    public void validateUserAuthPermissions(Role role) throws AccessException {
+    public void validateUserAuthPermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, USER, ACTION_UPDATE, "role"));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), USER, ACTION_UPDATE, "role"));
     }
 
-    public void validateCustomerCreatePermissions(Role role) throws AccessException {
+    public void validateCustomerCreatePermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, CUSTOMER, ACTION_CREATE));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), CUSTOMER, ACTION_CREATE));
     }
 
-    public void validateCustomerUpdatePermissions(Role role) throws AccessException {
+    public void validateCustomerUpdatePermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, CUSTOMER, ACTION_UPDATE, "name"));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), CUSTOMER, ACTION_UPDATE, "name"));
     }
 
-    public void validateCustomerLostPermissions(Role role) throws AccessException {
+    public void validateCustomerLostPermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, CUSTOMER, ACTION_UPDATE, "status"));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), CUSTOMER, ACTION_UPDATE, "status"));
     }
 
-    public void validateCustomerRetrievePermissions(Role role) throws AccessException {
+    public void validateCustomerRetrievePermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, CUSTOMER, ACTION_UPDATE, "status"));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), CUSTOMER, ACTION_UPDATE, "status"));
     }
 
-    public void validateBrandCreatePermissions(Role role) throws AccessException {
+    public void validateBrandCreatePermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, BRAND, ACTION_CREATE));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), BRAND, ACTION_CREATE));
     }
 
-    public void validateBrandUpdatePermissions(Role role) throws AccessException {
+    public void validateBrandUpdatePermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, BRAND, ACTION_UPDATE));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), BRAND, ACTION_UPDATE));
     }
 
-    public void validateQuotationCreatePermission(Role role) throws AccessException {
+    public void validateQuotationCreatePermission(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, QUOTATION, ACTION_CREATE));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), QUOTATION, ACTION_CREATE));
     }
 
-    public void validateQuotationUpdatePermission(Role role) throws AccessException {
+    public void validateQuotationUpdatePermission(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, QUOTATION, ACTION_UPDATE));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), QUOTATION, ACTION_UPDATE));
     }
 
-    public void validateContractCreatePermissions(Role role) throws AccessException {
+    public void validateContractCreatePermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, CONTRACT, ACTION_CREATE));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), CONTRACT, ACTION_CREATE));
     }
 
-    public void validateContractReceivePaperPermissions(Role role) throws AccessException {
+    public void validateContractReceivePaperPermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, CONTRACT, ACTION_UPDATE, "paper_date"));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), CONTRACT, ACTION_UPDATE, "paper_date"));
     }
 
-    public void validateContractReviewPermissions(Role role) throws AccessException {
+    public void validateContractReviewPermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, CONTRACT, ACTION_UPDATE, "status"));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), CONTRACT, ACTION_UPDATE, "status"));
     }
 
-    public void validateSettlementCreatePermissions(Role role) throws AccessException {
+    public void validateSettlementCreatePermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, SETTLEMENT_CONTRACT, ACTION_UPDATE));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), SETTLEMENT_CONTRACT, ACTION_UPDATE));
     }
 
-    public void validatePackageCreatePermissions(Role role) throws AccessException {
+    public void validateSettlementReviewPermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, PACKAGE, ACTION_CREATE));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), SETTLEMENT_CONTRACT, ACTION_UPDATE));
     }
 
-    public void validatePackageUpdatePermissions(Role role) throws AccessException {
+    public void validatePackageCreatePermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, PACKAGE, ACTION_UPDATE));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), PACKAGE, ACTION_CREATE));
     }
 
-    public void validateExceptionCreatePermissions(Role role) throws AccessException {
+    public void validatePackageUpdatePermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, EXCEPTION, ACTION_CREATE));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), PACKAGE, ACTION_UPDATE));
     }
 
-    public void validateExceptionUpdatePermissions(Role role) throws AccessException {
+    public void validateExceptionCreatePermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, EXCEPTION, ACTION_UPDATE, "type"));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), EXCEPTION, ACTION_CREATE));
     }
 
-    public void validateExceptionSolvePermissions(Role role) throws AccessException {
+    public void validateExceptionUpdatePermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, EXCEPTION, ACTION_UPDATE, "status"));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), EXCEPTION, ACTION_UPDATE, "type"));
     }
 
-    public void validateRoleCreatePermissions(Role role) throws AccessException {
+    public void validateExceptionSolvePermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, ROLE, ACTION_CREATE));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), EXCEPTION, ACTION_UPDATE, "close_date"));
     }
 
-    public void validateRoleUpdatePermissions(Role role) throws AccessException {
+    public void validateRoleCreatePermissions(User user, String token) throws AccessException, InvalidException {
 
-        validateRole(hasPermission(role, ROLE, ACTION_UPDATE));
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), ROLE, ACTION_CREATE));
+    }
+
+    public void validateRoleUpdatePermissions(User user, String token) throws AccessException, InvalidException {
+
+        validateToken(token, user.getAccessToken());
+        validateRole(hasPermission(user.getRole(), ROLE, ACTION_UPDATE));
     }
 
     private boolean hasPermission(Role role, String collection, String action, String fields) throws AccessException {
 
         if (role == null) {
 
-            throw new AccessException();
+            throw new AccessException("该用户没有操作权限");
         }
         List<DirectusPermissions> directusPermissions = role.getRole().getPermissions();
         return directusPermissions.stream().anyMatch(p -> matchCollectionActionFields(p, collection, action, fields));
@@ -159,9 +189,9 @@ public class PermissionValidator {
 
     private boolean hasPermission(Role role, String collection, String action) throws AccessException {
 
-        if (role == null || "".equals(role.getName())) {
+        if (role == null) {
 
-            throw new AccessException();
+            throw new AccessException("该用户没有操作权限");
         }
         List<DirectusPermissions> directusPermissions = role.getRole().getPermissions();
         return directusPermissions.stream().anyMatch(p -> matchCollectionAction(p, collection, action));
@@ -184,7 +214,15 @@ public class PermissionValidator {
 
         if (!hasPermission) {
 
-            throw new AccessException();
+            throw new AccessException("该用户没有操作权限");
+        }
+    }
+
+    private void validateToken(String token, String cacheToken) throws InvalidException {
+
+        if (!cacheToken.equals(token)) {
+
+            throw new InvalidException("用户口令已过期,请刷新后重试");
         }
     }
 }

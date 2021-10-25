@@ -23,4 +23,9 @@ public final class Reply {
     public String getContent() {
         return this.content;
     }
+
+    public boolean isSuccessful() {
+
+        return Response.Status.OK == status;
+    }
 }

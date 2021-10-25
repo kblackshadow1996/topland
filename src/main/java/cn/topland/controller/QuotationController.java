@@ -5,17 +5,18 @@ import cn.topland.dto.converter.QuotationConverter;
 import cn.topland.entity.User;
 import cn.topland.service.QuotationService;
 import cn.topland.service.UserService;
-import cn.topland.util.AccessException;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.util.StringReader;
+import cn.topland.util.exception.AccessException;
+import cn.topland.util.exception.InternalException;
+import cn.topland.util.exception.InvalidException;
+import cn.topland.util.exception.QueryException;
 import cn.topland.vo.QuotationVO;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.time.LocalDate;
 
 @RestController
@@ -37,31 +38,68 @@ public class QuotationController {
     @Autowired
     private QuotationConverter quotationConverter;
 
+    /**
+     * pdf下载
+     *
+     * @param html     合同页面
+     * @param title    合同标题
+     * @param identity 合同编号
+     * @param date     合同日期
+     * @param creator  操作用户
+     * @param token    操作用户token
+     * @return
+     * @throws InternalException
+     * @throws QueryException
+     * @throws AccessException
+     * @throws InvalidException
+     */
     @GetMapping(value = "/pdf")
-    public Response downloadPdf(String html, String title, String identity, @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+    public Response downloadPdf(String html, String title, String identity,
+                                @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
+                                Long creator, String token)
+            throws InternalException, QueryException, AccessException, InvalidException {
 
-        try {
-
-            return Responses.success(quotationService.downloadPdf(readHtml(html), title, identity, date));
-        } catch (IOException e) {
-
-            return Responses.fail(Response.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+        User user = userService.get(creator);
+        validator.validateQuotationCreatePermission(user, token);
+        return Responses.success(quotationService.downloadPdf(readHtml(html), title, identity, date));
     }
 
+    /**
+     * 新增报价合同
+     *
+     * @param quotationVO 报价信息
+     * @param token       操作用户token
+     * @return
+     * @throws AccessException
+     * @throws QueryException
+     * @throws InvalidException
+     */
     @PostMapping("/add")
-    public Response add(@RequestBody QuotationVO quotationVO) throws AccessException {
+    public Response add(@RequestBody QuotationVO quotationVO, String token)
+            throws AccessException, QueryException, InvalidException {
 
         User user = userService.get(quotationVO.getCreator());
-        validator.validateQuotationCreatePermission(user.getRole());
+        validator.validateQuotationCreatePermission(user, token);
         return Responses.success(quotationConverter.toDTO(quotationService.add(quotationVO, user)));
     }
 
+    /**
+     * 更新报价合同
+     *
+     * @param id          报价id
+     * @param quotationVO 报价信息
+     * @param token       操作用户token
+     * @return
+     * @throws AccessException
+     * @throws QueryException
+     * @throws InvalidException
+     */
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody QuotationVO quotationVO) throws AccessException {
+    public Response update(@PathVariable Long id, @RequestBody QuotationVO quotationVO, String token)
+            throws AccessException, QueryException, InvalidException {
 
         User user = userService.get(quotationVO.getCreator());
-        validator.validateQuotationUpdatePermission(user.getRole());
+        validator.validateQuotationUpdatePermission(user, token);
         return Responses.success(quotationConverter.toDTO(quotationService.update(id, quotationVO, user)));
     }
 

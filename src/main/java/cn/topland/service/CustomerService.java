@@ -4,7 +4,7 @@ import cn.topland.dao.CustomerRepository;
 import cn.topland.dao.OperationRepository;
 import cn.topland.dao.UserRepository;
 import cn.topland.entity.*;
-import cn.topland.util.UniqueException;
+import cn.topland.util.exception.UniqueException;
 import cn.topland.vo.CustomerVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ public class CustomerService {
     }
 
     @Transactional
-    public Customer add(CustomerVO customerVO, List<Contact> contacts, User creator) throws UniqueException {
+    public Customer add(CustomerVO customerVO, List<Contact> contacts, User creator) {
 
         validateNameUnique(customerVO.getName());
         Customer customer = repository.saveAndFlush(createCustomer(customerVO, contacts, creator));
@@ -43,7 +43,7 @@ public class CustomerService {
     }
 
     @Transactional
-    public Customer update(Customer customer, CustomerVO customerVO, List<Contact> contacts, User editor) throws UniqueException {
+    public Customer update(Customer customer, CustomerVO customerVO, List<Contact> contacts, User editor) {
 
         validateNameUnique(customerVO.getName(), customer.getId());
         repository.saveAndFlush(updateCustomer(customer, customerVO, contacts, editor));
@@ -67,11 +67,11 @@ public class CustomerService {
         return customer;
     }
 
-    private void validateNameUnique(String name, Long id) throws UniqueException {
+    private void validateNameUnique(String name, Long id) {
 
         if (repository.existsByNameAndIdNot(name, id)) {
 
-            throw new UniqueException("customer", "name", name);
+            throw new UniqueException("客户名称" + "[" + name + "]" + "重复");
         }
     }
 
@@ -79,7 +79,7 @@ public class CustomerService {
 
         if (repository.existsByName(name)) {
 
-            throw new UniqueException("customer", "name", name);
+            throw new UniqueException("客户名称" + "[" + name + "]" + "重复");
         }
     }
 

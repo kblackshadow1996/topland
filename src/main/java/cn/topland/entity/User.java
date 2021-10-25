@@ -1,5 +1,8 @@
 package cn.topland.entity;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -94,11 +97,22 @@ public class User extends RecordEntity {
      * directus邮箱
      */
     private String directusEmail;
+
     /**
      * directus登录密码，directus_users中已经将密码加密，
      * 存明文密码方便登录
      */
     private String directusPassword;
+
+    /**
+     * directus api请求token, 由前端来刷新缓存
+     */
+    private String accessToken;
+
+    /**
+     * directus 刷新token
+     */
+    private String refreshToken;
 
     @Enumerated(EnumType.STRING)
     private DataAuth auth;
@@ -106,6 +120,14 @@ public class User extends RecordEntity {
     @OneToOne
     @JoinColumn(name = "role")
     private Role role;
+
+    public JsonNode loginInfo() {
+
+        ObjectNode loginInfo = JsonNodeFactory.instance.objectNode();
+        loginInfo.put("email", directusEmail);
+        loginInfo.put("password", directusPassword);
+        return loginInfo;
+    }
 
     // 根据用户来源，用户三方id及固定邮箱域名创建如"wework_weekend@topland.cn"
     public String generateEmail() {

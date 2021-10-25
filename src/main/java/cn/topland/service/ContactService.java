@@ -4,6 +4,7 @@ import cn.topland.dao.ContactRepository;
 import cn.topland.entity.Contact;
 import cn.topland.entity.IdEntity;
 import cn.topland.vo.ContactVO;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,7 @@ public class ContactService {
     @Transactional
     public List<Contact> updateContacts(List<Contact> contacts, List<ContactVO> contactVOs) {
 
+        contacts = CollectionUtils.isEmpty(contacts) ? List.of() : contacts;
         Map<Long, Contact> contactMap = contacts.stream().collect(Collectors.toMap(IdEntity::getId, contact -> contact));
         return contactVOs.stream().map(contactVO -> {
 

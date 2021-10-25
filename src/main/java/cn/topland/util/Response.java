@@ -5,48 +5,48 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * REST接口数据统一格式
  */
 @Setter
 @Getter
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Response implements Serializable {
 
-    public static final String INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
+    public static final int OK = 200;
 
-    public static final String FORBIDDEN = "FORBIDDEN";
+    public static final int INVALID_PARAMS = 400;
 
-    public static final String RECORD_NOT_UNIQUE = "RECORD_NOT_UNIQUE";
+    public static final int INVALID = 401;
 
-    public static final String FAILED_VALIDATION = "FAILED_VALIDATION";
+    public static final int FORBIDDEN = 403;
 
-    private String code;
+    public static final int INTERNAL_SERVICE_UNAVAILABLE = 500;
+
+    public static final int EXTERNAL_SERVICE_UNAVAILABLE = 503;
+
+    private int code;
 
     private Object data;
 
     private String message;
 
-    private List<Errors> errors;
+    private boolean success;
 
     public Response(Object data) {
 
+        this.code = OK;
         this.data = data;
     }
 
-    public Response(String code, String message) {
+    public Response(int code, String message) {
 
-        errors = new ArrayList<>();
-        Errors error = new Errors(message, new Errors.Extensions(code));
-        errors.add(error);
+        this.code = code;
+        this.message = message;
     }
 
-    public Response(Errors error) {
+    public boolean isSuccess() {
 
-        errors = new ArrayList<>();
-        errors.add(error);
+        return OK == this.code;
     }
 }

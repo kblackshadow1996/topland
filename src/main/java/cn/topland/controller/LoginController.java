@@ -3,10 +3,11 @@ package cn.topland.controller;
 import cn.topland.config.WeworkConfig;
 import cn.topland.dto.converter.UserConverter;
 import cn.topland.service.UserService;
-import cn.topland.util.AccessException;
-import cn.topland.util.InternalException;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
+import cn.topland.util.exception.AccessException;
+import cn.topland.util.exception.ExternalException;
+import cn.topland.util.exception.InternalException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,20 +28,36 @@ public class LoginController {
     @Autowired
     private UserConverter converter;
 
+    /**
+     * 获取企业微信二维码构造参数
+     *
+     * @return
+     */
     @GetMapping("/wework/config")
     public Response weworkConfig() {
 
         return Responses.success(weworkConfig);
     }
 
+    /**
+     * 登录
+     *
+     * @param code  企业微信扫码返回code
+     * @param state 系统随机state
+     * @return
+     * @throws AccessException
+     * @throws InternalException
+     * @throws ExternalException
+     */
     @GetMapping(value = "/wework/login")
-    public Response loginByWework(String code, String state) throws AccessException, InternalException {
+    public Response loginByWework(String code, String state)
+            throws AccessException, ExternalException, InternalException {
 
         if (StringUtils.isNotBlank(code) && StringUtils.equals(state, weworkConfig.getState())) {
 
             return Responses.success(converter.toDTO(userService.loginByWework(code)));
         }
-        return Responses.fail(Response.INTERNAL_SERVER_ERROR, "扫描二维码失败");
+        return Responses.fail(Response.EXTERNAL_SERVICE_UNAVAILABLE, "扫描二维码失败");
 
     }
 }

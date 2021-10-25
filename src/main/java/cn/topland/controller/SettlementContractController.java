@@ -6,11 +6,12 @@ import cn.topland.entity.User;
 import cn.topland.service.AttachmentService;
 import cn.topland.service.SettlementContractService;
 import cn.topland.service.UserService;
-import cn.topland.util.AccessException;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
+import cn.topland.util.exception.AccessException;
+import cn.topland.util.exception.InvalidException;
+import cn.topland.util.exception.QueryException;
 import cn.topland.vo.SettlementContractVO;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,22 +34,44 @@ public class SettlementContractController {
     @Autowired
     private SettlementContractConverter settlementContractConverter;
 
-    @SneakyThrows
+    /**
+     * 新增结算合同
+     *
+     * @param contractVO 结算合同信息
+     * @param token      操作用户token
+     * @return
+     * @throws AccessException
+     * @throws InvalidException
+     * @throws QueryException
+     */
     @PostMapping("/add")
-    public Response add(@RequestBody SettlementContractVO contractVO) {
+    public Response add(@RequestBody SettlementContractVO contractVO, String token)
+            throws AccessException, InvalidException, QueryException {
 
         User user = userService.get(contractVO.getCreator());
-        validator.validateSettlementCreatePermissions(user.getRole());
+        validator.validateSettlementCreatePermissions(user, token);
         return Responses.success(settlementContractConverter.toDTO(
                 contractService.add(contractVO, attachmentService.upload(contractVO.getAttachments()), user)
         ));
     }
 
+    /**
+     * 审核结算合同
+     *
+     * @param id         结算合同id
+     * @param contractVO 结算合同信息
+     * @param token      操作用户token
+     * @return
+     * @throws AccessException
+     * @throws QueryException
+     * @throws InvalidException
+     */
     @PatchMapping("/review/{id}")
-    public Response review(@PathVariable Long id, @RequestBody SettlementContractVO contractVO) throws AccessException {
+    public Response review(@PathVariable Long id, @RequestBody SettlementContractVO contractVO, String token)
+            throws AccessException, QueryException, InvalidException {
 
         User user = userService.get(contractVO.getCreator());
-        validator.validateSettlementCreatePermissions(user.getRole());
+        validator.validateSettlementReviewPermissions(user, token);
         return Responses.success(settlementContractConverter.toDTO(
                 contractService.review(id, contractVO, user)
         ));

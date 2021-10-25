@@ -4,6 +4,7 @@ import cn.topland.dao.*;
 import cn.topland.entity.Package;
 import cn.topland.entity.*;
 import cn.topland.util.UUIDGenerator;
+import cn.topland.util.exception.InternalException;
 import cn.topland.util.pdf.HtmlToPdfOperation;
 import cn.topland.util.pdf.HtmlToPdfParams;
 import cn.topland.util.pdf.HtmlToPdfParamsFactory;
@@ -67,29 +68,35 @@ public class QuotationService {
         return repository.saveAndFlush(updateQuotation(repository.getById(id), quotationVO, editor));
     }
 
-    public byte[] downloadPdf(String html, String title, String number, LocalDate date) throws IOException {
+    public byte[] downloadPdf(String html, String title, String number, LocalDate date) throws InternalException {
 
-        if (!Files.exists(new File(temDir).toPath())) {
+        try {
 
-            new File(temDir).mkdirs();
+            if (!Files.exists(new File(temDir).toPath())) {
+
+                new File(temDir).mkdirs();
+            }
+            String randomName = UUIDGenerator.generate();
+            String htmlPath = temDir + "/" + randomName + ".html";
+            String tmp = temDir + "/" + randomName + ".tmp.pdf";
+            String dest = temDir + "/" + randomName + ".pdf";
+
+            // 存html
+            FileUtils.writeStringToFile(new File(htmlPath), html, StandardCharsets.UTF_8);
+
+            // 生成pdf
+            HtmlToPdfParams params = new HtmlToPdfParamsFactory().quotation();
+            new HtmlToPdfOperation(params).apply(htmlPath, tmp);
+
+            // 处理pdf
+            QuotationPdfOperation pdfOperation = getPdfOperation(title, number, date);
+            pdfOperation.apply(tmp, dest);
+
+            return FileUtils.readFileToByteArray(new File(dest));
+        } catch (IOException e) {
+
+            throw new InternalException("pdf生成失败,请稍后再试");
         }
-        String randomName = UUIDGenerator.generate();
-        String htmlPath = temDir + "/" + randomName + ".html";
-        String tmp = temDir + "/" + randomName + ".tmp.pdf";
-        String dest = temDir + "/" + randomName + ".pdf";
-
-        // 存html
-        FileUtils.writeStringToFile(new File(htmlPath), html, StandardCharsets.UTF_8);
-
-        // 生成pdf
-        HtmlToPdfParams params = new HtmlToPdfParamsFactory().quotation();
-        new HtmlToPdfOperation(params).apply(htmlPath, tmp);
-
-        // 处理pdf
-        QuotationPdfOperation pdfOperation = getPdfOperation(title, number, date);
-        pdfOperation.apply(tmp, dest);
-
-        return FileUtils.readFileToByteArray(new File(dest));
     }
 
     private QuotationPdfOperation getPdfOperation(String title, String number, LocalDate date) {

@@ -1,8 +1,7 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.UserDTO;
-import cn.topland.entity.Department;
-import cn.topland.entity.User;
+import cn.topland.entity.directus.UserDO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
@@ -10,10 +9,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class UserConverter extends BaseConverter<User, UserDTO> {
+public class UserConverter extends BaseConverter<UserDO, UserDTO> {
 
     @Override
-    public List<UserDTO> toDTOs(List<User> users) {
+    public List<UserDTO> toDTOs(List<UserDO> users) {
 
         return CollectionUtils.isEmpty(users)
                 ? List.of()
@@ -21,14 +20,14 @@ public class UserConverter extends BaseConverter<User, UserDTO> {
     }
 
     @Override
-    public UserDTO toDTO(User user) {
+    public UserDTO toDTO(UserDO user) {
 
         return user != null
                 ? composeUserDTO(user)
                 : null;
     }
 
-    private UserDTO composeUserDTO(User user) {
+    private UserDTO composeUserDTO(UserDO user) {
 
         UserDTO userDTO = new UserDTO();
         userDTO.setId(user.getId());
@@ -39,29 +38,24 @@ public class UserConverter extends BaseConverter<User, UserDTO> {
         userDTO.setMobile(user.getMobile());
         userDTO.setActive(user.getActive());
         userDTO.setRemark(user.getRemark());
-        userDTO.setRole(getId(user.getRole()));
+        userDTO.setRole(user.getRole());
         userDTO.setAuth(user.getAuth());
         userDTO.setSource(user.getSource());
-        userDTO.setCreator(getId(user));
+        userDTO.setCreator(user.getCreator());
         userDTO.setCreateTime(user.getCreateTime());
 
         userDTO.setExternalPosition(user.getExternalPosition());
         userDTO.setInternalPosition(user.getInternalPosition());
-        userDTO.setDepartments(listDepartmentIds(user.getDepartments()));
+        userDTO.setDepartments(user.getDepartments());
         userDTO.setLeadDepartments(user.getLeadDepartments());
 
         // directus登录信息, 用于创建及登录
-        userDTO.setDirectusUserId(getId(user.getDirectusUser()));
+        userDTO.setDirectusUser(user.getDirectusUser());
         userDTO.setDirectusEmail(user.getDirectusEmail());
         userDTO.setDirectusPassword(user.getDirectusPassword());
+        userDTO.setRefreshToken(user.getRefreshToken());
+        userDTO.setAccessToken(user.getAccessToken());
 
         return userDTO;
-    }
-
-    private List<Long> listDepartmentIds(List<Department> departments) {
-
-        return CollectionUtils.isEmpty(departments)
-                ? List.of()
-                : departments.stream().map(this::getId).collect(Collectors.toList());
     }
 }
