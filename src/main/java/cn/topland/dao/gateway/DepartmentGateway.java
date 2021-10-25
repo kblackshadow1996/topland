@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,11 +36,34 @@ public class DepartmentGateway extends BaseGateway {
 
     public List<DepartmentDO> saveAll(List<Department> departments, String accessToken) throws InternalException {
 
-        Map<String, String> parentMap = departments.stream().collect(Collectors.toMap(Department::getDeptId, Department::getParentDeptId));
         List<DepartmentDO> departmentDOs = addDepartments(getCreateDepartments(departments), accessToken);
         departmentDOs.addAll(toDOs(getUpdateDepartments(departments)));
-        Map<String, Long> deptMap = mappingDept(departmentDOs)
-        return updateDepartments(parentMap, deptMap);
+        mappingParentDept(departmentDOs, getParent(departments));
+        return updateWithParent(departmentDOs, accessToken);
+    }
+
+    private List<DepartmentDO> updateWithParent(List<DepartmentDO> departmentDOs, String accessToken) throws InternalException {
+
+        List<DepartmentDO> departments = new ArrayList<>();
+        for (DepartmentDO dept : departmentDOs) {
+
+            Reply result = directus.patch(DEPARTMENT_URI + "/" + dept.getId(), tokenParam(accessToken), dept.toJson());
+            if (result.isSuccessful()) {
+
+
+                String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+                departments.add(JsonUtils.parse(data, DepartmentDO.class));
+            } else {
+
+                throw new InternalException("同步更新部门错误");
+            }
+        }
+        return departments;
+    }
+
+    private Map<String, String> getParent(List<Department> departments) {
+
+        return departments.stream().collect(Collectors.toMap(Department::getDeptId, Department::getParentDeptId));
     }
 
     private List<DepartmentDO> toDOs(List<Department> departments) {
@@ -49,12 +74,32 @@ public class DepartmentGateway extends BaseGateway {
     private DepartmentDO toDO(Department dept) {
 
         DepartmentDO department = new DepartmentDO();
-        return null;
+        department.setId(dept.getId());
+        department.setName(dept.getName());
+        department.setDeptId(dept.getDeptId());
+        department.setSort(dept.getSort());
+        department.setSource(dept.getSource().name());
+        department.setType(dept.getType().name());
+        department.setCreator(dept.getCreator().getId());
+        department.setEditor(dept.getEditor().getId());
+        department.setCreateTime(dept.getCreateTime());
+        department.setLastUpdateTime(dept.getLastUpdateTime());
+        return department;
     }
 
-    private Map<String, Long> mappingDept(List<DepartmentDO> deptDOs) {
+    private void mappingParentDept(List<DepartmentDO> deptDOs, Map<String, String> parentMap) {
 
-        return deptDOs.stream().collect(Collectors.toMap(DepartmentDO::getDeptId, DirectusIdEntity::getId));
+        // 得到部门deptId与其父部门id的关系映射
+        Map<String, Long> deptMap = deptDOs.stream().collect(Collectors.toMap(DepartmentDO::getDeptId, DirectusIdEntity::getId));
+        Map<String, Long> parentDeptMap = new HashMap<>();
+        parentMap.forEach((dept, parent) -> {
+
+            parentDeptMap.put(dept, deptMap.get(parentMap.get(parent)));
+        });
+        deptDOs.forEach(dept -> {
+
+            dept.setParent(parentDeptMap.get(dept.getDeptId()));
+        });
     }
 
     private List<DepartmentDO> addDepartments(List<Department> departments, String accessToken) throws InternalException {
@@ -65,7 +110,7 @@ public class DepartmentGateway extends BaseGateway {
             String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
             return JsonUtils.parse(data, DEPARTMENTS);
         }
-        throw new InternalException("add department failed");
+        throw new InternalException("同步新增部门错误");
     }
 
     private List<Department> getCreateDepartments(List<Department> departments) {

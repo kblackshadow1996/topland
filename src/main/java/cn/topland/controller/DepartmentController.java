@@ -8,6 +8,7 @@ import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.util.exception.AccessException;
+import cn.topland.util.exception.InternalException;
 import cn.topland.util.exception.InvalidException;
 import cn.topland.util.exception.QueryException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class DepartmentController {
      */
     @PostMapping("/wework/sync/all")
     public Response syncAllWeworkDept(Long creator, String token)
-            throws AccessException, QueryException, InvalidException {
+            throws AccessException, QueryException, InvalidException, InternalException {
 
         User user = userService.get(creator);
         validator.validDepartmentPermissions(user, token);
@@ -62,7 +63,7 @@ public class DepartmentController {
      */
     @PostMapping("/wework/sync/{deptId}")
     public Response syncWeworkDept(@PathVariable String deptId, Long creator, String token)
-            throws AccessException, InvalidException, QueryException {
+            throws AccessException, InvalidException, QueryException, InternalException {
 
         User user = userService.get(creator);
         validator.validDepartmentPermissions(user, token);

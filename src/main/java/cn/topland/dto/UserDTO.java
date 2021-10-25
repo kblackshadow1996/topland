@@ -1,6 +1,5 @@
 package cn.topland.dto;
 
-import cn.topland.entity.User;
 import cn.topland.entity.directus.Buffer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,8 +9,6 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static cn.topland.entity.User.Source;
 
 @Setter
 @Getter

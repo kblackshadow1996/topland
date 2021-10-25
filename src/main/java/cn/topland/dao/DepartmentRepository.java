@@ -18,4 +18,6 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
 
     @Query(value = "select dept from Department dept where dept.source=?1")
     List<Department> findBySource(Department.Source source);
+
+    Department findByDeptIdAndSource(String deptId, Department.Source source);
 }

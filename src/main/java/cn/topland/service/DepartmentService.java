@@ -1,15 +1,19 @@
 package cn.topland.service;
 
 import cn.topland.dao.DepartmentRepository;
+import cn.topland.dao.gateway.DepartmentGateway;
 import cn.topland.entity.Department;
 import cn.topland.entity.User;
+import cn.topland.entity.directus.DepartmentDO;
 import cn.topland.gateway.WeworkGateway;
 import cn.topland.gateway.response.WeworkDepartment;
 import cn.topland.service.parser.WeworkDepartmentParser;
+import cn.topland.util.exception.InternalException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,30 +31,43 @@ public class DepartmentService {
     @Autowired
     private WeworkDepartmentParser departmentParser;
 
+    @Autowired
+    private DepartmentGateway departmentGateway;
+
     /**
      * 根据组织id同步组织及其直属组织
      */
     @Transactional
-    public List<Department> syncWeworkDept(String deptId, User user) {
+    public List<DepartmentDO> syncWeworkDept(String deptId, User user) throws InternalException {
 
         List<Department> departments = departmentParser.parse(filterUpdateDepartments(deptId));
         List<Department> persistDepartments = repository.findByDeptIds(getDeptIds(departments), Source.WEWORK);
+        addParent(persistDepartments, deptId);
 
         List<Department> mergeDepartments = syncDepartments(persistDepartments, departments, user);
-        return repository.saveAllAndFlush(mergeDepartments);
+        return departmentGateway.saveAll(mergeDepartments, user.getAccessToken());
     }
 
     /**
      * 同步所有企业微信组织
      */
     @Transactional
-    public List<Department> syncAllWeworkDept(User user) {
+    public List<DepartmentDO> syncAllWeworkDept(User user) throws InternalException {
 
         List<Department> departments = departmentParser.parse(weworkGateway.listDepartments(null));
         List<Department> persistDepartments = repository.findBySource(Source.WEWORK);
 
         List<Department> mergeDepartments = syncDepartments(persistDepartments, departments, user);
-        return repository.saveAllAndFlush(mergeDepartments);
+        return departmentGateway.saveAll(mergeDepartments, user.getAccessToken());
+    }
+
+    private void addParent(List<Department> departments, String deptId) {
+
+        Department dept = repository.findByDeptIdAndSource(deptId, Source.WEWORK);
+        Department parent = dept.getParent() != null
+                ? repository.findByDeptIdAndSource(dept.getParent().getDeptId(), Source.WEWORK)
+                : null;
+        departments.add(parent);
     }
 
     private List<Department> syncDepartments(List<Department> persistDepartments, List<Department> departments, User user) {
@@ -110,6 +127,7 @@ public class DepartmentService {
 
         persistDept.setName(dept.getName());
         persistDept.setSort(dept.getSort());
+        persistDept.setLastUpdateTime(LocalDateTime.now());
     }
 
     private List<String> getDeptIds(List<Department> departments) {

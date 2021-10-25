@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 public abstract class DirectusRecordEntity extends DirectusIdEntity {
 
-    private Long creator;
+    protected Long creator;
 
-    private Long editor;
+    protected Long editor;
 }

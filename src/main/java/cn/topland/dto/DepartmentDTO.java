@@ -1,6 +1,5 @@
 package cn.topland.dto;
 
-import cn.topland.entity.Department;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -24,13 +23,19 @@ public class DepartmentDTO implements Serializable {
 
     private Long sort;
 
-    private Department.Type type;
+    private String type;
 
-    private Department.Source source;
+    private String source;
 
     private Long creator;
+
+    private Long editor;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonProperty(value = "create_time")
     private LocalDateTime createTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonProperty(value = "last_update_time")
+    private LocalDateTime lastUpdateTime;
 }

@@ -1,5 +1,5 @@
-1. 新增客户
-   POST /customer/add
+1. 新增客户 POST /customer/add
+
 ```json
 {
   "name": "阿里巴巴",
@@ -29,8 +29,8 @@
 }
 ```
 
-2. 更新客户
-   PATCH /customer/update/:id
+2. 更新客户 PATCH /customer/update/:id
+
 ```json
 {
   "name": "阿里巴巴-update",
@@ -70,8 +70,8 @@
 }
 ```
 
-3. 流失客户
-   PATCH /customer/lost/:id
+3. 流失客户 PATCH /customer/lost/:id
+
 ```json
 {
   "lost_reason": "该客户自身原因",
@@ -79,16 +79,16 @@
 }
 ```
 
-4. 寻回
-   PATCH /customer/retrieve/:id
+4. 寻回 PATCH /customer/retrieve/:id
+
 ```json
 {
   "creator": 1
 }
 ```
 
-5. 新增报价合同
-   POST /quotation/add
+5. 新增报价合同 POST /quotation/add
+
 ```json
 {
   "customer": 27,
@@ -101,7 +101,7 @@
   "totalComment": "总价格",
   "explanations": "第一条说明#第二条说明#第三条说明",
   "creator": 1,
-  "services":[
+  "services": [
     {
       "service": 1,
       "unit": "张",
@@ -113,8 +113,8 @@
 }
 ```
 
-6. 更新报价合同
-   PATCH /quotation/update/:id
+6. 更新报价合同 PATCH /quotation/update/:id
+
 ```json
 {
   "customer": 27,
@@ -127,7 +127,7 @@
   "total_comment": "总价格",
   "explanations": "第一条说明#第二条说明#第三条说明",
   "creator": 1,
-  "services":[
+  "services": [
     {
       "service": 1,
       "unit": "张",
@@ -139,8 +139,8 @@
 }
 ```
 
-7. 新增品牌
-   POST /brand/add
+7. 新增品牌 POST /brand/add
+
 ```json
 {
   "name": "蚂蚁金服",
@@ -163,8 +163,8 @@
 }
 ```
 
-8. 更新品牌
-   PATCH /brand/update/:id
+8. 更新品牌 PATCH /brand/update/:id
+
 ```json
 {
   "name": "蚂蚁金服科技",
@@ -188,8 +188,8 @@
 }
 ```
 
-9. 新增合同
-   POST /contract/add
+9. 新增合同 POST /contract/add
+
 ```json
 {
   "type": "YEAR",
@@ -208,8 +208,8 @@
 }
 ```
 
-10. 受到纸质合同
-    PATCH /contract/receive-paper/:id
+10. 受到纸质合同 PATCH /contract/receive-paper/:id
+
 ```json
 {
   "paper_date": "2021-11-16",
@@ -222,8 +222,8 @@
 }
 ```
 
-11. 审核合同
-    PATCH /contract/review/:id
+11. 审核合同 PATCH /contract/review/:id
+
 ```json
 {
   "action": "REJECT",
@@ -231,6 +231,7 @@
   "creator": 1
 }
 ```
+
 ```json
 {
   "action": "APPROVE",
@@ -239,11 +240,11 @@
 }
 ```
 
-12. 新增产品套餐
-    POST /package/add
+12. 新增产品套餐 POST /package/add
+
 ```json
 {
-  "name":"拍摄套餐",
+  "name": "拍摄套餐",
   "remark": "第一个产品套餐",
   "services": [
     {
@@ -257,11 +258,11 @@
 }
 ```
 
-13. 编辑产品套餐
-    PATCH /package/update/:id
+13. 编辑产品套餐 PATCH /package/update/:id
+
 ```json
 {
-  "name":"拍摄套餐-1",
+  "name": "拍摄套餐-1",
   "remark": "第一个产品套餐",
   "services": [
     {
@@ -282,8 +283,8 @@
 }
 ```
 
-14. 新增异常
-    POST /exception/add
+14. 新增异常 POST /exception/add
+
 ```json
 [
   {
@@ -291,8 +292,12 @@
     "type": "1",
     "department_source": "INTERNAL",
     "department": 2,
-    "owners": [1],
-    "copies": [1],
+    "owners": [
+      1
+    ],
+    "copies": [
+      1
+    ],
     "judge": 1,
     "complaint": "丢失很多素材",
     "self_check": "都是小王的锅",
@@ -305,17 +310,20 @@
 ]
 ```
 
+15. 更新异常 PATCH /exception/update/:id
 
-15. 更新异常
-    PATCH /exception/update/:id
 ```json
 {
   "attribute": "INTERNAL",
   "type": "1",
   "department_source": "INTERNAL",
   "department": 2,
-  "owners": [1],
-  "copies": [1],
+  "owners": [
+    1
+  ],
+  "copies": [
+    1
+  ],
   "judge": 1,
   "complaint": "丢失很多素材",
   "self_check": "都是小王的锅",
@@ -327,8 +335,8 @@
 }
 ```
 
-16. 解决异常
-    PATCH /exception/solve/:id
+16. 解决异常 PATCH /exception/solve/:id
+
 ```json
 {
   "close_date": "2021-12-12",
@@ -341,46 +349,49 @@
 }
 ```
 
-17. 同步组织
-    POST /department/wework/sync/all
+17. 同步组织 POST /department/wework/sync/all
 
-18. 同步单个组织
-    POST /department/wework/sync/:id1?creator=:id2
+18. 同步单个组织 POST /department/wework/sync/:id1?creator=:id2
 
-19. 同步用户
-    POST /user/wework/sync/all?creator=:id
+19. 同步用户 POST /user/wework/sync/all?creator=:id
 
-20. 同步单个组织用户
-    POST /user/wework/sync?deptId=:id1&creator=:id2
+20. 同步单个组织用户 POST /user/wework/sync?deptId=:id1&creator=:id2
 
-21. 创建角色
-    POST /role/add
+21. 创建角色 POST /role/add
+
 ```json
 {
   "name": "销售经理",
   "remark": "这是备注",
   "authorities": [
-    1,2,3,4,5
+    1,
+    2,
+    3,
+    4,
+    5
   ],
   "creator": 1
 }
 ```
 
-22. 更新角色
-    PATCH /role/update/:id
+22. 更新角色 PATCH /role/update/:id
+
 ```json
 {
   "name": "销售经理-update ",
   "remark": "这是备注",
   "authorities": [
-    1,2,3,4
+    1,
+    2,
+    3,
+    4
   ],
   "creator": 1
 }
 ```
 
-23. 单个用户授权
-    PATCH /user/auth/:id
+23. 单个用户授权 PATCH /user/auth/:id
+
 ```json
 {
   "role": 2,
@@ -389,49 +400,53 @@
 }
 ```
 
-24. 批量授权
-    PATCH /user/auth
+24. 批量授权 PATCH /user/auth
+
 ```json
 {
-  "users":[10,11,12],
+  "users": [
+    10,
+    11,
+    12
+  ],
   "role": 2,
   "auth": "ALL",
   "creator": 1
 }
 ```
 
-25. 新增结算合同
-    POST /settlement-contract/add
-```json
-{
-	"contract_date": "2021-10-18",
-	"receivable": "10000",
-	"remark": "写个备注",
-	"attachments": [
-		{
-			"file": "2dc57e24-ca41-4682-ae56-3660d048a6e5"
-		}
-	],
-	"contract": 1,
-	"action": "SUBMIT",
-	"creator": 1
-}
-```
-
-26. 审核结算合同
-    PATCH /settlement-contract/review/:id
-```json
-{
-    "action": "REJECT",
-    "creator": 1,
-    "review_comments": "不合理"
-}
-```
+25. 新增结算合同 POST /settlement-contract/add
 
 ```json
 {
-    "action": "APPROVE",
-    "creator": 1,
-    "review_comments": "合理"
+  "contract_date": "2021-10-18",
+  "receivable": "10000",
+  "remark": "写个备注",
+  "attachments": [
+    {
+      "file": "2dc57e24-ca41-4682-ae56-3660d048a6e5"
+    }
+  ],
+  "contract": 1,
+  "action": "SUBMIT",
+  "creator": 1
+}
+```
+
+26. 审核结算合同 PATCH /settlement-contract/review/:id
+
+```json
+{
+  "action": "REJECT",
+  "creator": 1,
+  "review_comments": "不合理"
+}
+```
+
+```json
+{
+  "action": "APPROVE",
+  "creator": 1,
+  "review_comments": "合理"
 }
 ```
