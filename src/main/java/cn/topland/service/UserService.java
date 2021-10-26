@@ -253,6 +253,11 @@ public class UserService {
 
     private DirectusUsers createDirectusUser(DirectusUsers root, String email) {
 
+        DirectusUsers persistUser = directusUsersRepository.findByEmail(email);
+        if (persistUser != null) {
+            // 避免创建directus用户成功，创建系统用户失败，导致下次同步再创建directus用户报错
+            return persistUser;
+        }
         DirectusUsers users = new DirectusUsers();
         users.setId(null);
         users.setEmail(email);

@@ -7,9 +7,6 @@ import cn.topland.util.Reply;
 import cn.topland.util.exception.InternalException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -53,7 +50,7 @@ public class ContactGateway extends BaseGateway {
         List<ContactDO> contactDOs = new ArrayList<>();
         for (Contact contact : contacts) {
 
-            Reply result = directus.patch(CONTACT_URI + "/" + contact.getId(), tokenParam(accessToken), composeContact(contact));
+            Reply result = directus.patch(CONTACT_URI + "/" + contact.getId(), tokenParam(accessToken), JsonUtils.toJsonNode(ContactDO.from(contact)));
             if (result.isSuccessful()) {
 
                 String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
@@ -78,26 +75,7 @@ public class ContactGateway extends BaseGateway {
 
     private JsonNode composeContacts(List<Contact> contacts) {
 
-        ArrayNode array = JsonNodeFactory.instance.arrayNode();
-        contacts.forEach(contact -> {
-
-            array.add(composeContact(contact));
-        });
-        return array;
-    }
-
-    private JsonNode composeContact(Contact contact) {
-
-        ObjectNode node = JsonNodeFactory.instance.objectNode();
-        node.put("name", contact.getName());
-        node.put("gender", contact.getGender().name());
-        node.put("mobile", contact.getMobile());
-        node.put("position", contact.getPosition());
-        node.put("department", contact.getDepartment());
-        node.put("address", contact.getAddress());
-        node.put("remark", contact.getRemark());
-        node.put("customer", contact.getCustomer());
-        node.put("brand", contact.getBrand());
-        return node;
+        List<ContactDO> contactDOs = contacts.stream().map(ContactDO::from).collect(Collectors.toList());
+        return JsonUtils.toJsonNode(contactDOs);
     }
 }

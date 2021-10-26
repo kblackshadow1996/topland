@@ -1,7 +1,11 @@
 package cn.topland.service;
 
 import cn.topland.dao.*;
+import cn.topland.dao.gateway.ContractGateway;
+import cn.topland.dao.gateway.OperationGateway;
 import cn.topland.entity.*;
+import cn.topland.entity.directus.ContractDO;
+import cn.topland.util.exception.InternalException;
 import cn.topland.vo.ContractVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +15,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 import static cn.topland.entity.Contract.*;
 
@@ -36,31 +39,42 @@ public class ContractService {
     @Autowired
     private OperationRepository operationRepository;
 
-    @Transactional
-    public Contract add(ContractVO contractVO, User creator) {
+    @Autowired
+    private ContractGateway contractGateway;
 
-        Contract contract = repository.saveAndFlush(createContract(contractVO, creator));
+    @Autowired
+    private OperationGateway operationGateway;
+
+    public Contract get(Long id) {
+
+        return repository.getById(id);
+    }
+
+    @Transactional
+    public ContractDO add(ContractVO contractVO, User creator) throws InternalException {
+
+        ContractDO contract = contractGateway.save(createContract(contractVO, creator), creator.getAccessToken());
         saveOperation(contract.getId(), Action.SUBMIT, creator, null);
         return contract;
     }
 
     @Transactional
-    public Contract review(Long id, ContractVO contractVO, User editor) {
+    public ContractDO review(Long id, ContractVO contractVO, User editor) throws InternalException {
 
-        Contract contract = repository.saveAndFlush(reviewContract(id, contractVO, editor));
+        ContractDO contract = contractGateway.update(reviewContract(id, contractVO, editor), editor.getAccessToken());
         saveOperation(id, contractVO.getAction(), editor, contractVO.getReviewComment());
         return contract;
     }
 
     @Transactional
-    public Contract receivePaper(Long id, ContractVO contractVO, List<Attachment> attachments, User creator) {
+    public ContractDO receivePaper(Long id, ContractVO contractVO, User creator) throws InternalException {
 
-        return repository.saveAndFlush(receiveContractPaper(id, contractVO, attachments, creator));
+        return contractGateway.update(receiveContractPaper(id, contractVO, creator), creator.getAccessToken());
     }
 
-    private void saveOperation(Long id, Action action, User creator, String remark) {
+    private void saveOperation(Long id, Action action, User creator, String remark) throws InternalException {
 
-        operationRepository.saveAndFlush(createOperation(id, action, creator, remark));
+        operationGateway.save(createOperation(id, action, creator, remark), creator.getAccessToken());
     }
 
     private Operation createOperation(Long id, Action action, User creator, String remark) {
@@ -75,11 +89,9 @@ public class ContractService {
         return operation;
     }
 
-    private Contract receiveContractPaper(Long id, ContractVO contractVO, List<Attachment> attachments, User creator) {
+    private Contract receiveContractPaper(Long id, ContractVO contractVO, User creator) {
 
         Contract contract = repository.getById(id);
-        // 上传附件
-        contract.setAttachments(attachments);
         contract.setPaperDate(contractVO.getPaperDate());
         contract.setEditor(creator);
         contract.setLastUpdateTime(LocalDateTime.now());

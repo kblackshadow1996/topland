@@ -2,18 +2,28 @@ package cn.topland.controller;
 
 import cn.topland.controller.validator.PermissionValidator;
 import cn.topland.dto.converter.ContractConverter;
+import cn.topland.entity.Attachment;
+import cn.topland.entity.SimpleIdEntity;
 import cn.topland.entity.User;
+import cn.topland.entity.directus.AttachmentDO;
+import cn.topland.entity.directus.ContractDO;
+import cn.topland.entity.directus.DirectusSimpleIdEntity;
 import cn.topland.service.AttachmentService;
 import cn.topland.service.ContractService;
 import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.util.exception.AccessException;
+import cn.topland.util.exception.InternalException;
 import cn.topland.util.exception.InvalidException;
 import cn.topland.util.exception.QueryException;
 import cn.topland.vo.ContractVO;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/contract")
@@ -45,7 +55,7 @@ public class ContractController {
      */
     @PostMapping("/add")
     public Response add(@RequestBody ContractVO contractVO, String token)
-            throws AccessException, QueryException, InvalidException {
+            throws AccessException, QueryException, InvalidException, InternalException {
 
         User user = userService.get(contractVO.getCreator());
         validator.validateContractCreatePermissions(user, token);
@@ -64,13 +74,13 @@ public class ContractController {
      */
     @PatchMapping("/receive-paper/{id}")
     public Response receivePaper(@PathVariable Long id, @RequestBody ContractVO contractVO, String token)
-            throws AccessException, QueryException, InvalidException {
+            throws AccessException, QueryException, InvalidException, InternalException {
 
         User user = userService.get(contractVO.getCreator());
         validator.validateContractReceivePaperPermissions(user, token);
-        return Responses.success(contractConverter.toDTO(
-                contractService.receivePaper(id, contractVO, attachmentService.upload(contractVO.getAttachments()), user)
-        ));
+        ContractDO contractDO = contractService.receivePaper(id, contractVO, user);
+        contractDO.setAttachments(listAttachmentDOs(attachmentService.uploadContractAttachments(contractVO.getAttachments(), id, token)));
+        return Responses.success(contractConverter.toDTO(contractDO));
     }
 
     /**
@@ -85,10 +95,30 @@ public class ContractController {
      */
     @PatchMapping("/review/{id}")
     public Response review(@PathVariable Long id, @RequestBody ContractVO contractVO, String token)
-            throws AccessException, QueryException, InvalidException {
+            throws AccessException, QueryException, InvalidException, InternalException {
 
         User user = userService.get(contractVO.getCreator());
         validator.validateContractReviewPermissions(user, token);
-        return Responses.success(contractConverter.toDTO(contractService.review(id, contractVO, user)));
+        ContractDO contractDO = contractService.review(id, contractVO, user);
+        contractDO.setAttachments(listAttachments(contractService.get(id).getAttachments()));
+        return Responses.success(contractConverter.toDTO(contractDO));
+    }
+
+    private List<Long> listAttachments(List<Attachment> attachments) {
+
+        return CollectionUtils.isEmpty(attachments)
+                ? List.of()
+                : attachments.stream().filter(attachment -> attachment.getContract() != null)
+                .map(SimpleIdEntity::getId)
+                .collect(Collectors.toList());
+    }
+
+    private List<Long> listAttachmentDOs(List<AttachmentDO> attachments) {
+
+        return CollectionUtils.isEmpty(attachments)
+                ? List.of()
+                : attachments.stream().filter(attachment -> attachment.getContract() != null)
+                .map(DirectusSimpleIdEntity::getId)
+                .collect(Collectors.toList());
     }
 }

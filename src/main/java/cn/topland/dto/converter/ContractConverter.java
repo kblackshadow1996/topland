@@ -1,26 +1,21 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.ContractDTO;
-import cn.topland.entity.Attachment;
-import cn.topland.entity.Contract;
-import org.apache.commons.collections4.CollectionUtils;
+import cn.topland.entity.directus.ContractDO;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Component
-public class ContractConverter extends BaseConverter<Contract, ContractDTO> {
+public class ContractConverter extends BaseConverter<ContractDO, ContractDTO> {
 
     @Override
-    public ContractDTO toDTO(Contract contract) {
+    public ContractDTO toDTO(ContractDO contract) {
 
         return contract != null
                 ? composeContractDTO(contract)
                 : null;
     }
 
-    private ContractDTO composeContractDTO(Contract contract) {
+    private ContractDTO composeContractDTO(ContractDO contract) {
 
         // 基本信息
         ContractDTO dto = new ContractDTO();
@@ -36,26 +31,19 @@ public class ContractConverter extends BaseConverter<Contract, ContractDTO> {
         dto.setStatus(contract.getStatus());
         dto.setType(contract.getType());
         dto.setRemark(contract.getRemark());
-        dto.setAttachments(listAttachmentIds(contract.getAttachments()));
+        dto.setAttachments(contract.getAttachments());
 
         // 关联信息
-        dto.setOrder(getId(contract.getOrder()));
-        dto.setCustomer(getId(contract.getCustomer()));
-        dto.setBrand(getId(contract.getBrand()));
-        dto.setSeller(getId(contract.getSeller()));
+        dto.setOrder(contract.getOrder());
+        dto.setCustomer(contract.getCustomer());
+        dto.setBrand(contract.getBrand());
+        dto.setSeller(contract.getSeller());
 
         // 创建信息
-        dto.setCreator(getId(contract.getCreator()));
-        dto.setEditor(getId(contract.getEditor()));
+        dto.setCreator(contract.getCreator());
+        dto.setEditor(contract.getEditor());
         dto.setCreateTime(contract.getCreateTime());
         dto.setLastUpdateTime(contract.getLastUpdateTime());
         return dto;
-    }
-
-    private List<Long> listAttachmentIds(List<Attachment> attachments) {
-
-        return CollectionUtils.isEmpty(attachments)
-                ? List.of()
-                : attachments.stream().map(this::getId).collect(Collectors.toList());
     }
 }

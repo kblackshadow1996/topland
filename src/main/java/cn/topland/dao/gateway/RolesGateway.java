@@ -5,9 +5,6 @@ import cn.topland.entity.directus.RolesDO;
 import cn.topland.util.JsonUtils;
 import cn.topland.util.Reply;
 import cn.topland.util.exception.InternalException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -23,7 +20,7 @@ public class RolesGateway extends BaseGateway {
 
     public RolesDO add(DirectusRoles roles, String accessToken) throws InternalException {
 
-        Reply result = directus.post(ROLES_URI, tokenParam(accessToken), composeRoles(roles));
+        Reply result = directus.post(ROLES_URI, tokenParam(accessToken), JsonUtils.toJsonNode(RolesDO.from(roles)));
         if (result.isSuccessful()) {
 
             System.out.println(result.getContent());
@@ -35,19 +32,12 @@ public class RolesGateway extends BaseGateway {
 
     public RolesDO update(DirectusRoles roles, String accessToken) throws InternalException {
 
-        Reply result = directus.patch(ROLES_URI + "/" + roles.getId(), tokenParam(accessToken), composeRoles(roles));
+        Reply result = directus.patch(ROLES_URI + "/" + roles.getId(), tokenParam(accessToken), JsonUtils.toJsonNode(RolesDO.from(roles)));
         if (result.isSuccessful()) {
 
             String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
             return JsonUtils.parse(data, RolesDO.class);
         }
         throw new InternalException("更新角色失败");
-    }
-
-    private JsonNode composeRoles(DirectusRoles roles) {
-
-        ObjectNode node = JsonNodeFactory.instance.objectNode();
-        node.put("name", roles.getName());
-        return node;
     }
 }

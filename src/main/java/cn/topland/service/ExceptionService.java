@@ -1,8 +1,12 @@
 package cn.topland.service;
 
 import cn.topland.dao.*;
+import cn.topland.dao.gateway.ExceptionGateway;
+import cn.topland.dao.gateway.OperationGateway;
 import cn.topland.entity.Exception;
 import cn.topland.entity.*;
+import cn.topland.entity.directus.ExceptionDO;
+import cn.topland.util.exception.InternalException;
 import cn.topland.vo.AttachmentVO;
 import cn.topland.vo.ExceptionVO;
 import org.apache.commons.collections4.CollectionUtils;
@@ -14,7 +18,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static cn.topland.entity.Exception.Action;
@@ -38,36 +41,50 @@ public class ExceptionService {
     private DepartmentRepository departmentRepository;
 
     @Autowired
+    private DirectusFilesRepository filesRepository;
+
+    @Autowired
     private OperationRepository operationRepository;
+
+    @Autowired
+    private ExceptionGateway exceptionGateway;
+
+    @Autowired
+    private OperationGateway operationGateway;
 
     public Exception get(Long id) {
 
         return repository.getById(id);
     }
 
-    @Transactional
-    public List<Exception> add(List<ExceptionVO> exceptionVOs, List<Attachment> attachments, User creator) {
+    public List<Exception> createAll(List<ExceptionVO> exceptionVOs, User creator) {
 
-        List<Exception> exceptions = repository.saveAllAndFlush(createExceptions(exceptionVOs, attachments, creator));
-        saveCreateOperations(exceptions, creator);
-        return exceptions;
+        return createExceptions(exceptionVOs, creator);
     }
 
     @Transactional
-    public Exception update(Long id, ExceptionVO exceptionVO, List<Attachment> attachments, User editor) {
+    public List<ExceptionDO> add(List<Exception> exceptions, User creator) throws InternalException {
+
+        List<ExceptionDO> exceptionDOs = exceptionGateway.saveAll(exceptions, creator.getAccessToken());
+        saveCreateOperations(exceptionDOs, creator);
+        return exceptionDOs;
+    }
+
+    @Transactional
+    public ExceptionDO update(Long id, ExceptionVO exceptionVO, User editor) throws InternalException {
 
         Exception exception = repository.getById(id);
-        Exception exp = repository.saveAndFlush(updateException(exception, exceptionVO, attachments, editor));
+        ExceptionDO exceptionDO = exceptionGateway.update(updateException(exception, exceptionVO, editor), editor.getAccessToken());
         saveUpdateOperation(id, editor);
-        return exp;
+        return exceptionDO;
     }
 
     @Transactional
-    public Exception solve(Long id, ExceptionVO exceptionVO, User editor) {
+    public ExceptionDO solve(Long id, ExceptionVO exceptionVO, User editor) throws InternalException {
 
         Exception persistExp = repository.getById(id);
         boolean isUpdate = isUpdateSolution(persistExp);
-        Exception exception = repository.saveAndFlush(solveException(persistExp, exceptionVO, editor));
+        ExceptionDO exception = exceptionGateway.update(solveException(persistExp, exceptionVO, editor), editor.getAccessToken());
         saveSolveOperation(id, editor, isUpdate);
         return exception;
     }
@@ -86,20 +103,18 @@ public class ExceptionService {
         return exception;
     }
 
-    private Exception updateException(Exception exception, ExceptionVO exceptionVO, List<Attachment> attachments, User editor) {
+    private Exception updateException(Exception exception, ExceptionVO exceptionVO, User editor) {
 
-        composeException(exception, exceptionVO, attachments);
+        composeException(exception, exceptionVO);
         exception.setEditor(editor);
         exception.setLastUpdateTime(LocalDateTime.now());
         return exception;
     }
 
-    private List<Exception> createExceptions(List<ExceptionVO> exceptionVOs, List<Attachment> attachments, User creator) {
+    private List<Exception> createExceptions(List<ExceptionVO> exceptionVOs, User creator) {
 
-        Map<String, Attachment> attachmentMap = attachments.stream()
-                .collect(Collectors.toMap(a -> a.getFile().getId(), a -> a));
         List<Exception> exceptions = exceptionVOs.stream()
-                .map(vo -> createException(vo, listExceptionAttachments(vo.getAttachments(), attachmentMap), creator))
+                .map(vo -> createException(vo, listExceptionAttachments(vo.getAttachments()), creator))
                 .collect(Collectors.toList());
         checkIfCritical(exceptions);
         return exceptions;
@@ -108,13 +123,14 @@ public class ExceptionService {
     private Exception createException(ExceptionVO exceptionVO, List<Attachment> attachments, User creator) {
 
         Exception exception = new Exception();
-        composeException(exception, exceptionVO, attachments);
+        composeException(exception, exceptionVO);
+        exception.setAttachments(attachments);
         exception.setCreator(creator);
         exception.setEditor(creator);
         return exception;
     }
 
-    private void composeException(Exception exception, ExceptionVO exceptionVO, List<Attachment> attachments) {
+    private void composeException(Exception exception, ExceptionVO exceptionVO) {
 
         exception.setCreateDate(exceptionVO.getCreateDate());
         exception.setOrders(listOrders(exceptionVO.getOrders()));
@@ -126,7 +142,6 @@ public class ExceptionService {
         exception.setCopies(listUsers(exceptionVO.getCopies()));
         exception.setJudge(getUser(exceptionVO.getJudge()));
         exception.setComplaint(exceptionVO.getComplaint());
-        exception.setAttachments(CollectionUtils.isEmpty(attachments) ? null : attachments);
         exception.setSelfCheck(exceptionVO.getSelfCheck());
         exception.setNarrative(exceptionVO.getNarrative());
         exception.setEstimatedLoss(exceptionVO.getEstimatedLoss());
@@ -219,20 +234,20 @@ public class ExceptionService {
         });
     }
 
-    private void saveCreateOperations(List<Exception> exceptions, User creator) {
+    private void saveCreateOperations(List<ExceptionDO> exceptions, User creator) throws InternalException {
 
-        operationRepository.saveAllAndFlush(createAddExceptionOperations(exceptions, creator));
+        operationGateway.saveAll(createAddExceptionOperations(exceptions, creator), creator.getAccessToken());
     }
 
-    private void saveUpdateOperation(Long id, User editor) {
+    private void saveUpdateOperation(Long id, User editor) throws InternalException {
 
-        operationRepository.saveAndFlush(createOperation(Action.UPDATE, id, editor));
+        operationGateway.save(createOperation(Action.UPDATE, id, editor), editor.getAccessToken());
     }
 
-    private void saveSolveOperation(Long id, User editor, boolean isUpdate) {
+    private void saveSolveOperation(Long id, User editor, boolean isUpdate) throws InternalException {
 
         Action action = isUpdate ? Action.UPDATE_SOLUTION : Action.CREATE_SOLUTION;
-        operationRepository.saveAndFlush(createOperation(action, id, editor));
+        operationGateway.save(createOperation(action, id, editor), editor.getAccessToken());
     }
 
     // 是否更新异常处理
@@ -241,7 +256,7 @@ public class ExceptionService {
         return exception.getCloseDate() != null;
     }
 
-    private List<Operation> createAddExceptionOperations(List<Exception> exceptions, User creator) {
+    private List<Operation> createAddExceptionOperations(List<ExceptionDO> exceptions, User creator) {
 
         return exceptions.stream()
                 .map(exception -> createOperation(Action.CREATE, exception.getId(), creator))
@@ -259,11 +274,16 @@ public class ExceptionService {
         return operation;
     }
 
-    private List<Attachment> listExceptionAttachments(List<AttachmentVO> attachmentVOs, Map<String, Attachment> attachmentMap) {
+    private List<Attachment> listExceptionAttachments(List<AttachmentVO> attachmentVOs) {
 
         return CollectionUtils.isNotEmpty(attachmentVOs)
                 ? attachmentVOs.stream()
-                .map(attachmentVO -> attachmentMap.get(attachmentVO.getFile()))
+                .map(attachmentVO -> {
+
+                    Attachment attachment = new Attachment();
+                    attachment.setFile(filesRepository.getById(attachmentVO.getFile()));
+                    return attachment;
+                })
                 .collect(Collectors.toList())
                 : List.of();
     }

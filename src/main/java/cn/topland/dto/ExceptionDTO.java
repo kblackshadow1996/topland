@@ -1,6 +1,7 @@
 package cn.topland.dto;
 
 import cn.topland.entity.Exception;
+import cn.topland.entity.directus.Buffer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,7 @@ public class ExceptionDTO implements Serializable {
 
     private Long id;
 
-    private Exception.Attribute attribute;
+    private String attribute;
 
     private List<Long> orders;
 
@@ -45,9 +46,9 @@ public class ExceptionDTO implements Serializable {
     @JsonProperty(value = "estimated_loss_condition")
     private String estimatedLossCondition;
 
-    private Boolean critical;
+    private Buffer critical;
 
-    private Boolean resolved;
+    private Buffer resolved;
 
     @JsonProperty(value = "create_date")
     private LocalDate createDate;
@@ -66,5 +67,5 @@ public class ExceptionDTO implements Serializable {
     @JsonProperty(value = "optimal_solution")
     private String optimalSolution;
 
-    private Boolean optimal;
+    private Buffer optimal;
 }

@@ -181,25 +181,8 @@ public class UserGateway extends BaseGateway {
 
     private ObjectNode composeUser(User user) {
 
-        ObjectNode node = JsonNodeFactory.instance.objectNode();
-        node.put("user_id", user.getUserId());
-        node.put("name", user.getName());
-        node.put("email", user.getEmail());
-        node.put("external_position", user.getExternalPosition());
-        node.put("internal_position", user.getInternalPosition());
-        node.put("mobile", user.getMobile());
-        node.put("avatar", user.getAvatar());
+        ObjectNode node = (ObjectNode) JsonUtils.toJsonNode(UserDO.from(user));
         node.set("departments", composeDepartments(user.getDepartments()));
-        node.put("lead_departments", user.getLeadDepartments());
-        node.put("source", user.getSource().name());
-        node.put("active", user.getActive() ? 1 : 0);
-        node.put("directus_user", user.getDirectusUser().getId());
-        node.put("directus_email", user.getDirectusEmail());
-        node.put("directus_password", user.getDirectusPassword());
-        node.put("creator", user.getCreator().getId());
-        node.put("editor", user.getEditor().getId());
-        node.put("create_time", FORMATTER.format(user.getCreateTime()));
-        node.put("last_update_time", FORMATTER.format(user.getLastUpdateTime()));
         return node;
     }
 

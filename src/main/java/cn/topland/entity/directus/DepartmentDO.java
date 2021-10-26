@@ -1,9 +1,7 @@
 package cn.topland.entity.directus;
 
+import cn.topland.entity.Department;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,19 +22,19 @@ public class DepartmentDO extends DirectusRecordEntity {
 
     private String source;
 
-    public JsonNode toJson() {
+    public static DepartmentDO from(Department department) {
 
-        ObjectNode dept = JsonNodeFactory.instance.objectNode();
-        dept.put("name", name);
-        dept.put("dept_id", deptId);
-        dept.put("parent", parent);
-        dept.put("sort", sort);
-        dept.put("type", type);
-        dept.put("source", source);
-        dept.put("creator", creator);
-        dept.put("editor", editor);
-        dept.put("create_time", DATETIME_FORMATTER.format(createTime));
-        dept.put("last_update_time", DATETIME_FORMATTER.format(lastUpdateTime));
-        return dept;
+        DepartmentDO departmentDO = new DepartmentDO();
+        departmentDO.setName(department.getName());
+        departmentDO.setDeptId(department.getDeptId());
+        departmentDO.setParent(department.getParent() == null ? null : department.getParent().getId());
+        departmentDO.setSort(department.getSort());
+        departmentDO.setType(department.getType().name());
+        departmentDO.setSource(department.getSource().name());
+        departmentDO.setCreator(department.getCreator().getId());
+        departmentDO.setEditor(department.getEditor().getId());
+        departmentDO.setCreateTime(department.getCreateTime());
+        departmentDO.setLastUpdateTime(department.getLastUpdateTime());
+        return departmentDO;
     }
 }

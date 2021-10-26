@@ -1,6 +1,5 @@
 package cn.topland.dto;
 
-import cn.topland.entity.Contract;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -20,7 +19,7 @@ public class ContractDTO implements Serializable {
 
     private String identity;
 
-    private Contract.Type type;
+    private String type;
 
     private Long customer;
 
@@ -52,7 +51,7 @@ public class ContractDTO implements Serializable {
 
     private List<Long> attachments;
 
-    private Contract.Status status;
+    private String status;
 
     private Long creator;
 

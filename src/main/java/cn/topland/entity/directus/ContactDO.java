@@ -30,10 +30,16 @@ public class ContactDO extends DirectusIdEntity {
 
         ContactDO contactDO = new ContactDO();
         contactDO.setName(contact.getName());
-        contactDO.setBrand(contact.getBrand());
-        contactDO.setCustomer(contact.getCustomer());
+        contactDO.setGender(contact.getGender().name());
+        contactDO.setMobile(contact.getMobile());
+        contactDO.setPosition(contact.getPosition());
         contactDO.setDepartment(contact.getDepartment());
         contactDO.setAddress(contact.getAddress());
+        contactDO.setRemark(contact.getRemark());
+        contactDO.setBrand(contact.getBrand());
+        contactDO.setCustomer(contact.getCustomer());
+        contactDO.setCreateTime(contact.getCreateTime());
+        contactDO.setLastUpdateTime(contact.getLastUpdateTime());
         return contactDO;
     }
 }

@@ -5,12 +5,14 @@ import cn.topland.entity.directus.OperationDO;
 import cn.topland.util.JsonUtils;
 import cn.topland.util.Reply;
 import cn.topland.util.exception.InternalException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class OperationGateway extends BaseGateway {
@@ -21,9 +23,12 @@ public class OperationGateway extends BaseGateway {
     @Autowired
     private DirectusGateway directus;
 
+    private static final TypeReference<List<OperationDO>> OPERATIONS = new TypeReference<>() {
+    };
+
     public OperationDO save(Operation operation, String accessToken) throws InternalException {
 
-        Reply result = directus.post(OPERATION_URI, tokenParam(accessToken), composeOperation(operation));
+        Reply result = directus.post(OPERATION_URI, tokenParam(accessToken), JsonUtils.toJsonNode(OperationDO.from(operation)));
         if (result.isSuccessful()) {
 
             String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
@@ -32,17 +37,20 @@ public class OperationGateway extends BaseGateway {
         throw new InternalException("添加操作记录失败");
     }
 
-    private JsonNode composeOperation(Operation operation) {
+    public List<OperationDO> saveAll(List<Operation> operations, String accessToken) throws InternalException {
 
-        ObjectNode node = JsonNodeFactory.instance.objectNode();
-        node.put("module", operation.getModule().name());
-        node.put("module_id", operation.getModuleId());
-        node.put("action", operation.getAction());
-        node.put("remark", operation.getRemark());
-        node.put("creator", operation.getCreator().getId());
-        node.put("editor", operation.getEditor().getId());
-        node.put("create_time", FORMATTER.format(operation.getCreateTime()));
-        node.put("last_update_time", FORMATTER.format(operation.getLastUpdateTime()));
-        return node;
+        Reply result = directus.post(OPERATION_URI, tokenParam(accessToken), composeOperations(operations));
+        if (result.isSuccessful()) {
+
+            String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+            return JsonUtils.parse(data, OPERATIONS);
+        }
+        throw new InternalException("添加操作记录失败");
+    }
+
+    private JsonNode composeOperations(List<Operation> operations) {
+
+        List<OperationDO> operationDOs = operations.stream().map(OperationDO::from).collect(Collectors.toList());
+        return JsonUtils.toJsonNode(operationDOs);
     }
 }

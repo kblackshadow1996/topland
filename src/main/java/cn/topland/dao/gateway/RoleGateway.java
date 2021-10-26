@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -27,7 +28,7 @@ public class RoleGateway extends BaseGateway {
 
     public RoleDO add(Role role, String accessToken) throws InternalException {
 
-        Reply result = directus.post(ROLE_URI, tokenParam(accessToken), composeRole(role));
+        Reply result = directus.post(ROLE_URI, tokenParam(accessToken), JsonUtils.toJsonNode(RoleDO.from(role)));
         System.out.println(result.getContent());
         if (result.isSuccessful()) {
 
@@ -50,25 +51,21 @@ public class RoleGateway extends BaseGateway {
 
     private JsonNode composeRole(Role role) {
 
-        ObjectNode node = JsonNodeFactory.instance.objectNode();
-        node.put("name", role.getName());
-        node.put("directus_role", role.getRole().getId());
+        ObjectNode node = (ObjectNode) JsonUtils.toJsonNode(RoleDO.from(role));
         node.set("authorities", composeAuths(role.getAuthorities()));
-        node.put("remark", role.getRemark());
-        node.put("creator", role.getCreator().getId());
-        node.put("editor", role.getEditor().getId());
-        node.put("create_time", FORMATTER.format(role.getCreateTime()));
-        node.put("last_update_time", FORMATTER.format(role.getCreateTime()));
         return node;
     }
 
     private JsonNode composeAuths(List<Authority> authorities) {
 
         ArrayNode auths = JsonNodeFactory.instance.arrayNode();
-        authorities.forEach(auth -> {
+        if (CollectionUtils.isNotEmpty(authorities)) {
 
-            auths.add(composeAuth(auth));
-        });
+            authorities.forEach(auth -> {
+
+                auths.add(composeAuth(auth));
+            });
+        }
         return auths;
     }
 

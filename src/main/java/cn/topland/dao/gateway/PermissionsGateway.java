@@ -9,13 +9,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class PermissionsGateway extends BaseGateway {
@@ -54,25 +54,8 @@ public class PermissionsGateway extends BaseGateway {
 
     private JsonNode composePermissions(List<DirectusPermissions> permissions) {
 
-        ArrayNode array = JsonNodeFactory.instance.arrayNode();
-        permissions.forEach(permission -> {
-
-            array.add(composePermission(permission));
-        });
-        return array;
-    }
-
-    private JsonNode composePermission(DirectusPermissions permission) {
-
-        ObjectNode node = JsonNodeFactory.instance.objectNode();
-        node.put("collection", permission.getCollection());
-        node.put("action", permission.getAction());
-        node.put("permissions", permission.getPermissions());
-        node.put("validation", permission.getValidation());
-        node.put("presets", permission.getPresets());
-        node.put("fields", permission.getFields());
-        node.put("role", permission.getRole());
-        return node;
+        List<PermissionDO> permissionDOs = permissions.stream().map(PermissionDO::from).collect(Collectors.toList());
+        return JsonUtils.toJsonNode(permissionDOs);
     }
 
     private JsonNode composePermissionIds(List<DirectusPermissions> permissions) {

@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 public class Buffer implements Serializable {
 
-    private String type = "buffer";
+    private String type;
 
     private List<Byte> data;
 }

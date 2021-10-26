@@ -8,9 +8,6 @@ import cn.topland.util.Reply;
 import cn.topland.util.exception.InternalException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +44,7 @@ public class DepartmentGateway extends BaseGateway {
         List<DepartmentDO> departments = new ArrayList<>();
         for (DepartmentDO dept : departmentDOs) {
 
-            Reply result = directus.patch(DEPARTMENT_URI + "/" + dept.getId(), tokenParam(accessToken), dept.toJson());
+            Reply result = directus.patch(DEPARTMENT_URI + "/" + dept.getId(), tokenParam(accessToken), JsonUtils.toJsonNode(dept));
             if (result.isSuccessful()) {
 
                 String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
@@ -72,31 +69,7 @@ public class DepartmentGateway extends BaseGateway {
 
     private List<DepartmentDO> toDOs(List<Department> departments) {
 
-        return departments.stream().map(this::toDO).collect(Collectors.toList());
-    }
-
-    private DepartmentDO toDO(Department dept) {
-
-        DepartmentDO department = new DepartmentDO();
-        department.setId(dept.getId());
-        department.setName(dept.getName());
-        department.setDeptId(dept.getDeptId());
-        department.setParent(getParent(dept.getParent()));
-        department.setSort(dept.getSort());
-        department.setSource(dept.getSource().name());
-        department.setType(dept.getType().name());
-        department.setCreator(dept.getCreator().getId());
-        department.setEditor(dept.getEditor().getId());
-        department.setCreateTime(dept.getCreateTime());
-        department.setLastUpdateTime(dept.getLastUpdateTime());
-        return department;
-    }
-
-    private Long getParent(Department parent) {
-
-        return parent != null
-                ? parent.getId()
-                : null;
+        return departments.stream().map(DepartmentDO::from).collect(Collectors.toList());
     }
 
     private void mappingParentDept(List<DepartmentDO> deptDOs, Map<String, String> parentMap, Department parentDept) {
@@ -148,26 +121,7 @@ public class DepartmentGateway extends BaseGateway {
 
     private JsonNode composeDepartments(List<Department> departments) {
 
-        ArrayNode array = JsonNodeFactory.instance.arrayNode();
-        departments.forEach(department -> {
-
-            array.add(composeDepartment(department));
-        });
-        return array;
-    }
-
-    private JsonNode composeDepartment(Department department) {
-
-        ObjectNode node = JsonNodeFactory.instance.objectNode();
-        node.put("name", department.getName());
-        node.put("dept_id", department.getDeptId());
-        node.put("sort", department.getSort());
-        node.put("type", department.getType().name());
-        node.put("source", department.getSource().name());
-        node.put("creator", department.getCreator().getId());
-        node.put("editor", department.getEditor().getId());
-        node.put("create_time", FORMATTER.format(department.getCreateTime()));
-        node.put("last_update_time", FORMATTER.format(department.getLastUpdateTime()));
-        return node;
+        List<DepartmentDO> departmentDOs = departments.stream().map(DepartmentDO::from).collect(Collectors.toList());
+        return JsonUtils.toJsonNode(departmentDOs);
     }
 }

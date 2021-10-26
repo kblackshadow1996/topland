@@ -1,10 +1,7 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.ExceptionDTO;
-import cn.topland.entity.Attachment;
-import cn.topland.entity.Exception;
-import cn.topland.entity.Order;
-import cn.topland.entity.User;
+import cn.topland.entity.directus.ExceptionDO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
@@ -12,10 +9,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class ExceptionConverter extends BaseConverter<Exception, ExceptionDTO> {
+public class ExceptionConverter extends BaseConverter<ExceptionDO, ExceptionDTO> {
 
     @Override
-    public List<ExceptionDTO> toDTOs(List<Exception> exceptions) {
+    public List<ExceptionDTO> toDTOs(List<ExceptionDO> exceptions) {
 
         return CollectionUtils.isEmpty(exceptions)
                 ? List.of()
@@ -23,26 +20,26 @@ public class ExceptionConverter extends BaseConverter<Exception, ExceptionDTO> {
     }
 
     @Override
-    public ExceptionDTO toDTO(Exception exception) {
+    public ExceptionDTO toDTO(ExceptionDO exception) {
 
         return exception != null
                 ? composeException(exception)
                 : null;
     }
 
-    private ExceptionDTO composeException(Exception exception) {
+    private ExceptionDTO composeException(ExceptionDO exception) {
 
         ExceptionDTO dto = new ExceptionDTO();
         dto.setId(exception.getId());
         dto.setAttribute(exception.getAttribute());
-        dto.setType(getId(exception.getType()));
-        dto.setDepartment(getId(exception.getDepartment()));
-        dto.setOrders(listOrderIds(exception.getOrders()));
-        dto.setOwners(listUserIds(exception.getOwners()));
-        dto.setOwners(listUserIds(exception.getOwners()));
-        dto.setJudge(getId(exception.getJudge()));
+        dto.setType(exception.getType());
+        dto.setDepartment(exception.getDepartment());
+        dto.setOrders(exception.getOrders());
+        dto.setOwners(exception.getOwners());
+        dto.setOwners(exception.getOwners());
+        dto.setJudge(exception.getJudge());
         dto.setComplaint(exception.getComplaint());
-        dto.setAttachments(listAttachmentIds(exception.getAttachments()));
+        dto.setAttachments(exception.getAttachments());
         dto.setSelfCheck(exception.getSelfCheck());
         dto.setNarrative(exception.getNarrative());
         dto.setEstimatedLoss(exception.getEstimatedLoss());
@@ -58,26 +55,5 @@ public class ExceptionConverter extends BaseConverter<Exception, ExceptionDTO> {
         dto.setOptimalSolution(exception.getOptimalSolution());
 
         return dto;
-    }
-
-    private List<Long> listAttachmentIds(List<Attachment> attachments) {
-
-        return CollectionUtils.isEmpty(attachments)
-                ? List.of()
-                : attachments.stream().map(this::getId).collect(Collectors.toList());
-    }
-
-    protected List<Long> listUserIds(List<User> users) {
-
-        return CollectionUtils.isEmpty(users)
-                ? List.of()
-                : users.stream().map(this::getId).collect(Collectors.toList());
-    }
-
-    protected List<Long> listOrderIds(List<Order> orders) {
-
-        return CollectionUtils.isEmpty(orders)
-                ? List.of()
-                : orders.stream().map(this::getId).collect(Collectors.toList());
     }
 }
