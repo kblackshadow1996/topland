@@ -58,7 +58,7 @@ public class Customer extends RecordEntity {
      * 状态
      */
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.COOPERATING;
 
     /**
      * 发票信息

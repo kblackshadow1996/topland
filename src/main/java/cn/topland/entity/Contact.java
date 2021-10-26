@@ -4,10 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * 联系人
@@ -54,6 +51,12 @@ public class Contact extends IdEntity {
      * 备注
      */
     private String remark;
+
+    @Transient
+    private Long customer;
+
+    @Transient
+    private Long brand;
 
     public enum Gender {
 

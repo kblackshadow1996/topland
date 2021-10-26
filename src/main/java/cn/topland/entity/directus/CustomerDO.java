@@ -1,19 +1,14 @@
-package cn.topland.dto;
+package cn.topland.entity.directus;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Setter
 @Getter
-public class CustomerDTO implements Serializable {
-
-    private Long id;
+public class CustomerDO extends DirectusRecordEntity {
 
     private String name;
 
@@ -23,11 +18,11 @@ public class CustomerDTO implements Serializable {
 
     private String type;
 
-    private String status;
-
     private Long parent;
 
     private String source;
+
+    private String status;
 
     @JsonProperty(value = "invoice_type")
     private String invoiceType;
@@ -47,16 +42,4 @@ public class CustomerDTO implements Serializable {
     private String account;
 
     private List<Long> contacts;
-
-    private Long creator;
-
-    private Long editor;
-
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @JsonProperty(value = "create_time")
-    private LocalDateTime createTime;
-
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @JsonProperty(value = "last_update_time")
-    private LocalDateTime lastUpdateTime;
 }

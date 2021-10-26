@@ -3,7 +3,11 @@ package cn.topland.service;
 import cn.topland.dao.CustomerRepository;
 import cn.topland.dao.OperationRepository;
 import cn.topland.dao.UserRepository;
+import cn.topland.dao.gateway.CustomerGateway;
+import cn.topland.dao.gateway.OperationGateway;
 import cn.topland.entity.*;
+import cn.topland.entity.directus.CustomerDO;
+import cn.topland.util.exception.InternalException;
 import cn.topland.util.exception.UniqueException;
 import cn.topland.vo.CustomerVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,42 +32,48 @@ public class CustomerService {
     @Autowired
     private OperationRepository operationRepository;
 
+    @Autowired
+    private CustomerGateway customerGateway;
+
+    @Autowired
+    private OperationGateway operationGateway;
+
     public Customer get(Long id) {
 
         return repository.getById(id);
     }
 
     @Transactional
-    public Customer add(CustomerVO customerVO, List<Contact> contacts, User creator) {
+    public CustomerDO add(CustomerVO customerVO, User creator) throws InternalException {
 
         validateNameUnique(customerVO.getName());
-        Customer customer = repository.saveAndFlush(createCustomer(customerVO, contacts, creator));
-        saveOperation(customer.getId(), Action.CREATE, creator, null);
+        CustomerDO customer = customerGateway.save(createCustomer(customerVO, creator), creator.getAccessToken());
+        saveOperation(customer.getId(), Action.CREATE, creator, null, creator.getAccessToken());
         return customer;
     }
 
     @Transactional
-    public Customer update(Customer customer, CustomerVO customerVO, List<Contact> contacts, User editor) {
+    public CustomerDO update(Customer customer, CustomerVO customerVO, User editor) throws InternalException {
 
         validateNameUnique(customerVO.getName(), customer.getId());
-        repository.saveAndFlush(updateCustomer(customer, customerVO, contacts, editor));
-        saveOperation(customer.getId(), Action.UPDATE, editor, null);
+        CustomerDO customerDO = customerGateway.update(updateCustomer(customer, customerVO, editor), editor.getAccessToken());
+        saveOperation(customerDO.getId(), Action.UPDATE, editor, null, editor.getAccessToken());
+        return customerDO;
+    }
+
+    @Transactional
+    public CustomerDO lost(Long id, CustomerVO customerVO, User editor) throws InternalException {
+
+        CustomerDO customer = customerGateway.update(lostCustomer(repository.getById(id), editor), editor.getAccessToken());
+        saveOperation(id, Action.LOST, editor, customerVO.getLostReason(), editor.getAccessToken());
         return customer;
     }
 
     @Transactional
-    public Customer lost(Long id, CustomerVO customerVO, User editor) {
+    public CustomerDO retrieve(Long id, User editor) throws InternalException {
 
-        Customer customer = repository.saveAndFlush(lostCustomer(repository.getById(id), editor));
-        saveOperation(id, Action.LOST, editor, customerVO.getLostReason());
-        return customer;
-    }
-
-    @Transactional
-    public Customer retrieve(Long id, User editor) {
-
-        Customer customer = repository.saveAndFlush(retrieveCustomer(repository.getById(id), editor));
-        saveOperation(id, Action.RETRIEVE, editor, null);
+        CustomerDO customer = customerGateway.update(retrieveCustomer(repository.getById(id), editor), editor.getAccessToken());
+        saveOperation(id, Action.RETRIEVE, editor, null, editor.getAccessToken());
         return customer;
     }
 
@@ -99,12 +109,20 @@ public class CustomerService {
         return customer;
     }
 
-    private Customer updateCustomer(Customer customer, CustomerVO customerVO, List<Contact> contacts, User editor) {
+    private Customer updateCustomer(Customer customer, CustomerVO customerVO, User editor) {
 
         composeCustomer(customerVO, customer);
-        customer.setContacts(contacts);
         customer.setEditor(editor);
         customer.setLastUpdateTime(LocalDateTime.now());
+        return customer;
+    }
+
+    private Customer createCustomer(CustomerVO customerVO, User creator) {
+
+        Customer customer = new Customer();
+        composeCustomer(customerVO, customer);
+        customer.setCreator(creator);
+        customer.setEditor(creator);
         return customer;
     }
 
@@ -118,9 +136,9 @@ public class CustomerService {
         return customer;
     }
 
-    private void saveOperation(Long id, Action action, User creator, String remark) {
+    private void saveOperation(Long id, Action action, User creator, String remark, String accessToken) throws InternalException {
 
-        operationRepository.saveAndFlush(createOperation(id, action, creator, remark));
+        operationGateway.save(createOperation(id, action, creator, remark), accessToken);
     }
 
     private Operation createOperation(Long id, Action action, User creator, String remark) {

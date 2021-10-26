@@ -1,64 +1,50 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.CustomerDTO;
-import cn.topland.entity.Contact;
-import cn.topland.entity.Customer;
-import cn.topland.entity.Invoice;
-import org.apache.commons.collections4.CollectionUtils;
+import cn.topland.entity.directus.CustomerDO;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Component
-public class CustomerConverter extends BaseConverter<Customer, CustomerDTO> {
+public class CustomerConverter extends BaseConverter<CustomerDO, CustomerDTO> {
 
     @Override
-    public CustomerDTO toDTO(Customer customer) {
+    public CustomerDTO toDTO(CustomerDO customer) {
 
         return customer != null
                 ? composeCustomerDTO(customer)
                 : null;
     }
 
-    private CustomerDTO composeCustomerDTO(Customer customer) {
+    private CustomerDTO composeCustomerDTO(CustomerDO customer) {
 
         // 基本信息
         CustomerDTO dto = new CustomerDTO();
         dto.setId(customer.getId());
         dto.setName(customer.getName());
-        dto.setSeller(getId(customer.getSeller()));
+        dto.setSeller(customer.getSeller());
         dto.setBusiness(customer.getBusiness());
         dto.setType(customer.getType());
         dto.setStatus(customer.getStatus());
-        dto.setParent(getId(customer.getParent()));
+        dto.setParent(customer.getParent());
         dto.setSource(customer.getSource());
 
         // 发票
-        Invoice invoice = customer.getInvoice();
-        dto.setInvoiceType(invoice.getInvoiceType());
-        dto.setIdentity(invoice.getIdentity());
-        dto.setPostAddress(invoice.getPostAddress());
-        dto.setRegisterAddress(invoice.getRegisterAddress());
-        dto.setMobile(invoice.getMobile());
-        dto.setAccount(invoice.getAccount());
-        dto.setBank(invoice.getBank());
+        dto.setInvoiceType(customer.getInvoiceType());
+        dto.setIdentity(customer.getIdentity());
+        dto.setPostAddress(customer.getPostAddress());
+        dto.setRegisterAddress(customer.getRegisterAddress());
+        dto.setMobile(customer.getMobile());
+        dto.setAccount(customer.getAccount());
+        dto.setBank(customer.getBank());
 
         // 联系人
-        dto.setContacts(listContactIds(customer.getContacts()));
+        dto.setContacts(customer.getContacts());
 
         // 创建信息
-        dto.setCreator(getId(customer.getCreator()));
-        dto.setEditor(getId(customer.getEditor()));
+        dto.setCreator(customer.getCreator());
+        dto.setEditor(customer.getCreator());
         dto.setCreateTime(customer.getCreateTime());
         dto.setLastUpdateTime(customer.getLastUpdateTime());
         return dto;
-    }
-
-    private List<Long> listContactIds(List<Contact> contacts) {
-
-        return CollectionUtils.isEmpty(contacts)
-                ? List.of()
-                : contacts.stream().map(this::getId).collect(Collectors.toList());
     }
 }
