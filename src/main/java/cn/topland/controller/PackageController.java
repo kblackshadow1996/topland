@@ -91,6 +91,6 @@ public class PackageController {
 
         return CollectionUtils.isEmpty(services)
                 ? List.of()
-                : services.stream().map(DirectusIdEntity::getId).collect(Collectors.toList());
+                : services.stream().filter(s -> s.getPkgId() != null).map(DirectusIdEntity::getId).collect(Collectors.toList());
     }
 }

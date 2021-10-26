@@ -1,42 +1,32 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.RoleDTO;
-import cn.topland.entity.Authority;
-import cn.topland.entity.Role;
-import org.apache.commons.collections4.CollectionUtils;
+import cn.topland.entity.directus.RoleDO;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Component
-public class RoleConverter extends BaseConverter<Role, RoleDTO> {
+public class RoleConverter extends BaseConverter<RoleDO, RoleDTO> {
 
     @Override
-    public RoleDTO toDTO(Role role) {
+    public RoleDTO toDTO(RoleDO role) {
 
         return role != null
                 ? composeRole(role)
                 : null;
     }
 
-    private RoleDTO composeRole(Role role) {
+    private RoleDTO composeRole(RoleDO role) {
 
         RoleDTO dto = new RoleDTO();
         dto.setId(role.getId());
         dto.setName(role.getName());
-        dto.setRole(getId(role.getRole()));
+        dto.setDirectusRole(role.getDirectusRole());
         dto.setRemark(role.getRemark());
-        dto.setCreator(getId(role.getCreator()));
+        dto.setCreator(role.getCreator());
+        dto.setEditor(role.getEditor());
         dto.setCreateTime(role.getCreateTime());
-        dto.setAuthorities(listAuthIds(role.getAuthorities()));
+        dto.setLastUpdateTime(role.getLastUpdateTime());
+        dto.setAuthorities(role.getAuthorities());
         return dto;
-    }
-
-    private List<Long> listAuthIds(List<Authority> authorities) {
-
-        return CollectionUtils.isEmpty(authorities)
-                ? List.of()
-                : authorities.stream().map(this::getId).collect(Collectors.toList());
     }
 }

@@ -1,14 +1,8 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.PackageDTO;
-import cn.topland.entity.Package;
-import cn.topland.entity.PackageService;
 import cn.topland.entity.directus.PackageDO;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class PackageConverter extends BaseConverter<PackageDO, PackageDTO> {

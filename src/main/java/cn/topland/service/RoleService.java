@@ -1,9 +1,16 @@
 package cn.topland.service;
 
 import cn.topland.dao.*;
+import cn.topland.dao.gateway.PermissionsGateway;
+import cn.topland.dao.gateway.RoleGateway;
+import cn.topland.dao.gateway.RolesGateway;
 import cn.topland.entity.*;
+import cn.topland.entity.directus.PermissionDO;
+import cn.topland.entity.directus.RoleDO;
+import cn.topland.entity.directus.RolesDO;
 import cn.topland.service.composer.PermissionComposer;
 import cn.topland.util.exception.AccessException;
+import cn.topland.util.exception.InternalException;
 import cn.topland.util.exception.UniqueException;
 import cn.topland.vo.RoleVO;
 import org.apache.commons.collections4.CollectionUtils;
@@ -14,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -42,31 +48,40 @@ public class RoleService {
     @Autowired
     private PermissionComposer permissionComposer;
 
+    @Autowired
+    private RoleGateway roleGateway;
+
+    @Autowired
+    private RolesGateway rolesGateway;
+
+    @Autowired
+    private PermissionsGateway permissionsGateway;
+
     public Role get(Long id) {
 
         return repository.getById(id);
     }
 
     @Transactional
-    public Role add(RoleVO roleVO, User creator) {
+    public RoleDO add(RoleVO roleVO, User creator) throws InternalException {
 
         validateNameUnique(roleVO.getName());
         List<Authority> authorities = authorityRepository.findAllById(roleVO.getAuthorities());
-        List<DirectusPermissions> permissions = createPermissions(authorities);
-        DirectusRoles directusRole = createDirectusRoles(roleVO, permissions);
-        return repository.saveAndFlush(createRole(roleVO, authorities, directusRole, creator));
+        DirectusRoles directusRole = createDirectusRoles(roleVO, creator.getAccessToken());
+        createPermissions(authorities, directusRole.getId(), creator.getAccessToken());
+        return roleGateway.add(createRole(roleVO, directusRole, authorities, creator), creator.getAccessToken());
     }
 
     @Transactional
-    public Role update(Long id, RoleVO roleVO, User editor) throws AccessException {
+    public RoleDO update(Long id, RoleVO roleVO, User editor) throws AccessException, InternalException {
 
         validateNameUnique(roleVO.getName(), id);
         Role role = repository.getById(id);
         validateAdmin(role.getName());
         List<Authority> authorities = authorityRepository.findAllById(roleVO.getAuthorities());
-        List<DirectusPermissions> permissions = updatePermissions(role.getRole().getPermissions(), authorities);
-        DirectusRoles directusRole = updateDirectusRoles(role.getRole(), roleVO, permissions);
-        return repository.saveAndFlush(updateRole(role, roleVO, authorities, directusRole, editor));
+        DirectusRoles directusRole = updateDirectusRoles(role.getRole(), roleVO, editor.getAccessToken());
+        updatePermissions(role.getRole().getPermissions(), authorities, directusRole.getId(), editor.getAccessToken());
+        return roleGateway.update(updateRole(role, roleVO, authorities, directusRole, editor), editor.getAccessToken());
     }
 
     private void validateAdmin(String name) throws AccessException {
@@ -101,45 +116,44 @@ public class RoleService {
         return role;
     }
 
-    private DirectusRoles updateDirectusRoles(DirectusRoles role, RoleVO roleVO, List<DirectusPermissions> permissions) {
+    private DirectusRoles updateDirectusRoles(DirectusRoles role, RoleVO roleVO, String accessToken) throws InternalException {
 
         role.setName(roleVO.getName());
-        role.setPermissions(permissions);
-        return directusRolesRepository.saveAndFlush(role);
+        rolesGateway.update(role, accessToken);
+        return role;
     }
 
-    private List<DirectusPermissions> updatePermissions(List<DirectusPermissions> oldPermissions, List<Authority> newAuths) {
+    private List<PermissionDO> updatePermissions(List<DirectusPermissions> oldPermissions, List<Authority> newAuths, String role, String accessToken) throws InternalException {
 
-        List<DirectusPermissions> newPermissions = createWithDefaultPermissions(newAuths);
+        List<DirectusPermissions> newPermissions = createWithDefaultPermissions(newAuths, role);
         List<DirectusPermissions> intersection = (List<DirectusPermissions>) CollectionUtils.intersection(oldPermissions, newPermissions);
         List<DirectusPermissions> retain = (List<DirectusPermissions>) CollectionUtils.retainAll(oldPermissions, intersection);
         // 需要删除的部分
-        Collection<DirectusPermissions> remove = CollectionUtils.removeAll(oldPermissions, intersection);
+        List<DirectusPermissions> remove = (List<DirectusPermissions>) CollectionUtils.removeAll(oldPermissions, retain);
         if (CollectionUtils.isNotEmpty(remove)) {
 
-            directusPermissionsRepository.deleteAll(remove);
+            permissionsGateway.removeAll(remove, accessToken);
         }
         // 需要新增的部分
-        Collection<DirectusPermissions> add = CollectionUtils.removeAll(newPermissions, intersection);
-        if (CollectionUtils.isNotEmpty(add)) {
-
-            retain.addAll(directusPermissionsRepository.saveAllAndFlush(add));
-        }
-        return retain;
+        List<DirectusPermissions> add = (List<DirectusPermissions>) CollectionUtils.removeAll(newPermissions, intersection);
+        return CollectionUtils.isNotEmpty(add)
+                ? permissionsGateway.saveAll(add, accessToken)
+                : List.of();
     }
 
-    private List<DirectusPermissions> createPermissions(List<Authority> authorities) {
+    private List<PermissionDO> createPermissions(List<Authority> authorities, String role, String accessToken) throws InternalException {
 
-        List<DirectusPermissions> directusPermissions = createWithDefaultPermissions(authorities);
+        List<DirectusPermissions> directusPermissions = createWithDefaultPermissions(authorities, role);
         return CollectionUtils.isNotEmpty(directusPermissions)
-                ? directusPermissionsRepository.saveAllAndFlush(directusPermissions)
+                ? permissionsGateway.saveAll(directusPermissions, accessToken)
                 : null;
     }
 
-    private List<DirectusPermissions> createWithDefaultPermissions(List<Authority> authorities) {
+    private List<DirectusPermissions> createWithDefaultPermissions(List<Authority> authorities, String role) {
 
         List<DirectusPermissions> directusPermissions = permissionComposer.compose(authorities);
         directusPermissions.addAll(permissionComposer.createPermissions(listDefaultPermissions()));
+        directusPermissions.forEach(p -> p.setRole(role));
         return directusPermissions;
     }
 
@@ -148,7 +162,7 @@ public class RoleService {
         return permissionRepository.findByAuthorityIsNull();
     }
 
-    private Role createRole(RoleVO roleVO, List<Authority> authorities, DirectusRoles directusRole, User creator) {
+    private Role createRole(RoleVO roleVO, DirectusRoles directusRole, List<Authority> authorities, User creator) {
 
         Role role = new Role();
         composeRole(roleVO, authorities, directusRole, role);
@@ -165,11 +179,12 @@ public class RoleService {
         role.setRemark(roleVO.getRemark());
     }
 
-    private DirectusRoles createDirectusRoles(RoleVO roleVO, List<DirectusPermissions> permissions) {
+    private DirectusRoles createDirectusRoles(RoleVO roleVO, String accessToken) throws InternalException {
 
         DirectusRoles directusRole = new DirectusRoles();
         directusRole.setName(roleVO.getName());
-        directusRole.setPermissions(permissions);
-        return directusRolesRepository.saveAndFlush(directusRole);
+        RolesDO rolesDO = rolesGateway.add(directusRole, accessToken);
+        directusRole.setId(rolesDO.getId());
+        return directusRole;
     }
 }

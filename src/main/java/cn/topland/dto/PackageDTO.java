@@ -25,11 +25,11 @@ public class PackageDTO implements Serializable {
 
     private Long editor;
 
-    @JsonFormat(pattern = "yyyyMMdd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonProperty(value = "create_time")
     private LocalDateTime createTime;
 
-    @JsonFormat(pattern = "yyyyMMdd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonProperty(value = "last_update_time")
     private LocalDateTime lastUpdateTime;
 }

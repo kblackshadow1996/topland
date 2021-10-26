@@ -1,5 +1,7 @@
-package cn.topland.util;
+package cn.topland.dao.gateway;
 
+import cn.topland.util.HttpDelete;
+import cn.topland.util.Reply;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Consts;
@@ -73,6 +75,25 @@ public class DirectusGateway {
             return new Reply(Response.Status.SERVICE_UNAVAILABLE, "");
         }
         return reply(client, httpPost, response);
+    }
+
+    public Reply delete(String url, MultiValueMap<String, String> parameters, JsonNode body) {
+
+        CloseableHttpClient client = HttpClients.createDefault();
+        cn.topland.util.HttpDelete httpDelete;
+        HttpResponse response;
+        try {
+
+            httpDelete = new HttpDelete(new URIBuilder(DIRECTUS_URL + url).addParameters(composeParams(parameters)).build().toString());
+            httpDelete.setHeader("Content-Type", "application/json");
+            httpDelete.setEntity(new StringEntity(body.toPrettyString(), StandardCharsets.UTF_8));
+            response = client.execute(httpDelete);
+        } catch (IOException | URISyntaxException e) {
+
+            log.error(e.getMessage());
+            return new Reply(Response.Status.SERVICE_UNAVAILABLE, "");
+        }
+        return reply(client, httpDelete, response);
     }
 
     private static Reply reply(CloseableHttpClient client, HttpRequestBase httpRequest, HttpResponse response) {

@@ -8,6 +8,7 @@ import org.hibernate.annotations.Type;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.Objects;
 
 /**
@@ -55,6 +56,9 @@ public class DirectusPermissions extends SimpleIdEntity {
      * 字段
      */
     private String fields;
+
+    @Transient
+    private String role;
 
     @Override
     public boolean equals(Object o) {

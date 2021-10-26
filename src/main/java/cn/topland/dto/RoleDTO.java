@@ -17,7 +17,8 @@ public class RoleDTO implements Serializable {
 
     private String name;
 
-    private String role;
+    @JsonProperty(value = "directus_role")
+    private String directusRole;
 
     private String remark;
 
@@ -25,7 +26,13 @@ public class RoleDTO implements Serializable {
 
     private Long creator;
 
+    private Long editor;
+
     @JsonProperty(value = "create_time")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createTime;
+
+    @JsonProperty(value = "last_update_time")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime lastUpdateTime;
 }

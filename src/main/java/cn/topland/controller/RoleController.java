@@ -8,6 +8,7 @@ import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.util.exception.AccessException;
+import cn.topland.util.exception.InternalException;
 import cn.topland.util.exception.InvalidException;
 import cn.topland.util.exception.QueryException;
 import cn.topland.vo.RoleVO;
@@ -42,7 +43,7 @@ public class RoleController {
      */
     @PostMapping("/add")
     public Response add(@RequestBody RoleVO roleVO, String token)
-            throws AccessException, QueryException, InvalidException {
+            throws AccessException, QueryException, InvalidException, InternalException {
 
         User user = userService.get(roleVO.getCreator());
         validator.validateRoleCreatePermissions(user, token);
@@ -62,7 +63,7 @@ public class RoleController {
      */
     @PatchMapping("/update/{id}")
     public Response update(@PathVariable Long id, @RequestBody RoleVO roleVO, String token)
-            throws AccessException, QueryException, InvalidException {
+            throws AccessException, QueryException, InvalidException, InternalException {
 
         User user = userService.get(roleVO.getCreator());
         validator.validateRoleUpdatePermissions(user, token);

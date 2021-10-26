@@ -3,7 +3,6 @@ package cn.topland.dao.gateway;
 import cn.topland.entity.Department;
 import cn.topland.entity.directus.DepartmentDO;
 import cn.topland.entity.directus.DirectusIdEntity;
-import cn.topland.util.DirectusGateway;
 import cn.topland.util.JsonUtils;
 import cn.topland.util.Reply;
 import cn.topland.util.exception.InternalException;
