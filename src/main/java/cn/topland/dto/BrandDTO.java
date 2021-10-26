@@ -17,6 +17,8 @@ public class BrandDTO implements Serializable {
 
     private String name;
 
+    private Long customer;
+
     private Long seller;
 
     private Long producer;

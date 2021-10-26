@@ -49,10 +49,10 @@ public class ContactService {
 
                 Contact contact = contactMap.get(contactVO.getId());
                 updates.add(contact);
-                customerContacts.add(updateContact(contact, contactVO, customer));
+                customerContacts.add(updateCustomerContact(contact, contactVO, customer));
             } else {
 
-                customerContacts.add(createContact(contactVO, customer));
+                customerContacts.add(createCustomerContact(contactVO, customer));
             }
         }
         List<Contact> deletes = (List<Contact>) CollectionUtils.removeAll(contacts, updates);
@@ -65,28 +65,52 @@ public class ContactService {
     }
 
     @Transactional
-    public List<Contact> createContacts(List<ContactVO> contactVOs) {
+    public List<ContactDO> createBrandContacts(List<ContactVO> contactVOs, Long brand, String token) throws InternalException {
 
-        List<Contact> contacts = contactVOs.stream().map(this::createContact).collect(Collectors.toList());
-        return contactRepository.saveAllAndFlush(contacts);
+        List<Contact> contacts = contactVOs.stream().map(contactVO -> createBrandContact(contactVO, brand)).collect(Collectors.toList());
+        return contactGateway.saveAll(contacts, token);
     }
 
     @Transactional
-    public List<Contact> updateContacts(List<Contact> contacts, List<ContactVO> contactVOs) {
+    public List<ContactDO> updateBrandContacts(List<Contact> contacts, List<ContactVO> contactVOs, Long brand, String token) throws InternalException {
 
         contacts = CollectionUtils.isEmpty(contacts) ? List.of() : contacts;
         Map<Long, Contact> contactMap = contacts.stream().collect(Collectors.toMap(IdEntity::getId, contact -> contact));
-        return contactVOs.stream().map(contactVO -> {
+        List<Contact> brandContacts = new ArrayList<>();
+        List<Contact> updates = new ArrayList<>();
+        for (ContactVO contactVO : contactVOs) {
 
-            return contactMap.containsKey(contactVO.getId())
-                    ? updateContact(contactMap.get(contactVO.getId()), contactVO)
-                    : createContact(contactVO);
-        }).collect(Collectors.toList());
+            if (contactMap.containsKey(contactVO.getId())) {
+
+                Contact contact = contactMap.get(contactVO.getId());
+                updates.add(contact);
+                brandContacts.add(updateBrandContact(contact, contactVO, brand));
+            } else {
+
+                brandContacts.add(createBrandContact(contactVO, brand));
+            }
+        }
+        List<Contact> deletes = (List<Contact>) CollectionUtils.removeAll(contacts, updates);
+        deletes.forEach(delete -> {
+            // 解除关联
+            delete.setBrand(null);
+        });
+        brandContacts.addAll(deletes);
+        return contactGateway.saveAll(brandContacts, token);
     }
 
-    private Contact updateContact(Contact contact, ContactVO contactVO, Long customer) {
+    private Contact updateBrandContact(Contact contact, ContactVO contactVO, Long brand) {
 
-        return composeContact(contact, contactVO, customer);
+        Contact con = composeContact(contact, contactVO);
+        con.setBrand(brand);
+        return con;
+    }
+
+    private Contact updateCustomerContact(Contact contact, ContactVO contactVO, Long customer) {
+
+        Contact con = composeContact(contact, contactVO);
+        con.setCustomer(customer);
+        return con;
     }
 
     private Contact createCustomerContact(ContactVO contactVO, Long customer) {
@@ -96,31 +120,10 @@ public class ContactService {
         return contact;
     }
 
-    private Contact updateContact(Contact contact, ContactVO contactVO) {
+    private Contact createBrandContact(ContactVO contactVO, Long brand) {
 
-        return composeContact(contact, contactVO);
-    }
-
-    private Contact createContact(ContactVO contactVO, Long customer) {
-
-        return composeContact(new Contact(), contactVO, customer);
-    }
-
-    private Contact createContact(ContactVO contactVO) {
-
-        return composeContact(new Contact(), contactVO);
-    }
-
-    private Contact composeContact(Contact contact, ContactVO contactVO, Long customer) {
-
-        contact.setCustomer(customer);
-        contact.setName(contactVO.getName());
-        contact.setGender(contactVO.getGender());
-        contact.setMobile(contactVO.getMobile());
-        contact.setAddress(contactVO.getAddress());
-        contact.setDepartment(contactVO.getDepartment());
-        contact.setPosition(contactVO.getPosition());
-        contact.setRemark(contactVO.getRemark());
+        Contact contact = composeContact(new Contact(), contactVO);
+        contact.setBrand(brand);
         return contact;
     }
 

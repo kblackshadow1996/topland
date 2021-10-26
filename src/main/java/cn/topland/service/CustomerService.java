@@ -48,7 +48,7 @@ public class CustomerService {
 
         validateNameUnique(customerVO.getName());
         CustomerDO customer = customerGateway.save(createCustomer(customerVO, creator), creator.getAccessToken());
-        saveOperation(customer.getId(), Action.CREATE, creator, null, creator.getAccessToken());
+        saveOperation(customer.getId(), Action.CREATE, creator, null);
         return customer;
     }
 
@@ -57,7 +57,7 @@ public class CustomerService {
 
         validateNameUnique(customerVO.getName(), customer.getId());
         CustomerDO customerDO = customerGateway.update(updateCustomer(customer, customerVO, editor), editor.getAccessToken());
-        saveOperation(customerDO.getId(), Action.UPDATE, editor, null, editor.getAccessToken());
+        saveOperation(customerDO.getId(), Action.UPDATE, editor, null);
         return customerDO;
     }
 
@@ -65,7 +65,7 @@ public class CustomerService {
     public CustomerDO lost(Long id, CustomerVO customerVO, User editor) throws InternalException {
 
         CustomerDO customer = customerGateway.update(lostCustomer(repository.getById(id), editor), editor.getAccessToken());
-        saveOperation(id, Action.LOST, editor, customerVO.getLostReason(), editor.getAccessToken());
+        saveOperation(id, Action.LOST, editor, customerVO.getLostReason());
         return customer;
     }
 
@@ -73,7 +73,7 @@ public class CustomerService {
     public CustomerDO retrieve(Long id, User editor) throws InternalException {
 
         CustomerDO customer = customerGateway.update(retrieveCustomer(repository.getById(id), editor), editor.getAccessToken());
-        saveOperation(id, Action.RETRIEVE, editor, null, editor.getAccessToken());
+        saveOperation(id, Action.RETRIEVE, editor, null);
         return customer;
     }
 
@@ -136,9 +136,9 @@ public class CustomerService {
         return customer;
     }
 
-    private void saveOperation(Long id, Action action, User creator, String remark, String accessToken) throws InternalException {
+    private void saveOperation(Long id, Action action, User creator, String remark) throws InternalException {
 
-        operationGateway.save(createOperation(id, action, creator, remark), accessToken);
+        operationGateway.save(createOperation(id, action, creator, remark), creator.getAccessToken());
     }
 
     private Operation createOperation(Long id, Action action, User creator, String remark) {

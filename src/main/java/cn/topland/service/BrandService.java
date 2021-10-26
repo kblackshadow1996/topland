@@ -4,7 +4,14 @@ import cn.topland.dao.BrandRepository;
 import cn.topland.dao.CustomerRepository;
 import cn.topland.dao.OperationRepository;
 import cn.topland.dao.UserRepository;
-import cn.topland.entity.*;
+import cn.topland.dao.gateway.BrandGateway;
+import cn.topland.dao.gateway.OperationGateway;
+import cn.topland.entity.Brand;
+import cn.topland.entity.Customer;
+import cn.topland.entity.Operation;
+import cn.topland.entity.User;
+import cn.topland.entity.directus.BrandDO;
+import cn.topland.util.exception.InternalException;
 import cn.topland.util.exception.QueryException;
 import cn.topland.util.exception.UniqueException;
 import cn.topland.vo.BrandVO;
@@ -13,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static cn.topland.entity.Brand.Action;
 
@@ -32,6 +38,12 @@ public class BrandService {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @Autowired
+    private BrandGateway brandGateway;
+
+    @Autowired
+    private OperationGateway operationGateway;
+
     public Brand get(Long id) throws QueryException {
 
         if (id == null || !repository.existsById(id)) {
@@ -42,21 +54,21 @@ public class BrandService {
     }
 
     @Transactional
-    public Brand add(BrandVO brandVO, List<Contact> contacts, User creator) {
+    public BrandDO add(BrandVO brandVO, User creator) throws InternalException {
 
         validateNameUnique(brandVO.getName());
-        Brand brand = repository.saveAndFlush(createBrand(brandVO, contacts, creator));
-        saveOperation(brand.getId(), Action.CREATE, creator);
-        return brand;
+        BrandDO brandDO = brandGateway.save(createBrand(brandVO, creator), creator.getAccessToken());
+        saveOperation(brandDO.getId(), Action.CREATE, creator);
+        return brandDO;
     }
 
     @Transactional
-    public Brand update(Brand brand, BrandVO brandVO, List<Contact> contacts, User editor) {
+    public BrandDO update(Brand brand, BrandVO brandVO, User editor) throws InternalException {
 
         validateNameUnique(brandVO.getName(), brand.getId());
-        repository.saveAndFlush(updateBrand(brand, brandVO, contacts, editor));
-        saveOperation(brand.getId(), Action.UPDATE, editor);
-        return brand;
+        BrandDO brandDO = brandGateway.update(updateBrand(brand, brandVO, editor), editor.getAccessToken());
+        saveOperation(brandDO.getId(), Action.UPDATE, editor);
+        return brandDO;
     }
 
     private void validateNameUnique(String name) {
@@ -75,28 +87,26 @@ public class BrandService {
         }
     }
 
-    private Brand updateBrand(Brand brand, BrandVO brandVO, List<Contact> contacts, User editor) {
+    private Brand updateBrand(Brand brand, BrandVO brandVO, User editor) {
 
         composeBrand(brand, brandVO);
-        brand.setContacts(contacts);
         brand.setEditor(editor);
         brand.setLastUpdateTime(LocalDateTime.now());
         return brand;
     }
 
-    private Brand createBrand(BrandVO brandVO, List<Contact> contacts, User creator) {
+    private Brand createBrand(BrandVO brandVO, User creator) {
 
         Brand brand = new Brand();
         composeBrand(brand, brandVO);
-        brand.setContacts(contacts);
         brand.setCreator(creator);
         brand.setEditor(creator);
         return brand;
     }
 
-    private void saveOperation(Long id, Action action, User creator) {
+    private void saveOperation(Long id, Action action, User creator) throws InternalException {
 
-        operationRepository.saveAndFlush(createOperation(id, action, creator));
+        operationGateway.save(createOperation(id, action, creator), creator.getAccessToken());
     }
 
     private Operation createOperation(Long id, Action action, User creator) {
