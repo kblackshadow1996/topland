@@ -26,18 +26,14 @@ public class OperationGateway extends BaseGateway {
     private static final TypeReference<List<OperationDO>> OPERATIONS = new TypeReference<>() {
     };
 
-    public OperationDO save(Operation operation, String accessToken) throws InternalException {
+    public OperationDO save(Operation operation, String accessToken) {
 
         Reply result = directus.post(OPERATION_URI, tokenParam(accessToken), JsonUtils.toJsonNode(OperationDO.from(operation)));
-        if (result.isSuccessful()) {
-
-            String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
-            return JsonUtils.parse(data, OperationDO.class);
-        }
-        throw new InternalException("添加操作记录失败");
+        String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+        return JsonUtils.parse(data, OperationDO.class);
     }
 
-    public List<OperationDO> saveAll(List<Operation> operations, String accessToken) throws InternalException {
+    public List<OperationDO> saveAll(List<Operation> operations, String accessToken) {
 
         Reply result = directus.post(OPERATION_URI, tokenParam(accessToken), composeOperations(operations));
         if (result.isSuccessful()) {

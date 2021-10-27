@@ -5,21 +5,23 @@ import cn.topland.dao.CustomerRepository;
 import cn.topland.dao.OperationRepository;
 import cn.topland.dao.UserRepository;
 import cn.topland.dao.gateway.BrandGateway;
+import cn.topland.dao.gateway.ContactGateway;
 import cn.topland.dao.gateway.OperationGateway;
-import cn.topland.entity.Brand;
-import cn.topland.entity.Customer;
-import cn.topland.entity.Operation;
-import cn.topland.entity.User;
+import cn.topland.entity.*;
 import cn.topland.entity.directus.BrandDO;
-import cn.topland.util.exception.InternalException;
-import cn.topland.util.exception.QueryException;
+import cn.topland.entity.directus.ContactDO;
 import cn.topland.util.exception.UniqueException;
 import cn.topland.vo.BrandVO;
+import cn.topland.vo.ContactVO;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static cn.topland.entity.Brand.Action;
 
@@ -44,31 +46,92 @@ public class BrandService {
     @Autowired
     private OperationGateway operationGateway;
 
-    public Brand get(Long id) throws QueryException {
+    @Autowired
+    private ContactGateway contactGateway;
 
-        if (id == null || !repository.existsById(id)) {
+    public Brand get(Long id) {
 
-            throw new QueryException("品牌不存在");
-        }
         return repository.getById(id);
     }
 
-    @Transactional
-    public BrandDO add(BrandVO brandVO, User creator) throws InternalException {
+    public BrandDO add(BrandVO brandVO, User creator) {
 
         validateNameUnique(brandVO.getName());
         BrandDO brandDO = brandGateway.save(createBrand(brandVO, creator), creator.getAccessToken());
+        brandDO.setContacts(listContacts(updateBrandContacts(List.of(), brandVO.getContacts(), brandDO.getId(), creator.getAccessToken())));
         saveOperation(brandDO.getId(), Action.CREATE, creator);
         return brandDO;
     }
 
-    @Transactional
-    public BrandDO update(Brand brand, BrandVO brandVO, User editor) throws InternalException {
+    public BrandDO update(Long id, BrandVO brandVO, User editor) {
 
+        Brand brand = repository.getById(id);
         validateNameUnique(brandVO.getName(), brand.getId());
         BrandDO brandDO = brandGateway.update(updateBrand(brand, brandVO, editor), editor.getAccessToken());
+        brandDO.setContacts(listContacts(updateBrandContacts(brand.getContacts(), brandVO.getContacts(), id, editor.getAccessToken())));
         saveOperation(brandDO.getId(), Action.UPDATE, editor);
         return brandDO;
+    }
+
+    private List<Long> listContacts(List<ContactDO> contacts) {
+
+        return CollectionUtils.isEmpty(contacts)
+                ? List.of()
+                : contacts.stream().filter(contact -> contact.getBrand() != null)
+                .map(ContactDO::getId).collect(Collectors.toList());
+    }
+
+    public List<ContactDO> updateBrandContacts(List<Contact> contacts, List<ContactVO> contactVOs, Long brand, String token) {
+
+        contacts = CollectionUtils.isEmpty(contacts) ? List.of() : contacts;
+        Map<Long, Contact> contactMap = contacts.stream().collect(Collectors.toMap(IdEntity::getId, contact -> contact));
+        List<Contact> brandContacts = new ArrayList<>();
+        List<Contact> updates = new ArrayList<>();
+        for (ContactVO contactVO : contactVOs) {
+
+            if (contactMap.containsKey(contactVO.getId())) {
+
+                Contact contact = contactMap.get(contactVO.getId());
+                updates.add(contact);
+                brandContacts.add(updateContact(contact, contactVO, brand));
+            } else {
+
+                brandContacts.add(createContact(contactVO, brand));
+            }
+        }
+        List<Contact> deletes = (List<Contact>) CollectionUtils.removeAll(contacts, updates);
+        deletes.forEach(delete -> {
+            // 解除关联
+            delete.setBrand(null);
+        });
+        brandContacts.addAll(deletes);
+        return contactGateway.saveAll(brandContacts, token);
+    }
+
+    private Contact updateContact(Contact contact, ContactVO contactVO, Long brand) {
+
+        Contact con = composeContact(contact, contactVO);
+        con.setBrand(brand);
+        return con;
+    }
+
+    private Contact createContact(ContactVO contactVO, Long brand) {
+
+        Contact contact = composeContact(new Contact(), contactVO);
+        contact.setBrand(brand);
+        return contact;
+    }
+
+    private Contact composeContact(Contact contact, ContactVO contactVO) {
+
+        contact.setName(contactVO.getName());
+        contact.setGender(contactVO.getGender());
+        contact.setMobile(contactVO.getMobile());
+        contact.setAddress(contactVO.getAddress());
+        contact.setDepartment(contactVO.getDepartment());
+        contact.setPosition(contactVO.getPosition());
+        contact.setRemark(contactVO.getRemark());
+        return contact;
     }
 
     private void validateNameUnique(String name) {
@@ -104,7 +167,7 @@ public class BrandService {
         return brand;
     }
 
-    private void saveOperation(Long id, Action action, User creator) throws InternalException {
+    private void saveOperation(Long id, Action action, User creator) {
 
         operationGateway.save(createOperation(id, action, creator), creator.getAccessToken());
     }

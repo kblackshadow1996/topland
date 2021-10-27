@@ -8,9 +8,7 @@ import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.util.exception.AccessException;
-import cn.topland.util.exception.InternalException;
 import cn.topland.util.exception.InvalidException;
-import cn.topland.util.exception.QueryException;
 import cn.topland.vo.RoleVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -37,13 +35,9 @@ public class RoleController {
      * @param roleVO 角色信息
      * @param token  操作用户token
      * @return
-     * @throws AccessException
-     * @throws QueryException
-     * @throws InvalidException
      */
     @PostMapping("/add")
-    public Response add(@RequestBody RoleVO roleVO, String token)
-            throws AccessException, QueryException, InvalidException, InternalException {
+    public Response add(@RequestBody RoleVO roleVO, String token) {
 
         User user = userService.get(roleVO.getCreator());
         validator.validateRoleCreatePermissions(user, token);
@@ -62,8 +56,7 @@ public class RoleController {
      * @throws InvalidException
      */
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody RoleVO roleVO, String token)
-            throws AccessException, QueryException, InvalidException, InternalException {
+    public Response update(@PathVariable Long id, @RequestBody RoleVO roleVO, String token) {
 
         User user = userService.get(roleVO.getCreator());
         validator.validateRoleUpdatePermissions(user, token);

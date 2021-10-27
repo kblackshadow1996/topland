@@ -7,10 +7,6 @@ import cn.topland.service.DepartmentService;
 import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
-import cn.topland.util.exception.AccessException;
-import cn.topland.util.exception.InternalException;
-import cn.topland.util.exception.InvalidException;
-import cn.topland.util.exception.QueryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,11 +35,9 @@ public class DepartmentController {
      * @param creator 操作用户
      * @param token   操作用户token
      * @return
-     * @throws AccessException
      */
     @PostMapping("/wework/sync/all")
-    public Response syncAllWeworkDept(Long creator, String token)
-            throws AccessException, QueryException, InvalidException, InternalException {
+    public Response syncAllWeworkDept(Long creator, String token) {
 
         User user = userService.get(creator);
         validator.validDepartmentPermissions(user, token);
@@ -57,13 +51,9 @@ public class DepartmentController {
      * @param creator 操作用户
      * @param token   操作用户token
      * @return
-     * @throws AccessException
-     * @throws InvalidException
-     * @throws QueryException
      */
     @PostMapping("/wework/sync/{deptId}")
-    public Response syncWeworkDept(@PathVariable String deptId, Long creator, String token)
-            throws AccessException, InvalidException, QueryException, InternalException {
+    public Response syncWeworkDept(@PathVariable String deptId, Long creator, String token) {
 
         User user = userService.get(creator);
         validator.validDepartmentPermissions(user, token);

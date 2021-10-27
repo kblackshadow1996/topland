@@ -1,8 +1,12 @@
 package cn.topland.service;
 
 import cn.topland.dao.*;
+import cn.topland.dao.gateway.QuotationGateway;
+import cn.topland.dao.gateway.QuotationServiceGateway;
 import cn.topland.entity.Package;
 import cn.topland.entity.*;
+import cn.topland.entity.directus.QuotationDO;
+import cn.topland.entity.directus.QuotationServiceDO;
 import cn.topland.util.UUIDGenerator;
 import cn.topland.util.exception.InternalException;
 import cn.topland.util.pdf.HtmlToPdfOperation;
@@ -11,11 +15,11 @@ import cn.topland.util.pdf.HtmlToPdfParamsFactory;
 import cn.topland.util.pdf.QuotationPdfOperation;
 import cn.topland.vo.QuotationServiceVO;
 import cn.topland.vo.QuotationVO;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +29,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -56,18 +61,28 @@ public class QuotationService {
     @Autowired
     private QuotationServiceRepository quotationServiceRepository;
 
-    @Transactional
-    public Quotation add(QuotationVO quotationVO, User creator) {
+    @Autowired
+    private QuotationServiceGateway quotationServiceGateway;
 
-        return repository.saveAndFlush(createQuotation(quotationVO, creator));
+    @Autowired
+    private QuotationGateway quotationGateway;
+
+    public QuotationDO add(QuotationVO quotationVO, User creator) {
+
+        QuotationDO quotationDO = quotationGateway.save(createQuotation(quotationVO, creator), creator.getAccessToken());
+        quotationDO.setServices(listServices(updateServices(List.of(), quotationVO.getServices(), quotationDO.getId(), creator.getAccessToken())));
+        return quotationDO;
     }
 
-    public Quotation update(Long id, QuotationVO quotationVO, User editor) {
+    public QuotationDO update(Long id, QuotationVO quotationVO, User editor) {
 
-        return repository.saveAndFlush(updateQuotation(repository.getById(id), quotationVO, editor));
+        Quotation quotation = repository.getById(id);
+        QuotationDO quotationDO = quotationGateway.update(updateQuotation(repository.getById(id), quotationVO, editor), editor.getAccessToken());
+        quotationDO.setServices(listServices(updateServices(quotation.getServices(), quotationVO.getServices(), id, editor.getAccessToken())));
+        return quotationDO;
     }
 
-    public byte[] downloadPdf(String html, String title, String number, LocalDate date) throws InternalException {
+    public byte[] downloadPdf(String html, String title, String number, LocalDate date) {
 
         try {
 
@@ -98,6 +113,14 @@ public class QuotationService {
         }
     }
 
+    private List<Long> listServices(List<QuotationServiceDO> services) {
+
+        return CollectionUtils.isEmpty(services)
+                ? List.of()
+                : services.stream().filter(service -> service.getQuotation() != null)
+                .map(QuotationServiceDO::getId).collect(Collectors.toList());
+    }
+
     private QuotationPdfOperation getPdfOperation(String title, String number, LocalDate date) {
 
         return QuotationPdfOperation.builder()
@@ -111,7 +134,6 @@ public class QuotationService {
 
         Quotation quotation = new Quotation();
         composeQuotation(quotation, quotationVO);
-        quotation.setServices(createServices(quotationVO.getServices()));
         quotation.setIdentity(createIdentity(creator));
         quotation.setCreator(creator);
         quotation.setEditor(creator);
@@ -137,7 +159,6 @@ public class QuotationService {
         composeQuotation(quotation, quotationVO);
         quotation.setEditor(editor);
         quotation.setLastUpdateTime(LocalDateTime.now());
-        quotation.setServices(updateServices(quotation.getServices(), quotationVO.getServices()));
         return quotation;
     }
 
@@ -157,44 +178,50 @@ public class QuotationService {
         quotation.setSeller(getUser(quotationVO.getSeller()));
     }
 
-    private List<cn.topland.entity.QuotationService> updateServices(List<cn.topland.entity.QuotationService> services,
-                                                                    List<QuotationServiceVO> serviceVOs) {
+    private List<QuotationServiceDO> updateServices(List<cn.topland.entity.QuotationService> services,
+                                                    List<QuotationServiceVO> serviceVOs, Long quotation, String accessToken) {
 
         List<Long> serviceIds = serviceVOs.stream().map(QuotationServiceVO::getService).collect(Collectors.toList());
         Map<Long, cn.topland.entity.Service> serviceMap = serviceRepository.findAllById(serviceIds).stream()
                 .collect(Collectors.toMap(IdEntity::getId, s -> s));
         Map<Long, cn.topland.entity.QuotationService> quotationServiceMap = services.stream()
                 .collect(Collectors.toMap(IdEntity::getId, s -> s));
-        List<cn.topland.entity.QuotationService> quotationServices = serviceVOs.stream().map(serviceVO -> {
+        List<cn.topland.entity.QuotationService> quotationServices = new ArrayList<>();
+        List<cn.topland.entity.QuotationService> updates = new ArrayList<>();
+        for (QuotationServiceVO serviceVO : serviceVOs) {
 
-            return quotationServiceMap.containsKey(serviceVO.getId())
-                    ? updateService(quotationServiceMap.get(serviceVO.getId()), serviceVO, serviceMap.get(serviceVO.getService()))
-                    : createService(serviceVO, serviceMap.get(serviceVO.getService()));
-        }).collect(Collectors.toList());
-        return quotationServiceRepository.saveAllAndFlush(quotationServices);
+            cn.topland.entity.QuotationService service;
+            if (quotationServiceMap.containsKey(serviceVO.getId())) {
+
+                service = quotationServiceMap.get(serviceVO.getId());
+                updateService(service, serviceVO, serviceMap.get(serviceVO.getService()));
+                service.setQuotation(quotation);
+                updates.add(service);
+            } else {
+
+                service = createService(serviceVO, serviceMap.get(serviceVO.getService()));
+                service.setQuotation(quotation);
+            }
+            quotationServices.add(service);
+        }
+        List<cn.topland.entity.QuotationService> deletes = (List<cn.topland.entity.QuotationService>) CollectionUtils.removeAll(services, updates);
+        deletes.forEach(delete -> {
+            // 解除关联
+            delete.setQuotation(null);
+        });
+        quotationServices.addAll(deletes);
+        return quotationServiceGateway.saveAll(quotationServices, accessToken);
     }
 
-    private List<cn.topland.entity.QuotationService> createServices(List<QuotationServiceVO> services) {
-
-        List<Long> serviceIds = services.stream().map(QuotationServiceVO::getService).collect(Collectors.toList());
-        Map<Long, cn.topland.entity.Service> serviceMap = serviceRepository.findAllById(serviceIds).stream()
-                .collect(Collectors.toMap(IdEntity::getId, s -> s));
-        List<cn.topland.entity.QuotationService> quotationServices = services.stream()
-                .map(serviceVO -> createService(serviceVO, serviceMap.get(serviceVO.getService())))
-                .collect(Collectors.toList());
-        return quotationServiceRepository.saveAllAndFlush(quotationServices);
-    }
-
-    private cn.topland.entity.QuotationService updateService(cn.topland.entity.QuotationService quotationService,
-                                                             QuotationServiceVO serviceVO,
-                                                             cn.topland.entity.Service service) {
+    private void updateService(cn.topland.entity.QuotationService quotationService,
+                               QuotationServiceVO serviceVO,
+                               cn.topland.entity.Service service) {
 
         quotationService.setAmount(serviceVO.getAmount());
         quotationService.setExplanation(serviceVO.getExplanation());
         quotationService.setPrice(serviceVO.getPrice());
         quotationService.setUnit(serviceVO.getUnit());
         quotationService.setService(service);
-        return quotationService;
     }
 
     private cn.topland.entity.QuotationService createService(QuotationServiceVO serviceVO, cn.topland.entity.Service service) {

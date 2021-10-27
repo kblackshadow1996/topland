@@ -5,17 +5,13 @@ import cn.topland.dao.DirectusFilesRepository;
 import cn.topland.dao.gateway.AttachmentGateway;
 import cn.topland.entity.Attachment;
 import cn.topland.entity.DirectusFiles;
-import cn.topland.entity.Exception;
 import cn.topland.entity.SimpleIdEntity;
 import cn.topland.entity.UuidEntity;
 import cn.topland.entity.directus.AttachmentDO;
-import cn.topland.entity.directus.ExceptionDO;
-import cn.topland.util.exception.InternalException;
 import cn.topland.vo.AttachmentVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +30,7 @@ public class AttachmentService {
     @Autowired
     private AttachmentGateway attachmentGateway;
 
-    public List<AttachmentDO> uploadContractAttachments(List<AttachmentVO> attachments, Long contract, String token) throws InternalException {
+    public List<AttachmentDO> uploadContractAttachments(List<AttachmentVO> attachments, Long contract, String token) {
 
         List<Attachment> attaches = uploadContractAttachments(attachments, contract);
         return attachmentGateway.upload(attaches, token);

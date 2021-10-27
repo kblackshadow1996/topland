@@ -5,7 +5,6 @@ import cn.topland.entity.Role;
 import cn.topland.entity.directus.RoleDO;
 import cn.topland.util.JsonUtils;
 import cn.topland.util.Reply;
-import cn.topland.util.exception.InternalException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -26,27 +25,18 @@ public class RoleGateway extends BaseGateway {
     @Autowired
     private DirectusGateway directus;
 
-    public RoleDO add(Role role, String accessToken) throws InternalException {
+    public RoleDO add(Role role, String accessToken) {
 
         Reply result = directus.post(ROLE_URI, tokenParam(accessToken), JsonUtils.toJsonNode(RoleDO.from(role)));
-        System.out.println(result.getContent());
-        if (result.isSuccessful()) {
-
-            String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
-            return JsonUtils.parse(data, RoleDO.class);
-        }
-        throw new InternalException("新建角色失败");
+        String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+        return JsonUtils.parse(data, RoleDO.class);
     }
 
-    public RoleDO update(Role role, String accessToken) throws InternalException {
+    public RoleDO update(Role role, String accessToken) {
 
         Reply result = directus.patch(ROLE_URI + "/" + role.getId(), tokenParam(accessToken), composeRole(role));
-        if (result.isSuccessful()) {
-
-            String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
-            return JsonUtils.parse(data, RoleDO.class);
-        }
-        throw new InternalException("更新角色失败");
+        String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+        return JsonUtils.parse(data, RoleDO.class);
     }
 
     private JsonNode composeRole(Role role) {

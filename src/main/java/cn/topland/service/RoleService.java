@@ -10,7 +10,6 @@ import cn.topland.entity.directus.RoleDO;
 import cn.topland.entity.directus.RolesDO;
 import cn.topland.service.composer.PermissionComposer;
 import cn.topland.util.exception.AccessException;
-import cn.topland.util.exception.InternalException;
 import cn.topland.util.exception.UniqueException;
 import cn.topland.vo.RoleVO;
 import org.apache.commons.collections4.CollectionUtils;
@@ -18,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -62,7 +60,7 @@ public class RoleService {
         return repository.getById(id);
     }
 
-    public RoleDO add(RoleVO roleVO, User creator) throws InternalException {
+    public RoleDO add(RoleVO roleVO, User creator) {
 
         validateNameUnique(roleVO.getName());
         List<Authority> authorities = authorityRepository.findAllById(roleVO.getAuthorities());
@@ -71,7 +69,7 @@ public class RoleService {
         return roleGateway.add(createRole(roleVO, directusRole, authorities, creator), creator.getAccessToken());
     }
 
-    public RoleDO update(Long id, RoleVO roleVO, User editor) throws AccessException, InternalException {
+    public RoleDO update(Long id, RoleVO roleVO, User editor) {
 
         validateNameUnique(roleVO.getName(), id);
         Role role = repository.getById(id);
@@ -114,14 +112,14 @@ public class RoleService {
         return role;
     }
 
-    private DirectusRoles updateDirectusRoles(DirectusRoles role, RoleVO roleVO, String accessToken) throws InternalException {
+    private DirectusRoles updateDirectusRoles(DirectusRoles role, RoleVO roleVO, String accessToken) {
 
         role.setName(roleVO.getName());
         rolesGateway.update(role, accessToken);
         return role;
     }
 
-    private List<PermissionDO> updatePermissions(List<DirectusPermissions> oldPermissions, List<Authority> newAuths, String role, String accessToken) throws InternalException {
+    private List<PermissionDO> updatePermissions(List<DirectusPermissions> oldPermissions, List<Authority> newAuths, String role, String accessToken) {
 
         List<DirectusPermissions> newPermissions = createWithDefaultPermissions(newAuths, role);
         List<DirectusPermissions> intersection = (List<DirectusPermissions>) CollectionUtils.intersection(oldPermissions, newPermissions);
@@ -139,7 +137,7 @@ public class RoleService {
                 : List.of();
     }
 
-    private List<PermissionDO> createPermissions(List<Authority> authorities, String role, String accessToken) throws InternalException {
+    private List<PermissionDO> createPermissions(List<Authority> authorities, String role, String accessToken) {
 
         List<DirectusPermissions> directusPermissions = createWithDefaultPermissions(authorities, role);
         return CollectionUtils.isNotEmpty(directusPermissions)
@@ -177,7 +175,7 @@ public class RoleService {
         role.setRemark(roleVO.getRemark());
     }
 
-    private DirectusRoles createDirectusRoles(RoleVO roleVO, String accessToken) throws InternalException {
+    private DirectusRoles createDirectusRoles(RoleVO roleVO, String accessToken) {
 
         DirectusRoles directusRole = new DirectusRoles();
         directusRole.setName(roleVO.getName());

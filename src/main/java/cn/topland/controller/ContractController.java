@@ -2,28 +2,16 @@ package cn.topland.controller;
 
 import cn.topland.controller.validator.PermissionValidator;
 import cn.topland.dto.converter.ContractConverter;
-import cn.topland.entity.Attachment;
-import cn.topland.entity.SimpleIdEntity;
 import cn.topland.entity.User;
-import cn.topland.entity.directus.AttachmentDO;
 import cn.topland.entity.directus.ContractDO;
-import cn.topland.entity.directus.DirectusSimpleIdEntity;
 import cn.topland.service.AttachmentService;
 import cn.topland.service.ContractService;
 import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
-import cn.topland.util.exception.AccessException;
-import cn.topland.util.exception.InternalException;
-import cn.topland.util.exception.InvalidException;
-import cn.topland.util.exception.QueryException;
 import cn.topland.vo.ContractVO;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/contract")
@@ -50,12 +38,9 @@ public class ContractController {
      * @param contractVO 合同信息
      * @param token      操作用户token
      * @return
-     * @throws AccessException
-     * @throws QueryException
      */
     @PostMapping("/add")
-    public Response add(@RequestBody ContractVO contractVO, String token)
-            throws AccessException, QueryException, InvalidException, InternalException {
+    public Response add(@RequestBody ContractVO contractVO, String token) {
 
         User user = userService.get(contractVO.getCreator());
         validator.validateContractCreatePermissions(user, token);
@@ -69,12 +54,9 @@ public class ContractController {
      * @param contractVO 合同信息
      * @param token      操作用户token
      * @return
-     * @throws AccessException
-     * @throws QueryException
      */
     @PatchMapping("/receive-paper/{id}")
-    public Response receivePaper(@PathVariable Long id, @RequestBody ContractVO contractVO, String token)
-            throws AccessException, QueryException, InvalidException, InternalException {
+    public Response receivePaper(@PathVariable Long id, @RequestBody ContractVO contractVO, String token) {
 
         User user = userService.get(contractVO.getCreator());
         validator.validateContractReceivePaperPermissions(user, token);
@@ -89,12 +71,9 @@ public class ContractController {
      * @param contractVO 合同信息
      * @param token      操作用户token
      * @return
-     * @throws AccessException
-     * @throws QueryException
      */
     @PatchMapping("/review/{id}")
-    public Response review(@PathVariable Long id, @RequestBody ContractVO contractVO, String token)
-            throws AccessException, QueryException, InvalidException, InternalException {
+    public Response review(@PathVariable Long id, @RequestBody ContractVO contractVO, String token) {
 
         User user = userService.get(contractVO.getCreator());
         validator.validateContractReviewPermissions(user, token);

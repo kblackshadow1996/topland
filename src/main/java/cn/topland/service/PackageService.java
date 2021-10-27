@@ -1,18 +1,25 @@
 package cn.topland.service;
 
 import cn.topland.dao.PackageRepository;
+import cn.topland.dao.ServiceRepository;
 import cn.topland.dao.gateway.PackageGateway;
+import cn.topland.dao.gateway.PackageServiceGateway;
+import cn.topland.entity.IdEntity;
 import cn.topland.entity.Package;
 import cn.topland.entity.User;
 import cn.topland.entity.directus.PackageDO;
-import cn.topland.util.exception.InternalException;
+import cn.topland.entity.directus.PackageServiceDO;
+import cn.topland.vo.PackageServiceVO;
 import cn.topland.vo.PackageVO;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class PackageService {
@@ -21,33 +28,91 @@ public class PackageService {
     private PackageRepository repository;
 
     @Autowired
+    private ServiceRepository serviceRepository;
+
+    @Autowired
     private PackageGateway packageGateway;
+
+    @Autowired
+    private PackageServiceGateway serviceGateway;
 
     public Package get(Long id) {
 
         return repository.getById(id);
     }
 
-    public PackageDO add(PackageVO packageVO, User creator) throws InternalException {
+    public PackageDO add(PackageVO packageVO, User creator) {
 
-        return packageGateway.save(createPackage(packageVO, creator), creator.getAccessToken());
+        PackageDO packageDO = packageGateway.save(createPackage(packageVO, creator), creator.getAccessToken());
+        packageDO.setServices(listServices(updateServices(List.of(), packageVO.getServices(), packageDO.getId(), creator.getAccessToken())));
+        return packageDO;
     }
 
-    public PackageDO update(Package pkg, PackageVO packageVO, User editor) throws InternalException {
+    public PackageDO update(Long id, PackageVO packageVO, User editor) {
 
-        return packageGateway.update(updatePackage(pkg, packageVO, editor), editor.getAccessToken());
+        Package pkg = repository.getById(id);
+        PackageDO packageDO = packageGateway.update(updatePackage(pkg, packageVO, editor), editor.getAccessToken());
+        packageDO.setServices(listServices(updateServices(pkg.getServices(), packageVO.getServices(), id, editor.getAccessToken())));
+        return packageDO;
     }
 
-    @Transactional
-    public Package add(PackageVO packageVO, List<cn.topland.entity.PackageService> services, User creator) {
+    private List<Long> listServices(List<PackageServiceDO> services) {
 
-        return repository.saveAndFlush(createPackage(packageVO, services, creator));
+        return CollectionUtils.isEmpty(services)
+                ? List.of()
+                : services.stream().filter(service -> service.getPkgId() != null)
+                .map(PackageServiceDO::getId).collect(Collectors.toList());
     }
 
-    @Transactional
-    public Package update(Package pkg, PackageVO packageVO, List<cn.topland.entity.PackageService> services, User editor) {
+    private List<PackageServiceDO> updateServices(List<cn.topland.entity.PackageService> services, List<PackageServiceVO> serviceVOs, Long pkg, String token) {
 
-        return repository.saveAndFlush(updatePackage(pkg, packageVO, services, editor));
+        Map<Long, cn.topland.entity.Service> serviceMap = getServices(serviceVOs);
+        Map<Long, cn.topland.entity.PackageService> packageServiceMap = services.stream().collect(Collectors.toMap(IdEntity::getId, p -> p));
+        List<cn.topland.entity.PackageService> packageServices = new ArrayList<>();
+        List<cn.topland.entity.PackageService> updates = new ArrayList<>();
+        serviceVOs.forEach(serviceVO -> {
+
+            if (packageServiceMap.containsKey(serviceVO.getId())) {
+
+                cn.topland.entity.PackageService service = packageServiceMap.get(serviceVO.getId());
+                packageServices.add(composeService(pkg, service, serviceVO, serviceMap.get(serviceVO.getService())));
+                updates.add(service);
+            } else {
+
+                packageServices.add(createService(pkg, serviceVO, serviceMap.get(serviceVO.getService())));
+            }
+        });
+        List<cn.topland.entity.PackageService> deletes = (List<cn.topland.entity.PackageService>) CollectionUtils.removeAll(services, updates);
+        deletes.forEach(delete -> {
+
+            delete.setPkgId(null);
+        });
+        packageServices.addAll(deletes);
+        return serviceGateway.saveAll(packageServices, token);
+    }
+
+    private Map<Long, cn.topland.entity.Service> getServices(List<PackageServiceVO> serviceVOs) {
+
+        List<Long> serviceIds = serviceVOs.stream().map(PackageServiceVO::getService).collect(Collectors.toList());
+        return serviceRepository.findAllById(serviceIds).stream().
+                collect(Collectors.toMap(IdEntity::getId, s -> s));
+    }
+
+    private cn.topland.entity.PackageService createService(Long pkgId, PackageServiceVO serviceVO, cn.topland.entity.Service service) {
+
+        return composeService(pkgId, new cn.topland.entity.PackageService(), serviceVO, service);
+    }
+
+    private cn.topland.entity.PackageService composeService(Long pkgId, cn.topland.entity.PackageService packageService,
+                                                            PackageServiceVO serviceVO,
+                                                            cn.topland.entity.Service service) {
+
+        packageService.setPkgId(pkgId);
+        packageService.setService(service);
+        packageService.setUnit(serviceVO.getUnit());
+        packageService.setDelivery(serviceVO.getDelivery());
+        packageService.setPrice(serviceVO.getPrice());
+        return packageService;
     }
 
     private Package createPackage(PackageVO packageVO, User creator) {
@@ -64,25 +129,6 @@ public class PackageService {
         composePackage(pkg, packageVO);
         pkg.setEditor(editor);
         pkg.setLastUpdateTime(LocalDateTime.now());
-        return pkg;
-    }
-
-    private Package updatePackage(Package pkg, PackageVO packageVO, List<cn.topland.entity.PackageService> services, User editor) {
-
-        composePackage(pkg, packageVO);
-        pkg.setServices(services);
-        pkg.setEditor(editor);
-        pkg.setLastUpdateTime(LocalDateTime.now());
-        return pkg;
-    }
-
-    private Package createPackage(PackageVO packageVO, List<cn.topland.entity.PackageService> services, User creator) {
-
-        Package pkg = new Package();
-        composePackage(pkg, packageVO);
-        pkg.setServices(services);
-        pkg.setCreator(creator);
-        pkg.setEditor(creator);
         return pkg;
     }
 

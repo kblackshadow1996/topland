@@ -1,6 +1,6 @@
 package cn.topland.util.exception;
 
-public class InternalException extends Exception {
+public class InternalException extends RuntimeException {
 
     public InternalException(String message) {
 

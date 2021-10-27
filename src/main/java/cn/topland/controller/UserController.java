@@ -6,10 +6,6 @@ import cn.topland.entity.User;
 import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
-import cn.topland.util.exception.AccessException;
-import cn.topland.util.exception.InternalException;
-import cn.topland.util.exception.InvalidException;
-import cn.topland.util.exception.QueryException;
 import cn.topland.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -33,12 +29,9 @@ public class UserController {
      * @param creator 当前操作用户id
      * @param token   当前操作用户token
      * @return
-     * @throws AccessException
-     * @throws InternalException
      */
     @PostMapping("/wework/sync/all")
-    public Response syncAll(Long creator, String token)
-            throws AccessException, InternalException, InvalidException, QueryException {
+    public Response syncAll(Long creator, String token) {
 
         User user = userService.get(creator);
         validator.validateUserPermissions(user, token);
@@ -52,12 +45,9 @@ public class UserController {
      * @param creator 当前操作用户id
      * @param token   当前操作用户token
      * @return
-     * @throws AccessException
-     * @throws InternalException
      */
     @PostMapping(value = "/wework/sync")
-    public Response sync(String deptId, Long creator, String token)
-            throws AccessException, InternalException, InvalidException, QueryException {
+    public Response sync(String deptId, Long creator, String token) {
 
         User user = userService.get(creator);
         validator.validateUserPermissions(user, token);
@@ -71,11 +61,9 @@ public class UserController {
      * @param userVO role用户角色;auth数据权限
      * @param token  当前操作用户token
      * @return
-     * @throws AccessException
      */
     @PatchMapping(value = "/auth/{id}")
-    public Response auth(@PathVariable Long id, @RequestBody UserVO userVO, String token)
-            throws AccessException, InvalidException, QueryException, InternalException {
+    public Response auth(@PathVariable Long id, @RequestBody UserVO userVO, String token) {
 
         User user = userService.get(userVO.getCreator());
         validator.validateUserAuthPermissions(user, token);
@@ -88,11 +76,9 @@ public class UserController {
      * @param userVO users用户id;role用户角色;auth数据权限
      * @param token  当前操作用户token
      * @return
-     * @throws AccessException
      */
     @PatchMapping(value = "/auth")
-    public Response auth(@RequestBody UserVO userVO, String token)
-            throws AccessException, InvalidException, QueryException, InternalException {
+    public Response auth(@RequestBody UserVO userVO, String token) {
 
         User user = userService.get(userVO.getCreator());
         validator.validateUserAuthPermissions(user, token);

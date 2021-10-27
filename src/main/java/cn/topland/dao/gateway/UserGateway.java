@@ -5,7 +5,6 @@ import cn.topland.entity.User;
 import cn.topland.entity.directus.UserDO;
 import cn.topland.util.JsonUtils;
 import cn.topland.util.Reply;
-import cn.topland.util.exception.AccessException;
 import cn.topland.util.exception.InternalException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -42,52 +41,74 @@ public class UserGateway extends BaseGateway {
     private static final TypeReference<List<UserDO>> USERS = new TypeReference<>() {
     };
 
-    public UserDO login(User user) throws AccessException, InternalException {
+    public UserDO login(User user) {
 
         Reply result = directus.post(LOGIN_URI, null, user.loginInfo());
-        if (result.isSuccessful()) {
-
-            return cacheToken(user, JsonUtils.parse(result.getContent()));
-        }
-        throw new AccessException("账号异常");
+        return cacheToken(user, JsonUtils.parse(result.getContent()));
     }
 
-    public void logout(User user) throws InternalException {
+    public void logout(User user) {
 
-        Reply result = directus.post(LOGOUT_URI, null, user.logoutInfo());
-        if (!result.isSuccessful()) {
-
-            throw new InternalException("logout failed");
-        }
+        directus.post(LOGOUT_URI, null, user.logoutInfo());
     }
 
-    public void refreshToken(User user) throws InternalException {
+    public String refreshToken(User user) {
 
-        ObjectNode body = JsonNodeFactory.instance.objectNode();
-        body.put("refresh_token", user.getRefreshToken());
-        Reply result = directus.post(REFRESH_URI + "/" + user.getId(), tokenParam(user.getAccessToken()), body);
-        if (!result.isSuccessful()) {
-
-            throw new InternalException("刷新token失败");
-        }
+        JsonNode token = refresh(user);
+        UserDO userDO = cacheToken(user, Map.of("access_token", token.path("access_token").asText(),
+                "refresh_token", token.path("refresh_token").asText()));
+        return userDO.getAccessToken();
     }
 
-    public List<UserDO> saveAll(List<User> users, String accessToken) throws InternalException {
+    public List<UserDO> saveAll(List<User> users, String accessToken) {
 
         List<UserDO> userDOs = addUsers(getCreateUsers(users), accessToken);
         userDOs.addAll(updateUsers(getUpdateUsers(users), accessToken));
         return userDOs;
     }
 
-    public List<UserDO> auth(List<User> users, String accessToken) throws InternalException {
+    public List<UserDO> auth(List<User> users, String accessToken) {
 
         Reply result = directus.patch(USER_URI, tokenParam(accessToken), composeAuth(users));
-        if (result.isSuccessful()) {
+        String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+        return JsonUtils.parse(data, USERS);
+    }
 
-            String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
-            return JsonUtils.parse(data, USERS);
+    private JsonNode refresh(User user) {
+
+        ObjectNode body = JsonNodeFactory.instance.objectNode();
+        body.put("refresh_token", user.getRefreshToken());
+        Reply reply = directus.post(REFRESH_URI + "/" + user.getId(), tokenParam(user.getAccessToken()), body);
+        return JsonUtils.read(reply.getContent()).path("data");
+    }
+
+    private UserDO cacheToken(User user, Map<String, Object> tokens) throws InternalException {
+
+        ObjectNode body = JsonNodeFactory.instance.objectNode();
+        body.put("access_token", (String) tokens.get("access_token"));
+        body.put("refresh_token", (String) tokens.get("refresh_token"));
+        Reply result = directus.patch(USER_URI + "/" + user.getId(), tokenParam((String) tokens.get("access_token")), body);
+        String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+        return JsonUtils.parse(data, UserDO.class);
+    }
+
+    private List<UserDO> updateUsers(List<User> users, String accessToken) {
+
+        List<UserDO> userDOs = new ArrayList<>();
+        for (User user : users) {
+
+            // 更新用户只能单个进行
+            Reply result = directus.patch(USER_URI + "/" + user.getId(), tokenParam(accessToken), composeUser(user));
+            userDOs.add(JsonUtils.parse(JsonUtils.read(result.getContent()).path("data").toPrettyString(), UserDO.class));
         }
-        throw new InternalException("授权失败");
+        return userDOs;
+    }
+
+    private List<UserDO> addUsers(List<User> users, String accessToken) {
+
+        Reply result = directus.post(USER_URI, tokenParam(accessToken), composeUsers(users));
+        String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+        return JsonUtils.parse(data, USERS);
     }
 
     private JsonNode composeAuth(List<User> users) {
@@ -116,35 +137,6 @@ public class UserGateway extends BaseGateway {
         return array;
     }
 
-    private List<UserDO> updateUsers(List<User> users, String accessToken) throws InternalException {
-
-        List<UserDO> userDOs = new ArrayList<>();
-        for (User user : users) {
-
-            // 更新用户只能单个进行
-            Reply result = directus.patch(USER_URI + "/" + user.getId(), tokenParam(accessToken), composeUser(user));
-            if (result.isSuccessful()) {
-
-                userDOs.add(JsonUtils.parse(JsonUtils.read(result.getContent()).path("data").toPrettyString(), UserDO.class));
-            } else {
-
-                throw new InternalException("同步更新用户[" + user.getUserId() + "]失败");
-            }
-        }
-        return userDOs;
-    }
-
-    private List<UserDO> addUsers(List<User> users, String accessToken) throws InternalException {
-
-        Reply result = directus.post(USER_URI, tokenParam(accessToken), composeUsers(users));
-        if (result.isSuccessful()) {
-
-            String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
-            return JsonUtils.parse(data, USERS);
-        }
-        throw new InternalException("同步创建用户失败");
-    }
-
     private List<User> getUpdateUsers(List<User> users) {
 
         return users.stream().filter(u -> u.getId() != null).collect(Collectors.toList());
@@ -153,20 +145,6 @@ public class UserGateway extends BaseGateway {
     private List<User> getCreateUsers(List<User> users) {
 
         return users.stream().filter(u -> u.getId() == null).collect(Collectors.toList());
-    }
-
-    private UserDO cacheToken(User user, Map<String, Object> tokens) throws InternalException {
-
-        ObjectNode body = JsonNodeFactory.instance.objectNode();
-        body.put("access_token", (String) tokens.get("access_token"));
-        body.put("refresh_token", (String) tokens.get("refresh_token"));
-        Reply result = directus.patch(USER_URI + "/" + user.getId(), tokenParam((String) tokens.get("access_token")), body);
-        if (result.isSuccessful()) {
-
-            String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
-            return JsonUtils.parse(data, UserDO.class);
-        }
-        throw new InternalException("缓存token失败");
     }
 
     private JsonNode composeUsers(List<User> users) {

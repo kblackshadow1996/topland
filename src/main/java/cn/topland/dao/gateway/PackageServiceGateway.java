@@ -4,7 +4,6 @@ import cn.topland.entity.PackageService;
 import cn.topland.entity.directus.PackageServiceDO;
 import cn.topland.util.JsonUtils;
 import cn.topland.util.Reply;
-import cn.topland.util.exception.InternalException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,39 +26,29 @@ public class PackageServiceGateway extends BaseGateway {
     private static final TypeReference<List<PackageServiceDO>> SERVICES = new TypeReference<>() {
     };
 
-    public List<PackageServiceDO> saveAll(List<PackageService> services, String accessToken) throws InternalException {
+    public List<PackageServiceDO> saveAll(List<PackageService> services, String accessToken) {
 
         List<PackageServiceDO> packageServices = createAll(getCreatePackageServices(services), accessToken);
         packageServices.addAll(updateAll(getUpdatePackageServices(services), accessToken));
         return packageServices;
     }
 
-    private List<PackageServiceDO> createAll(List<PackageService> services, String accessToken) throws InternalException {
+    private List<PackageServiceDO> createAll(List<PackageService> services, String accessToken) {
 
         Reply result = directus.post(PACKAGE_SERVICE_URI, tokenParam(accessToken), composePackageServices(services));
-        if (result.isSuccessful()) {
-
-            String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
-            return JsonUtils.parse(data, SERVICES);
-        }
-        throw new InternalException("新增联系人失败");
+        String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+        return JsonUtils.parse(data, SERVICES);
     }
 
-    private List<PackageServiceDO> updateAll(List<PackageService> services, String accessToken) throws InternalException {
+    private List<PackageServiceDO> updateAll(List<PackageService> services, String accessToken) {
 
         List<PackageServiceDO> packageServices = new ArrayList<>();
         for (PackageService service : services) {
 
             Reply result = directus.patch(PACKAGE_SERVICE_URI + "/" + service.getId(), tokenParam(accessToken),
                     JsonUtils.toJsonNode(PackageServiceDO.from(service)));
-            if (result.isSuccessful()) {
-
-                String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
-                packageServices.add(JsonUtils.parse(data, PackageServiceDO.class));
-            } else {
-
-                throw new InternalException("更新套餐服务异常");
-            }
+            String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+            packageServices.add(JsonUtils.parse(data, PackageServiceDO.class));
         }
         return packageServices;
     }

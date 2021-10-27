@@ -3,7 +3,6 @@ package cn.topland.util.annotation.method;
 import cn.topland.entity.User;
 import cn.topland.util.annotation.SessionManager;
 import cn.topland.util.annotation.bind.SessionUser;
-import cn.topland.util.exception.QueryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -33,7 +32,7 @@ public class SessionUserMapMethodArgumentResolver implements HandlerMethodArgume
 
     @Override
     public User resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-                                NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws QueryException {
+                                NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
 
         HttpSession httpSession = webRequest.getNativeRequest(HttpServletRequest.class).getSession();
         return manager.getUser(httpSession);

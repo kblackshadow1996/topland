@@ -15,13 +15,11 @@ import cn.topland.service.parser.WeworkUserParser;
 import cn.topland.util.exception.AccessException;
 import cn.topland.util.exception.ExternalException;
 import cn.topland.util.exception.InternalException;
-import cn.topland.util.exception.QueryException;
 import cn.topland.vo.UserVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -62,12 +60,8 @@ public class UserService {
     @Autowired
     private UsersGateway usersGateway;
 
-    public User get(Long id) throws QueryException {
+    public User get(Long id) {
 
-        if (id == null || !repository.existsById(id)) {
-
-            throw new QueryException("用户不存在");
-        }
         return repository.getById(id);
     }
 
@@ -79,7 +73,7 @@ public class UserService {
     /**
      * 企业微信登录
      */
-    public UserDO loginByWework(String code) throws AccessException, ExternalException, InternalException {
+    public UserDO loginByWework(String code) {
 
         UserInfo userInfo = weworkGateway.getUserInfo(code);
         if (Objects.nonNull(userInfo)) {
@@ -98,7 +92,7 @@ public class UserService {
     /**
      * 按部门同步(只同步部门直属人员)
      */
-    public List<UserDO> syncWeworkUser(String deptId, User creator) throws InternalException {
+    public List<UserDO> syncWeworkUser(String deptId, User creator) {
 
         // 用于关联用户部门
         List<Department> departments = deptRepository.listAllDeptIds(Department.Source.WEWORK);
@@ -117,7 +111,7 @@ public class UserService {
     /**
      * 同步所有
      */
-    public List<UserDO> syncAllWeworkUser(User creator) throws InternalException {
+    public List<UserDO> syncAllWeworkUser(User creator) {
 
         List<Department> departments = deptRepository.listAllDeptIds(Department.Source.WEWORK);
         checkIfSyncDept(departments);
@@ -131,7 +125,7 @@ public class UserService {
     }
 
     // 授权
-    public UserDO auth(Long id, UserVO userVO) throws InternalException {
+    public UserDO auth(Long id, UserVO userVO) {
 
         User creator = repository.getById(userVO.getCreator());
         Role role = roleRepository.getById(userVO.getRole());
@@ -140,7 +134,7 @@ public class UserService {
         return userGateway.auth(List.of(user), creator.getAccessToken()).get(0);
     }
 
-    public List<UserDO> auth(UserVO userVO) throws InternalException {
+    public List<UserDO> auth(UserVO userVO) {
 
         User creator = repository.getById(userVO.getCreator());
         return userGateway.auth(authUsers(userVO, creator), creator.getAccessToken());
@@ -163,7 +157,7 @@ public class UserService {
         return user;
     }
 
-    private DirectusUsers authDirectusUser(DirectusUsers directusUser, DirectusRoles role, String accessToken) throws InternalException {
+    private DirectusUsers authDirectusUser(DirectusUsers directusUser, DirectusRoles role, String accessToken) {
 
         directusUser.setRole(role);
         usersGateway.auth(directusUser, accessToken);
@@ -216,7 +210,7 @@ public class UserService {
         return mergeUsers;
     }
 
-    private void combineWithDirectus(List<User> users, DirectusRoles role, String accessToken) throws InternalException {
+    private void combineWithDirectus(List<User> users, DirectusRoles role, String accessToken) {
 
         if (CollectionUtils.isNotEmpty(users)) {
 
@@ -288,7 +282,7 @@ public class UserService {
                 .findFirst().get();
     }
 
-    private UserDO loginByWeworkUser(User user) throws AccessException, InternalException {
+    private UserDO loginByWeworkUser(User user) {
 
         if (user.getActive()) { // 启用
 
@@ -300,7 +294,7 @@ public class UserService {
         }
     }
 
-    private void checkIfSyncDept(List<Department> departments) throws InternalException {
+    private void checkIfSyncDept(List<Department> departments) {
 
         if (CollectionUtils.isEmpty(departments)) {
 

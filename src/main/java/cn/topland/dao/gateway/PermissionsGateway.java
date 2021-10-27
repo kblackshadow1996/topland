@@ -4,7 +4,6 @@ import cn.topland.entity.DirectusPermissions;
 import cn.topland.entity.directus.PermissionDO;
 import cn.topland.util.JsonUtils;
 import cn.topland.util.Reply;
-import cn.topland.util.exception.InternalException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -29,26 +28,18 @@ public class PermissionsGateway extends BaseGateway {
     private static final TypeReference<List<PermissionDO>> PERMISSIONS = new TypeReference<>() {
     };
 
-    public List<PermissionDO> saveAll(List<DirectusPermissions> permissions, String accessToken) throws InternalException {
+    public List<PermissionDO> saveAll(List<DirectusPermissions> permissions, String accessToken) {
 
         Reply result = directus.post(PERMISSIONS_URI, tokenParam(accessToken), composePermissions(permissions));
-        if (result.isSuccessful()) {
-
-            String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
-            return JsonUtils.parse(data, PERMISSIONS);
-        }
-        throw new InternalException("添加权限失败");
+        String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+        return JsonUtils.parse(data, PERMISSIONS);
     }
 
-    public void removeAll(List<DirectusPermissions> permissions, String accessToken) throws InternalException {
+    public void removeAll(List<DirectusPermissions> permissions, String accessToken) {
 
         if (CollectionUtils.isNotEmpty(permissions)) {
 
-            Reply result = directus.delete(PERMISSIONS_URI, tokenParam(accessToken), composePermissionIds(permissions));
-            if (!result.isSuccessful()) {
-
-                throw new InternalException("删除权限失败");
-            }
+            directus.delete(PERMISSIONS_URI, tokenParam(accessToken), composePermissionIds(permissions));
         }
     }
 

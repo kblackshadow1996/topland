@@ -1,6 +1,6 @@
 package cn.topland.util.exception;
 
-public class InvalidException extends Exception {
+public class InvalidException extends RuntimeException {
 
     public InvalidException(String message) {
         super(message);

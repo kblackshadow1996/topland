@@ -8,7 +8,6 @@ import cn.topland.entity.Exception;
 import cn.topland.entity.*;
 import cn.topland.entity.directus.AttachmentDO;
 import cn.topland.entity.directus.ExceptionDO;
-import cn.topland.util.exception.InternalException;
 import cn.topland.vo.AttachmentVO;
 import cn.topland.vo.ExceptionVO;
 import org.apache.commons.collections4.CollectionUtils;
@@ -64,7 +63,7 @@ public class ExceptionService {
         return repository.getById(id);
     }
 
-    public List<ExceptionDO> add(List<ExceptionVO> exceptions, User creator) throws InternalException {
+    public List<ExceptionDO> add(List<ExceptionVO> exceptions, User creator) {
 
         List<Exception> createExceptions = createExceptions(exceptions, creator);
         List<ExceptionDO> exceptionDOs = exceptionGateway.saveAll(createExceptions, creator.getAccessToken());
@@ -73,7 +72,7 @@ public class ExceptionService {
         return exceptionDOs;
     }
 
-    public ExceptionDO update(Long id, ExceptionVO exceptionVO, User editor) throws InternalException {
+    public ExceptionDO update(Long id, ExceptionVO exceptionVO, User editor) {
 
         Exception exception = repository.getById(id);
         Exception updateException = updateException(exception, exceptionVO, editor);
@@ -84,7 +83,7 @@ public class ExceptionService {
     }
 
     @Transactional
-    public ExceptionDO solve(Long id, ExceptionVO exceptionVO, User editor) throws InternalException {
+    public ExceptionDO solve(Long id, ExceptionVO exceptionVO, User editor) {
 
         Exception persistExp = repository.getById(id);
         boolean isUpdate = isUpdateSolution(persistExp);
@@ -103,7 +102,7 @@ public class ExceptionService {
     }
 
     // 为了兼容directus作出的让步
-    private void saveAllAttachments(List<Exception> exceptions, List<ExceptionDO> exceptionDOs, String token) throws InternalException {
+    private void saveAllAttachments(List<Exception> exceptions, List<ExceptionDO> exceptionDOs, String token) {
 
         Map<String, Long> exceptionMap = exceptionDOs.stream().collect(Collectors.toMap(ExceptionDO::getUuid, ExceptionDO::getId));
         List<Attachment> attachments = new ArrayList<>();
@@ -273,17 +272,17 @@ public class ExceptionService {
         });
     }
 
-    private void saveCreateOperations(List<ExceptionDO> exceptions, User creator) throws InternalException {
+    private void saveCreateOperations(List<ExceptionDO> exceptions, User creator) {
 
         operationGateway.saveAll(createAddExceptionOperations(exceptions, creator), creator.getAccessToken());
     }
 
-    private void saveUpdateOperation(Long id, User editor) throws InternalException {
+    private void saveUpdateOperation(Long id, User editor) {
 
         operationGateway.save(createOperation(Action.UPDATE, id, editor), editor.getAccessToken());
     }
 
-    private void saveSolveOperation(Long id, User editor, boolean isUpdate) throws InternalException {
+    private void saveSolveOperation(Long id, User editor, boolean isUpdate) {
 
         Action action = isUpdate ? Action.UPDATE_SOLUTION : Action.CREATE_SOLUTION;
         operationGateway.save(createOperation(action, id, editor), editor.getAccessToken());

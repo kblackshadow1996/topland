@@ -9,9 +9,7 @@ import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.util.exception.AccessException;
-import cn.topland.util.exception.InternalException;
 import cn.topland.util.exception.InvalidException;
-import cn.topland.util.exception.QueryException;
 import cn.topland.vo.SettlementContractVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -46,8 +44,7 @@ public class SettlementContractController {
      * @throws QueryException
      */
     @PostMapping("/add")
-    public Response add(@RequestBody SettlementContractVO contractVO, String token)
-            throws AccessException, InvalidException, QueryException, InternalException {
+    public Response add(@RequestBody SettlementContractVO contractVO, String token) {
 
         User user = userService.get(contractVO.getCreator());
         validator.validateSettlementCreatePermissions(user, token);
@@ -66,8 +63,7 @@ public class SettlementContractController {
      * @throws InvalidException
      */
     @PatchMapping("/review/{id}")
-    public Response review(@PathVariable Long id, @RequestBody SettlementContractVO contractVO, String token)
-            throws AccessException, QueryException, InvalidException, InternalException {
+    public Response review(@PathVariable Long id, @RequestBody SettlementContractVO contractVO, String token) {
 
         User user = userService.get(contractVO.getCreator());
         validator.validateSettlementReviewPermissions(user, token);

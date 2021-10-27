@@ -1,7 +1,9 @@
 package cn.topland.dao.gateway;
 
 import cn.topland.util.HttpDelete;
+import cn.topland.util.JsonUtils;
 import cn.topland.util.Reply;
+import cn.topland.util.exception.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Consts;
@@ -35,6 +37,28 @@ import java.util.List;
 @Slf4j
 @Component
 public class DirectusGateway {
+
+    private static final String FAILED_VALIDATION = "FAILED_VALIDATION";
+
+    private static final String FORBIDDEN = "FORBIDDEN";
+
+    private static final String INVALID_CREDENTIALS = "INVALID_CREDENTIALS";
+
+    private static final String INVALID_IP = "INVALID_IP";
+
+    private static final String INVALID_OTP = "INVALID_OTP";
+
+    private static final String INVALID_PAYLOAD = "INVALID_PAYLOAD";
+
+    private static final String INVALID_QUERY = "INVALID_QUERY";
+
+    private static final String REQUESTS_EXCEEDED = "REQUESTS_EXCEEDED";
+
+    private static final String ROUTE_NOT_FOUND = "ROUTE_NOT_FOUND";
+
+    private static final String SERVICE_UNAVAILABLE = "SERVICE_UNAVAILABLE";
+
+    private static final String UNPROCESSABLE_ENTITY = "UNPROCESSABLE_ENTITY";
 
     @Value("${directus.url}")
     private String DIRECTUS_URL;
@@ -113,6 +137,7 @@ public class DirectusGateway {
             httpRequest.releaseConnection();
             client.getConnectionManager().shutdown();
         }
+        catchException(reply);
         return reply;
     }
 
@@ -133,5 +158,53 @@ public class DirectusGateway {
             }
         }
         return params;
+    }
+
+    protected static void catchException(Reply reply) {
+
+        if (!reply.isSuccessful()) {
+
+            JsonNode errors = JsonUtils.read(reply.getContent()).path("errors");
+            String code = errors.findPath("code").asText();
+            String message = errors.findPath("message").asText();
+            switch (code) {
+
+                case FAILED_VALIDATION:
+
+                    throw new ValidationException(message);
+                case FORBIDDEN:
+
+                    throw new AccessException(message);
+                case INVALID_CREDENTIALS:
+
+                    throw new CredentialException(message);
+                case INVALID_IP:
+
+                    throw new InvalidIpException(message);
+                case INVALID_OTP:
+
+                    throw new InvalidOtpException(message);
+                case INVALID_PAYLOAD:
+
+                    throw new InvalidPayloadException(message);
+                case INVALID_QUERY:
+
+                    throw new InvalidQueryException(message);
+                case REQUESTS_EXCEEDED:
+
+                    throw new RequestsExceededException(message);
+                case ROUTE_NOT_FOUND:
+
+                    throw new RouteNotFoundException(message);
+                case SERVICE_UNAVAILABLE:
+
+                    throw new ExternalException(message);
+                case UNPROCESSABLE_ENTITY:
+
+                    throw new UnprocessableException(message);
+                default:
+                    break;
+            }
+        }
     }
 }

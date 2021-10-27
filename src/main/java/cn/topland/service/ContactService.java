@@ -5,12 +5,10 @@ import cn.topland.dao.gateway.ContactGateway;
 import cn.topland.entity.Contact;
 import cn.topland.entity.IdEntity;
 import cn.topland.entity.directus.ContactDO;
-import cn.topland.util.exception.InternalException;
 import cn.topland.vo.ContactVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +27,13 @@ public class ContactService {
     @Autowired
     private ContactGateway contactGateway;
 
-    public List<ContactDO> createCustomerContacts(List<ContactVO> contactVOs, Long customer, String token) throws InternalException {
+    public List<ContactDO> createCustomerContacts(List<ContactVO> contactVOs, Long customer, String token) {
 
         List<Contact> contacts = contactVOs.stream().map(contactVO -> createCustomerContact(contactVO, customer)).collect(Collectors.toList());
         return contactGateway.saveAll(contacts, token);
     }
 
-    public List<ContactDO> updateCustomerContacts(List<Contact> contacts, List<ContactVO> contactVOs, Long customer, String token) throws InternalException {
+    public List<ContactDO> updateCustomerContacts(List<Contact> contacts, List<ContactVO> contactVOs, Long customer, String token) {
 
         contacts = CollectionUtils.isEmpty(contacts) ? List.of() : contacts;
         Map<Long, Contact> contactMap = contacts.stream().collect(Collectors.toMap(IdEntity::getId, contact -> contact));
@@ -62,13 +60,13 @@ public class ContactService {
         return contactGateway.saveAll(customerContacts, token);
     }
 
-    public List<ContactDO> createBrandContacts(List<ContactVO> contactVOs, Long brand, String token) throws InternalException {
+    public List<ContactDO> createBrandContacts(List<ContactVO> contactVOs, Long brand, String token) {
 
         List<Contact> contacts = contactVOs.stream().map(contactVO -> createBrandContact(contactVO, brand)).collect(Collectors.toList());
         return contactGateway.saveAll(contacts, token);
     }
 
-    public List<ContactDO> updateBrandContacts(List<Contact> contacts, List<ContactVO> contactVOs, Long brand, String token) throws InternalException {
+    public List<ContactDO> updateBrandContacts(List<Contact> contacts, List<ContactVO> contactVOs, Long brand, String token) {
 
         contacts = CollectionUtils.isEmpty(contacts) ? List.of() : contacts;
         Map<Long, Contact> contactMap = contacts.stream().collect(Collectors.toMap(IdEntity::getId, contact -> contact));

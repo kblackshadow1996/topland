@@ -8,13 +8,11 @@ import cn.topland.entity.*;
 import cn.topland.entity.directus.AttachmentDO;
 import cn.topland.entity.directus.DirectusSimpleIdEntity;
 import cn.topland.entity.directus.SettlementContractDO;
-import cn.topland.util.exception.InternalException;
 import cn.topland.vo.AttachmentVO;
 import cn.topland.vo.SettlementContractVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -59,7 +57,7 @@ public class SettlementContractService {
     @Autowired
     private SettlementContractGateway settlementGateway;
 
-    public SettlementContractDO add(SettlementContractVO contractVO, User creator) throws InternalException {
+    public SettlementContractDO add(SettlementContractVO contractVO, User creator) {
 
         SettlementContractDO contractDO = settlementGateway.save(createContract(contractVO, creator), creator.getAccessToken());
         saveOperation(contractDO.getId(), Action.SUBMIT, creator, null);
@@ -67,7 +65,7 @@ public class SettlementContractService {
         return contractDO;
     }
 
-    public SettlementContractDO review(Long id, SettlementContractVO contractVO, User editor) throws InternalException {
+    public SettlementContractDO review(Long id, SettlementContractVO contractVO, User editor) {
 
         SettlementContract contract = repository.getById(id);
         SettlementContractDO contractDO = settlementGateway.update(reviewSettlementContract(contract, contractVO, editor), editor.getAccessToken());
@@ -83,7 +81,7 @@ public class SettlementContractService {
                 : attachments.stream().map(SimpleIdEntity::getId).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    private void saveAllAttachments(SettlementContractDO contractDO, List<AttachmentVO> attachmentVOs, List<Attachment> attachments, String accessToken) throws InternalException {
+    private void saveAllAttachments(SettlementContractDO contractDO, List<AttachmentVO> attachmentVOs, List<Attachment> attachments, String accessToken) {
 
         List<Attachment> contractAttachments = createAttachments(attachmentVOs, attachments, contractDO.getId());
         Map<Long, List<AttachmentDO>> attachmentMap = attachmentGateway.upload(contractAttachments, accessToken).stream()
@@ -170,7 +168,7 @@ public class SettlementContractService {
         return "S" + date + employeeId + (count + 1);
     }
 
-    private void saveOperation(Long id, Action action, User creator, String remark) throws InternalException {
+    private void saveOperation(Long id, Action action, User creator, String remark) {
 
         operationGateway.save(createOperation(id, action, creator, remark), creator.getAccessToken());
     }

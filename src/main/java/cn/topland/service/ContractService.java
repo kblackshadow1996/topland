@@ -14,7 +14,6 @@ import cn.topland.vo.ContractVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -69,14 +68,14 @@ public class ContractService {
         return repository.getById(id);
     }
 
-    public ContractDO add(ContractVO contractVO, User creator) throws InternalException {
+    public ContractDO add(ContractVO contractVO, User creator) {
 
         ContractDO contract = contractGateway.save(createContract(contractVO, creator), creator.getAccessToken());
         saveOperation(contract.getId(), Action.SUBMIT, creator, null);
         return contract;
     }
 
-    public ContractDO review(Long id, ContractVO contractVO, User editor) throws InternalException {
+    public ContractDO review(Long id, ContractVO contractVO, User editor) {
 
         Contract contract = repository.getById(id);
         ContractDO contractDO = contractGateway.update(reviewContract(contract, contractVO, editor), editor.getAccessToken());
@@ -85,7 +84,7 @@ public class ContractService {
         return contractDO;
     }
 
-    public ContractDO receivePaper(Long id, ContractVO contractVO, User creator) throws InternalException {
+    public ContractDO receivePaper(Long id, ContractVO contractVO, User creator) {
 
         Contract contract = repository.getById(id);
         ContractDO contractDO = contractGateway.update(receiveContractPaper(contract, contractVO, creator), creator.getAccessToken());
@@ -100,7 +99,7 @@ public class ContractService {
                 : attachments.stream().map(SimpleIdEntity::getId).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    private void saveAllAttachments(ContractDO contractDO, List<AttachmentVO> attachmentVOs, List<Attachment> attachments, String accessToken) throws InternalException {
+    private void saveAllAttachments(ContractDO contractDO, List<AttachmentVO> attachmentVOs, List<Attachment> attachments, String accessToken) {
 
         List<Attachment> contractAttachments = createAttachments(attachmentVOs, attachments, contractDO.getId());
         Map<Long, List<AttachmentDO>> attachmentMap = attachmentGateway.upload(contractAttachments, accessToken).stream()

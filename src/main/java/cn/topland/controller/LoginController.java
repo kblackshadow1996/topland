@@ -5,9 +5,6 @@ import cn.topland.dto.converter.UserConverter;
 import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
-import cn.topland.util.exception.AccessException;
-import cn.topland.util.exception.ExternalException;
-import cn.topland.util.exception.InternalException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,13 +42,9 @@ public class LoginController {
      * @param code  企业微信扫码返回code
      * @param state 系统随机state
      * @return
-     * @throws AccessException
-     * @throws InternalException
-     * @throws ExternalException
      */
     @GetMapping(value = "/wework/login")
-    public Response loginByWework(String code, String state)
-            throws AccessException, ExternalException, InternalException {
+    public Response loginByWework(String code, String state) {
 
         if (StringUtils.isNotBlank(code) && StringUtils.equals(state, weworkConfig.getState())) {
 

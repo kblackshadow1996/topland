@@ -32,7 +32,8 @@ public class ConsoleTester {
 
         DepartmentDO departmentDO = new DepartmentDO();
         departmentDO.setLastUpdateTime(LocalDateTime.now());
-        System.out.println(JsonUtils.toJson(departmentDO));
+        String json = "{\"errors\":[{\"message\":\"Route /active 不存在。\",\"extensions\":{\"code\":\"ROUTE_NOT_FOUND\"}}]}";
+        System.out.println(JsonUtils.read(json).path("errors").findPath("code"));
 //        JsonUtils.read(json).path("data").forEach(u -> {
 //
 //            System.out.println(u.path("id").asLong());

@@ -8,10 +8,6 @@ import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.util.StringReader;
-import cn.topland.util.exception.AccessException;
-import cn.topland.util.exception.InternalException;
-import cn.topland.util.exception.InvalidException;
-import cn.topland.util.exception.QueryException;
 import cn.topland.vo.QuotationVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -48,16 +44,11 @@ public class QuotationController {
      * @param creator  操作用户
      * @param token    操作用户token
      * @return
-     * @throws InternalException
-     * @throws QueryException
-     * @throws AccessException
-     * @throws InvalidException
      */
     @GetMapping(value = "/pdf")
     public Response downloadPdf(String html, String title, String identity,
                                 @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
-                                Long creator, String token)
-            throws InternalException, QueryException, AccessException, InvalidException {
+                                Long creator, String token) {
 
         User user = userService.get(creator);
         validator.validateQuotationCreatePermission(user, token);
@@ -70,13 +61,9 @@ public class QuotationController {
      * @param quotationVO 报价信息
      * @param token       操作用户token
      * @return
-     * @throws AccessException
-     * @throws QueryException
-     * @throws InvalidException
      */
     @PostMapping("/add")
-    public Response add(@RequestBody QuotationVO quotationVO, String token)
-            throws AccessException, QueryException, InvalidException {
+    public Response add(@RequestBody QuotationVO quotationVO, String token) {
 
         User user = userService.get(quotationVO.getCreator());
         validator.validateQuotationCreatePermission(user, token);
@@ -90,13 +77,9 @@ public class QuotationController {
      * @param quotationVO 报价信息
      * @param token       操作用户token
      * @return
-     * @throws AccessException
-     * @throws QueryException
-     * @throws InvalidException
      */
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody QuotationVO quotationVO, String token)
-            throws AccessException, QueryException, InvalidException {
+    public Response update(@PathVariable Long id, @RequestBody QuotationVO quotationVO, String token) {
 
         User user = userService.get(quotationVO.getCreator());
         validator.validateQuotationUpdatePermission(user, token);

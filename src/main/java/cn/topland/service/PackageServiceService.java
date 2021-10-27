@@ -6,7 +6,6 @@ import cn.topland.dao.gateway.PackageServiceGateway;
 import cn.topland.entity.IdEntity;
 import cn.topland.entity.PackageService;
 import cn.topland.entity.directus.PackageServiceDO;
-import cn.topland.util.exception.InternalException;
 import cn.topland.vo.PackageServiceVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +29,12 @@ public class PackageServiceService {
     @Autowired
     private PackageServiceGateway packageServiceGateway;
 
-    public List<PackageServiceDO> add(Long pkgId, List<PackageServiceVO> serviceVOs, String token) throws InternalException {
+    public List<PackageServiceDO> add(Long pkgId, List<PackageServiceVO> serviceVOs, String token) {
 
         return packageServiceGateway.saveAll(createServices(pkgId, serviceVOs), token);
     }
 
-    public List<PackageServiceDO> update(Long pkgId, List<PackageService> services, List<PackageServiceVO> serviceVOs, String token) throws InternalException {
+    public List<PackageServiceDO> update(Long pkgId, List<PackageService> services, List<PackageServiceVO> serviceVOs, String token) {
 
         return packageServiceGateway.saveAll(updateServices(pkgId, services, serviceVOs), token);
     }

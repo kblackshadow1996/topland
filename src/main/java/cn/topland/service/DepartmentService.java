@@ -8,10 +8,8 @@ import cn.topland.entity.directus.DepartmentDO;
 import cn.topland.gateway.WeworkGateway;
 import cn.topland.gateway.response.WeworkDepartment;
 import cn.topland.service.parser.WeworkDepartmentParser;
-import cn.topland.util.exception.InternalException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -37,7 +35,7 @@ public class DepartmentService {
     /**
      * 根据组织id同步组织及其直属组织
      */
-    public List<DepartmentDO> syncWeworkDept(String deptId, User user) throws InternalException {
+    public List<DepartmentDO> syncWeworkDept(String deptId, User user) {
 
         List<Department> departments = departmentParser.parse(filterUpdateDepartments(deptId));
         List<Department> persistDepartments = repository.findByDeptIds(getDeptIds(departments), Source.WEWORK);
@@ -49,7 +47,7 @@ public class DepartmentService {
     /**
      * 同步所有企业微信组织
      */
-    public List<DepartmentDO> syncAllWeworkDept(User user) throws InternalException {
+    public List<DepartmentDO> syncAllWeworkDept(User user) {
 
         List<Department> departments = departmentParser.parse(weworkGateway.listDepartments(null));
         List<Department> persistDepartments = repository.findBySource(Source.WEWORK);

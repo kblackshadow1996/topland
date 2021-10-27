@@ -6,7 +6,6 @@ import cn.topland.entity.User;
 import cn.topland.entity.directus.ExceptionDO;
 import cn.topland.util.JsonUtils;
 import cn.topland.util.Reply;
-import cn.topland.util.exception.InternalException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -31,26 +30,18 @@ public class ExceptionGateway extends BaseGateway {
     private static final TypeReference<List<ExceptionDO>> EXCEPTIONS = new TypeReference<>() {
     };
 
-    public List<ExceptionDO> saveAll(List<Exception> exceptions, String accessToken) throws InternalException {
+    public List<ExceptionDO> saveAll(List<Exception> exceptions, String accessToken) {
 
         Reply result = directus.post(EXCEPTION_URI, tokenParam(accessToken), composeExceptions(exceptions));
-        if (result.isSuccessful()) {
-
-            String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
-            return JsonUtils.parse(data, EXCEPTIONS);
-        }
-        throw new InternalException("添加异常失败");
+        String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+        return JsonUtils.parse(data, EXCEPTIONS);
     }
 
-    public ExceptionDO update(Exception exception, String accessToken) throws InternalException {
+    public ExceptionDO update(Exception exception, String accessToken) {
 
         Reply result = directus.patch(EXCEPTION_URI + "/" + exception.getId(), tokenParam(accessToken), composeException(exception));
-        if (result.isSuccessful()) {
-
-            String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
-            return JsonUtils.parse(data, ExceptionDO.class);
-        }
-        throw new InternalException("更新异常失败");
+        String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+        return JsonUtils.parse(data, ExceptionDO.class);
     }
 
     private JsonNode composeExceptions(List<Exception> exceptions) {
