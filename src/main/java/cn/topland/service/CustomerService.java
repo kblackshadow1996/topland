@@ -43,7 +43,6 @@ public class CustomerService {
         return repository.getById(id);
     }
 
-    @Transactional
     public CustomerDO add(CustomerVO customerVO, User creator) throws InternalException {
 
         validateNameUnique(customerVO.getName());
@@ -52,7 +51,6 @@ public class CustomerService {
         return customer;
     }
 
-    @Transactional
     public CustomerDO update(Customer customer, CustomerVO customerVO, User editor) throws InternalException {
 
         validateNameUnique(customerVO.getName(), customer.getId());
@@ -61,7 +59,6 @@ public class CustomerService {
         return customerDO;
     }
 
-    @Transactional
     public CustomerDO lost(Long id, CustomerVO customerVO, User editor) throws InternalException {
 
         CustomerDO customer = customerGateway.update(lostCustomer(repository.getById(id), editor), editor.getAccessToken());
@@ -69,7 +66,6 @@ public class CustomerService {
         return customer;
     }
 
-    @Transactional
     public CustomerDO retrieve(Long id, User editor) throws InternalException {
 
         CustomerDO customer = customerGateway.update(retrieveCustomer(repository.getById(id), editor), editor.getAccessToken());

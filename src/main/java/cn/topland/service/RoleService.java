@@ -62,7 +62,6 @@ public class RoleService {
         return repository.getById(id);
     }
 
-    @Transactional
     public RoleDO add(RoleVO roleVO, User creator) throws InternalException {
 
         validateNameUnique(roleVO.getName());
@@ -72,7 +71,6 @@ public class RoleService {
         return roleGateway.add(createRole(roleVO, directusRole, authorities, creator), creator.getAccessToken());
     }
 
-    @Transactional
     public RoleDO update(Long id, RoleVO roleVO, User editor) throws AccessException, InternalException {
 
         validateNameUnique(roleVO.getName(), id);

@@ -36,7 +36,7 @@ public class UserDO extends DirectusRecordEntity {
     @JsonProperty(value = "lead_departments")
     private String leadDepartments;
 
-    private Buffer active;
+    private boolean active;
 
     private String remark;
 
@@ -78,7 +78,7 @@ public class UserDO extends DirectusRecordEntity {
         userDO.setDirectusUser(user.getDirectusUser() == null ? null : user.getDirectusUser().getId());
         userDO.setDirectusEmail(user.getDirectusEmail());
         userDO.setDirectusPassword(user.getDirectusPassword());
-        userDO.setAuth(user.getAuth().name());
+        userDO.setAuth(user.getAuth() == null ? null : user.getAuth().name());
         userDO.setRole(user.getRole() == null ? null : user.getRole().getId());
         userDO.setCreator(user.getCreator().getId());
         userDO.setEditor(user.getEditor().getId());

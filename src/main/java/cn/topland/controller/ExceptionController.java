@@ -2,9 +2,7 @@ package cn.topland.controller;
 
 import cn.topland.controller.validator.PermissionValidator;
 import cn.topland.dto.converter.ExceptionConverter;
-import cn.topland.entity.Attachment;
 import cn.topland.entity.Exception;
-import cn.topland.entity.SimpleIdEntity;
 import cn.topland.entity.User;
 import cn.topland.entity.directus.ExceptionDO;
 import cn.topland.service.AttachmentService;
@@ -17,12 +15,10 @@ import cn.topland.util.exception.InternalException;
 import cn.topland.util.exception.InvalidException;
 import cn.topland.util.exception.QueryException;
 import cn.topland.vo.ExceptionVO;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/exception")
@@ -59,8 +55,7 @@ public class ExceptionController {
 
         User user = userService.get(exceptionVOs.get(0).getCreator());
         validator.validateExceptionCreatePermissions(user, token);
-        List<Exception> exceptions = exceptionService.createAll(exceptionVOs, user);
-        List<ExceptionDO> exceptionDOs = exceptionService.add(exceptions, user);
+        List<ExceptionDO> exceptionDOs = exceptionService.add(exceptionVOs, user);
         return Responses.success(exceptionConverter.toDTOs(exceptionDOs));
     }
 
@@ -81,7 +76,8 @@ public class ExceptionController {
 
         User user = userService.get(exceptionVO.getCreator());
         validator.validateExceptionUpdatePermissions(user, token);
-        return Responses.success(exceptionConverter.toDTO(exceptionService.update(id, exceptionVO, user)));
+        ExceptionDO exceptionDO = exceptionService.update(id, exceptionVO, user);
+        return Responses.success(exceptionConverter.toDTO(exceptionDO));
     }
 
     /**
@@ -101,15 +97,6 @@ public class ExceptionController {
 
         User user = userService.get(exceptionVO.getCreator());
         validator.validateExceptionSolvePermissions(user, token);
-        ExceptionDO exceptionDO = exceptionService.solve(id, exceptionVO, user);
-        exceptionDO.setAttachments(listAttachments(exceptionService.get(id).getAttachments()));
-        return Responses.success(exceptionConverter.toDTO(exceptionDO));
-    }
-
-    private List<Long> listAttachments(List<Attachment> attachments) {
-
-        return CollectionUtils.isEmpty(attachments)
-                ? List.of()
-                : attachments.stream().map(SimpleIdEntity::getId).collect(Collectors.toList());
+        return Responses.success(exceptionConverter.toDTO(exceptionService.solve(id, exceptionVO, user)));
     }
 }

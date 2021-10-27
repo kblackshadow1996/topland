@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ContractGateway extends BaseGateway {
 
-    @Value("${directus.contract.uri}")
+    @Value("${directus.items.contract}")
     private String CONTRACT_URI;
 
     @Autowired
@@ -21,6 +21,7 @@ public class ContractGateway extends BaseGateway {
     public ContractDO save(Contract contract, String accessToken) throws InternalException {
 
         Reply result = directus.post(CONTRACT_URI, tokenParam(accessToken), JsonUtils.toJsonNode(ContractDO.from(contract)));
+        System.out.println(result.getContent());
         if (result.isSuccessful()) {
 
             String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();

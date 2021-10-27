@@ -46,9 +46,9 @@ public class ExceptionDTO implements Serializable {
     @JsonProperty(value = "estimated_loss_condition")
     private String estimatedLossCondition;
 
-    private Buffer critical;
+    private boolean critical;
 
-    private Buffer resolved;
+    private boolean resolved;
 
     @JsonProperty(value = "create_date")
     private LocalDate createDate;
@@ -67,5 +67,5 @@ public class ExceptionDTO implements Serializable {
     @JsonProperty(value = "optimal_solution")
     private String optimalSolution;
 
-    private Buffer optimal;
+    private boolean optimal;
 }

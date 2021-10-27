@@ -37,7 +37,6 @@ public class DepartmentService {
     /**
      * 根据组织id同步组织及其直属组织
      */
-    @Transactional
     public List<DepartmentDO> syncWeworkDept(String deptId, User user) throws InternalException {
 
         List<Department> departments = departmentParser.parse(filterUpdateDepartments(deptId));
@@ -50,7 +49,6 @@ public class DepartmentService {
     /**
      * 同步所有企业微信组织
      */
-    @Transactional
     public List<DepartmentDO> syncAllWeworkDept(User user) throws InternalException {
 
         List<Department> departments = departmentParser.parse(weworkGateway.listDepartments(null));

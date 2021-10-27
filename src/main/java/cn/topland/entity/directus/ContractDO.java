@@ -72,6 +72,10 @@ public class ContractDO extends DirectusRecordEntity {
         contractDO.setRemark(contract.getRemark());
         contractDO.setOrder(contract.getOrder() == null ? null : contract.getOrder().getId());
         contractDO.setStatus(contract.getStatus().name());
+        contractDO.setCreator(contract.getCreator().getId());
+        contractDO.setEditor(contract.getEditor().getId());
+        contractDO.setCreateTime(contract.getCreateTime());
+        contractDO.setLastUpdateTime(contract.getLastUpdateTime());
         return contractDO;
     }
 }

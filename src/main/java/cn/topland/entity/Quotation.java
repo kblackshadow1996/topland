@@ -84,11 +84,4 @@ public class Quotation extends RecordEntity {
     @ManyToOne
     @JoinColumn(name = "seller")
     private User seller;
-
-    /**
-     * pdf
-     */
-    @OneToOne
-    @JoinColumn(name = "pdf")
-    private Attachment pdf;
 }

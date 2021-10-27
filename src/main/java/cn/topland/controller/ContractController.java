@@ -79,7 +79,6 @@ public class ContractController {
         User user = userService.get(contractVO.getCreator());
         validator.validateContractReceivePaperPermissions(user, token);
         ContractDO contractDO = contractService.receivePaper(id, contractVO, user);
-        contractDO.setAttachments(listAttachmentDOs(attachmentService.uploadContractAttachments(contractVO.getAttachments(), id, token)));
         return Responses.success(contractConverter.toDTO(contractDO));
     }
 
@@ -100,25 +99,6 @@ public class ContractController {
         User user = userService.get(contractVO.getCreator());
         validator.validateContractReviewPermissions(user, token);
         ContractDO contractDO = contractService.review(id, contractVO, user);
-        contractDO.setAttachments(listAttachments(contractService.get(id).getAttachments()));
         return Responses.success(contractConverter.toDTO(contractDO));
-    }
-
-    private List<Long> listAttachments(List<Attachment> attachments) {
-
-        return CollectionUtils.isEmpty(attachments)
-                ? List.of()
-                : attachments.stream().filter(attachment -> attachment.getContract() != null)
-                .map(SimpleIdEntity::getId)
-                .collect(Collectors.toList());
-    }
-
-    private List<Long> listAttachmentDOs(List<AttachmentDO> attachments) {
-
-        return CollectionUtils.isEmpty(attachments)
-                ? List.of()
-                : attachments.stream().filter(attachment -> attachment.getContract() != null)
-                .map(DirectusSimpleIdEntity::getId)
-                .collect(Collectors.toList());
     }
 }

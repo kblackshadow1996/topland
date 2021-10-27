@@ -1,6 +1,5 @@
 package cn.topland.dto;
 
-import cn.topland.entity.directus.Buffer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -41,7 +40,7 @@ public class UserDTO implements Serializable {
 
     private String avatar;
 
-    private Buffer active;
+    private boolean active;
 
     private String remark;
 

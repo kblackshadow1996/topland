@@ -98,7 +98,6 @@ public class UserService {
     /**
      * 按部门同步(只同步部门直属人员)
      */
-    @Transactional
     public List<UserDO> syncWeworkUser(String deptId, User creator) throws InternalException {
 
         // 用于关联用户部门
@@ -118,7 +117,6 @@ public class UserService {
     /**
      * 同步所有
      */
-    @Transactional
     public List<UserDO> syncAllWeworkUser(User creator) throws InternalException {
 
         List<Department> departments = deptRepository.listAllDeptIds(Department.Source.WEWORK);
@@ -133,7 +131,6 @@ public class UserService {
     }
 
     // 授权
-    @Transactional
     public UserDO auth(Long id, UserVO userVO) throws InternalException {
 
         User creator = repository.getById(userVO.getCreator());
@@ -143,7 +140,6 @@ public class UserService {
         return userGateway.auth(List.of(user), creator.getAccessToken()).get(0);
     }
 
-    @Transactional
     public List<UserDO> auth(UserVO userVO) throws InternalException {
 
         User creator = repository.getById(userVO.getCreator());

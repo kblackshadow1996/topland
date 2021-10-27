@@ -62,7 +62,6 @@ public class QuotationService {
         return repository.saveAndFlush(createQuotation(quotationVO, creator));
     }
 
-    @Transactional
     public Quotation update(Long id, QuotationVO quotationVO, User editor) {
 
         return repository.saveAndFlush(updateQuotation(repository.getById(id), quotationVO, editor));

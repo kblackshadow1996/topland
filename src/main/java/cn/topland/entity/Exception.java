@@ -1,5 +1,6 @@
 package cn.topland.entity;
 
+import cn.topland.util.UUIDGenerator;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -146,6 +147,11 @@ public class Exception extends RecordEntity {
      * 是否实施最优解
      */
     private Boolean optimal;
+
+    /**
+     * 唯一标识符
+     */
+    private String uuid = UUIDGenerator.generate();
 
     public enum Action {
 

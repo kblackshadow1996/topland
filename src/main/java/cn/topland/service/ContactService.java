@@ -29,14 +29,12 @@ public class ContactService {
     @Autowired
     private ContactGateway contactGateway;
 
-    @Transactional
     public List<ContactDO> createCustomerContacts(List<ContactVO> contactVOs, Long customer, String token) throws InternalException {
 
         List<Contact> contacts = contactVOs.stream().map(contactVO -> createCustomerContact(contactVO, customer)).collect(Collectors.toList());
         return contactGateway.saveAll(contacts, token);
     }
 
-    @Transactional
     public List<ContactDO> updateCustomerContacts(List<Contact> contacts, List<ContactVO> contactVOs, Long customer, String token) throws InternalException {
 
         contacts = CollectionUtils.isEmpty(contacts) ? List.of() : contacts;
@@ -64,14 +62,12 @@ public class ContactService {
         return contactGateway.saveAll(customerContacts, token);
     }
 
-    @Transactional
     public List<ContactDO> createBrandContacts(List<ContactVO> contactVOs, Long brand, String token) throws InternalException {
 
         List<Contact> contacts = contactVOs.stream().map(contactVO -> createBrandContact(contactVO, brand)).collect(Collectors.toList());
         return contactGateway.saveAll(contacts, token);
     }
 
-    @Transactional
     public List<ContactDO> updateBrandContacts(List<Contact> contacts, List<ContactVO> contactVOs, Long brand, String token) throws InternalException {
 
         contacts = CollectionUtils.isEmpty(contacts) ? List.of() : contacts;

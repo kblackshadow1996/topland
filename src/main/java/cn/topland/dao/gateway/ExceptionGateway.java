@@ -36,8 +36,8 @@ public class ExceptionGateway extends BaseGateway {
         Reply result = directus.post(EXCEPTION_URI, tokenParam(accessToken), composeExceptions(exceptions));
         if (result.isSuccessful()) {
 
-            String date = JsonUtils.read(result.getContent()).path("data").toPrettyString();
-            return JsonUtils.parse(date, EXCEPTIONS);
+            String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+            return JsonUtils.parse(data, EXCEPTIONS);
         }
         throw new InternalException("添加异常失败");
     }
@@ -47,8 +47,8 @@ public class ExceptionGateway extends BaseGateway {
         Reply result = directus.patch(EXCEPTION_URI + "/" + exception.getId(), tokenParam(accessToken), composeException(exception));
         if (result.isSuccessful()) {
 
-            String date = JsonUtils.read(result.getContent()).path("data").toPrettyString();
-            return JsonUtils.parse(date, ExceptionDO.class);
+            String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+            return JsonUtils.parse(data, ExceptionDO.class);
         }
         throw new InternalException("更新异常失败");
     }
@@ -67,9 +67,9 @@ public class ExceptionGateway extends BaseGateway {
     private JsonNode composeException(Exception exception) {
 
         ObjectNode node = (ObjectNode) JsonUtils.toJsonNode(ExceptionDO.from(exception));
-        node.put("resolved", exception.getResolved() ? "1" : "0");
-        node.put("critical", exception.getCritical() ? "1" : "0");
-        node.put("optimal", exception.getOptimal() ? "1" : "0");
+        node.put("resolved", exception.getResolved() != null && exception.getResolved() ? 1 : 0);
+        node.put("critical", exception.getCritical() != null && exception.getCritical() ? 1 : 0);
+        node.put("optimal", exception.getOptimal() != null && exception.getOptimal() ? 1 : 0);
         node.set("copies", composeCopies(exception.getCopies()));
         node.set("owners", composeOwners(exception.getOwners()));
         node.set("orders", composeOrders(exception.getOrders()));

@@ -34,7 +34,6 @@ public class AttachmentService {
     @Autowired
     private AttachmentGateway attachmentGateway;
 
-    @Transactional
     public List<AttachmentDO> uploadContractAttachments(List<AttachmentVO> attachments, Long contract, String token) throws InternalException {
 
         List<Attachment> attaches = uploadContractAttachments(attachments, contract);

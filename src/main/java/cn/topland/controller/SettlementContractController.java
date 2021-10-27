@@ -9,6 +9,7 @@ import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.util.exception.AccessException;
+import cn.topland.util.exception.InternalException;
 import cn.topland.util.exception.InvalidException;
 import cn.topland.util.exception.QueryException;
 import cn.topland.vo.SettlementContractVO;
@@ -46,13 +47,11 @@ public class SettlementContractController {
      */
     @PostMapping("/add")
     public Response add(@RequestBody SettlementContractVO contractVO, String token)
-            throws AccessException, InvalidException, QueryException {
+            throws AccessException, InvalidException, QueryException, InternalException {
 
         User user = userService.get(contractVO.getCreator());
         validator.validateSettlementCreatePermissions(user, token);
-        return Responses.success(settlementContractConverter.toDTO(
-                contractService.add(contractVO, attachmentService.upload(contractVO.getAttachments()), user)
-        ));
+        return Responses.success(settlementContractConverter.toDTO(contractService.add(contractVO, user)));
     }
 
     /**
@@ -68,12 +67,10 @@ public class SettlementContractController {
      */
     @PatchMapping("/review/{id}")
     public Response review(@PathVariable Long id, @RequestBody SettlementContractVO contractVO, String token)
-            throws AccessException, QueryException, InvalidException {
+            throws AccessException, QueryException, InvalidException, InternalException {
 
         User user = userService.get(contractVO.getCreator());
         validator.validateSettlementReviewPermissions(user, token);
-        return Responses.success(settlementContractConverter.toDTO(
-                contractService.review(id, contractVO, user)
-        ));
+        return Responses.success(settlementContractConverter.toDTO(contractService.review(id, contractVO, user)));
     }
 }

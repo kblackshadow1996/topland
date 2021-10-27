@@ -47,9 +47,9 @@ public class ExceptionDO extends DirectusRecordEntity {
     @JsonProperty(value = "estimated_loss_condition")
     private String estimatedLossCondition;
 
-    private Buffer critical;
+    private Boolean critical;
 
-    private Buffer resolved;
+    private Boolean resolved;
 
     @JsonProperty(value = "close_date")
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -66,7 +66,9 @@ public class ExceptionDO extends DirectusRecordEntity {
     @JsonProperty(value = "optimal_solution")
     private String optimalSolution;
 
-    private Buffer optimal;
+    private Boolean optimal;
+
+    private String uuid;
 
     public static ExceptionDO from(Exception exception) {
 
@@ -90,6 +92,7 @@ public class ExceptionDO extends DirectusRecordEntity {
         exceptionDO.setEditor(exception.getEditor().getId());
         exceptionDO.setCreateTime(exception.getCreateTime());
         exceptionDO.setLastUpdateTime(exception.getLastUpdateTime());
+        exceptionDO.setUuid(exception.getUuid());
         return exceptionDO;
     }
 }

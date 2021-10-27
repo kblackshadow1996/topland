@@ -30,13 +30,11 @@ public class PackageServiceService {
     @Autowired
     private PackageServiceGateway packageServiceGateway;
 
-    @Transactional
     public List<PackageServiceDO> add(Long pkgId, List<PackageServiceVO> serviceVOs, String token) throws InternalException {
 
         return packageServiceGateway.saveAll(createServices(pkgId, serviceVOs), token);
     }
 
-    @Transactional
     public List<PackageServiceDO> update(Long pkgId, List<PackageService> services, List<PackageServiceVO> serviceVOs, String token) throws InternalException {
 
         return packageServiceGateway.saveAll(updateServices(pkgId, services, serviceVOs), token);

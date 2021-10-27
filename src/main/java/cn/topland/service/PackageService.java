@@ -28,13 +28,11 @@ public class PackageService {
         return repository.getById(id);
     }
 
-    @Transactional
     public PackageDO add(PackageVO packageVO, User creator) throws InternalException {
 
         return packageGateway.save(createPackage(packageVO, creator), creator.getAccessToken());
     }
 
-    @Transactional
     public PackageDO update(Package pkg, PackageVO packageVO, User editor) throws InternalException {
 
         return packageGateway.update(updatePackage(pkg, packageVO, editor), editor.getAccessToken());
