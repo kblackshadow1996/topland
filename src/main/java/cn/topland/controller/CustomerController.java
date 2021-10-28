@@ -40,7 +40,7 @@ public class CustomerController {
      * @return
      */
     @PostMapping("/add")
-    public Response add(@RequestBody CustomerVO customerVO, String token) {
+    public Response add(@RequestBody CustomerVO customerVO, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(customerVO.getCreator());
         validator.validateCustomerCreatePermissions(user, token);
@@ -57,7 +57,7 @@ public class CustomerController {
      * @return
      */
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody CustomerVO customerVO, String token) {
+    public Response update(@PathVariable Long id, @RequestBody CustomerVO customerVO, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(customerVO.getCreator());
         validator.validateCustomerUpdatePermissions(user, token);
@@ -74,7 +74,7 @@ public class CustomerController {
      * @return
      */
     @PatchMapping("/lost/{id}")
-    public Response lost(@PathVariable Long id, @RequestBody CustomerVO customerVO, String token) {
+    public Response lost(@PathVariable Long id, @RequestBody CustomerVO customerVO, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(customerVO.getCreator());
         validator.validateCustomerLostPermissions(user, token);
@@ -91,7 +91,7 @@ public class CustomerController {
      * @return
      */
     @PatchMapping("/retrieve/{id}")
-    public Response retrieve(@PathVariable Long id, @RequestBody CustomerVO customerVO, String token) {
+    public Response retrieve(@PathVariable Long id, @RequestBody CustomerVO customerVO, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(customerVO.getCreator());
         validator.validateCustomerRetrievePermissions(user, token);

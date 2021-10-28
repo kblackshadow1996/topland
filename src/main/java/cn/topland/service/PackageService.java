@@ -9,6 +9,7 @@ import cn.topland.entity.Package;
 import cn.topland.entity.User;
 import cn.topland.entity.directus.PackageDO;
 import cn.topland.entity.directus.PackageServiceDO;
+import cn.topland.util.exception.QueryException;
 import cn.topland.vo.PackageServiceVO;
 import cn.topland.vo.PackageVO;
 import org.apache.commons.collections4.CollectionUtils;
@@ -38,6 +39,10 @@ public class PackageService {
 
     public Package get(Long id) {
 
+        if (id == null || !repository.existsById(id)) {
+
+            throw new QueryException("套餐[id:" + id + "]不存在");
+        }
         return repository.getById(id);
     }
 
@@ -50,7 +55,7 @@ public class PackageService {
 
     public PackageDO update(Long id, PackageVO packageVO, User editor) {
 
-        Package pkg = repository.getById(id);
+        Package pkg = get(id);
         PackageDO packageDO = packageGateway.update(updatePackage(pkg, packageVO, editor), editor.getAccessToken());
         packageDO.setServices(listServices(updateServices(pkg.getServices(), packageVO.getServices(), id, editor.getAccessToken())));
         return packageDO;

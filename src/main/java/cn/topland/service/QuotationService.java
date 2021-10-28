@@ -9,6 +9,7 @@ import cn.topland.entity.directus.QuotationDO;
 import cn.topland.entity.directus.QuotationServiceDO;
 import cn.topland.util.UUIDGenerator;
 import cn.topland.util.exception.InternalException;
+import cn.topland.util.exception.QueryException;
 import cn.topland.util.pdf.HtmlToPdfOperation;
 import cn.topland.util.pdf.HtmlToPdfParams;
 import cn.topland.util.pdf.HtmlToPdfParamsFactory;
@@ -67,6 +68,15 @@ public class QuotationService {
     @Autowired
     private QuotationGateway quotationGateway;
 
+    public Quotation get(Long id) {
+
+        if (id == null || !repository.existsById(id)) {
+
+            throw new QueryException("报价[id:" + id + "]不存在");
+        }
+        return repository.getById(id);
+    }
+
     public QuotationDO add(QuotationVO quotationVO, User creator) {
 
         QuotationDO quotationDO = quotationGateway.save(createQuotation(quotationVO, creator), creator.getAccessToken());
@@ -76,8 +86,8 @@ public class QuotationService {
 
     public QuotationDO update(Long id, QuotationVO quotationVO, User editor) {
 
-        Quotation quotation = repository.getById(id);
-        QuotationDO quotationDO = quotationGateway.update(updateQuotation(repository.getById(id), quotationVO, editor), editor.getAccessToken());
+        Quotation quotation = get(id);
+        QuotationDO quotationDO = quotationGateway.update(updateQuotation(quotation, quotationVO, editor), editor.getAccessToken());
         quotationDO.setServices(listServices(updateServices(quotation.getServices(), quotationVO.getServices(), id, editor.getAccessToken())));
         return quotationDO;
     }
@@ -194,17 +204,17 @@ public class QuotationService {
             if (quotationServiceMap.containsKey(serviceVO.getId())) {
 
                 service = quotationServiceMap.get(serviceVO.getId());
-                updateService(service, serviceVO, serviceMap.get(serviceVO.getService()));
-                service.setQuotation(quotation);
                 updates.add(service);
+                updateService(service, serviceVO, serviceMap.get(serviceVO.getService()));
             } else {
 
                 service = createService(serviceVO, serviceMap.get(serviceVO.getService()));
-                service.setQuotation(quotation);
             }
+            service.setQuotation(quotation);
             quotationServices.add(service);
         }
         List<cn.topland.entity.QuotationService> deletes = (List<cn.topland.entity.QuotationService>) CollectionUtils.removeAll(services, updates);
+        System.out.println(deletes);
         deletes.forEach(delete -> {
             // 解除关联
             delete.setQuotation(null);

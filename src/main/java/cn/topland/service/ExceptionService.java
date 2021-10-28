@@ -8,6 +8,7 @@ import cn.topland.entity.Exception;
 import cn.topland.entity.*;
 import cn.topland.entity.directus.AttachmentDO;
 import cn.topland.entity.directus.ExceptionDO;
+import cn.topland.util.exception.QueryException;
 import cn.topland.vo.AttachmentVO;
 import cn.topland.vo.ExceptionVO;
 import org.apache.commons.collections4.CollectionUtils;
@@ -60,6 +61,10 @@ public class ExceptionService {
 
     public Exception get(Long id) {
 
+        if (id == null || !repository.existsById(id)) {
+
+            throw new QueryException("异常[id:" + id + "]不存在");
+        }
         return repository.getById(id);
     }
 
@@ -67,14 +72,14 @@ public class ExceptionService {
 
         List<Exception> createExceptions = createExceptions(exceptions, creator);
         List<ExceptionDO> exceptionDOs = exceptionGateway.saveAll(createExceptions, creator.getAccessToken());
-        saveCreateOperations(exceptionDOs, creator);
         saveAllAttachments(createExceptions, exceptionDOs, creator.getAccessToken());
+        saveCreateOperations(exceptionDOs, creator);
         return exceptionDOs;
     }
 
     public ExceptionDO update(Long id, ExceptionVO exceptionVO, User editor) {
 
-        Exception exception = repository.getById(id);
+        Exception exception = get(id);
         Exception updateException = updateException(exception, exceptionVO, editor);
         ExceptionDO exceptionDO = exceptionGateway.update(updateException, editor.getAccessToken());
         saveAllAttachments(List.of(updateException), List.of(exceptionDO), editor.getAccessToken());
@@ -117,7 +122,9 @@ public class ExceptionService {
             attachments.addAll(exceptionAttachments);
         });
         List<AttachmentDO> attachmentDOs = attachmentGateway.upload(attachments, token);
-        Map<Long, List<AttachmentDO>> attachmentMap = attachmentDOs.stream().collect(Collectors.groupingBy(AttachmentDO::getException));
+        Map<Long, List<AttachmentDO>> attachmentMap = attachmentDOs.stream()
+                .filter(attachmentDO -> attachmentDO.getException() != null)
+                .collect(Collectors.groupingBy(AttachmentDO::getException));
         exceptionDOs.forEach(exceptionDO -> {
 
             List<Long> attaches = attachmentMap.getOrDefault(exceptionDO.getId(), List.of()).stream()
@@ -334,15 +341,26 @@ public class ExceptionService {
     private Attachment createAttachment(String file) {
 
         Attachment attachment = new Attachment();
-        attachment.setFile(filesRepository.getById(file));
+        attachment.setFile(getFile(file));
         return attachment;
+    }
+
+    private DirectusFiles getFile(String file) {
+
+        if (file == null || !filesRepository.existsById(file)) {
+
+            throw new QueryException("附件[id:" + file + "]不存在");
+        }
+        return filesRepository.getById(file);
     }
 
     private User getUser(Long userId) {
 
-        return userId != null
-                ? userRepository.getById(userId)
-                : null;
+        if (userId == null || !userRepository.existsById(userId)) {
+
+            throw new QueryException("用户[id:" + userId + "]不存在");
+        }
+        return userRepository.getById(userId);
     }
 
     private List<User> listUsers(List<Long> userIds) {
@@ -361,15 +379,19 @@ public class ExceptionService {
 
     private Department getDepartment(Long department) {
 
-        return department != null
-                ? departmentRepository.getById(department)
-                : null;
+        if (department == null || !departmentRepository.existsById(department)) {
+
+            throw new QueryException("部门[id:" + department + "]不存在");
+        }
+        return departmentRepository.getById(department);
     }
 
     private ExceptionType getType(Long type) {
 
-        return type != null
-                ? typeRepository.getById(type)
-                : null;
+        if (type == null || !typeRepository.existsById(type)) {
+
+            throw new QueryException("部门[id:" + type + "]不存在");
+        }
+        return typeRepository.getById(type);
     }
 }

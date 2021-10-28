@@ -40,7 +40,7 @@ public class BrandController {
      * @return
      */
     @PostMapping("/add")
-    public Response add(@RequestBody BrandVO brandVO, String token) {
+    public Response add(@RequestBody BrandVO brandVO, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(brandVO.getCreator());
         validator.validateBrandCreatePermissions(user, token);
@@ -57,7 +57,7 @@ public class BrandController {
      * @return
      */
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody BrandVO brandVO, String token) {
+    public Response update(@PathVariable Long id, @RequestBody BrandVO brandVO, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(brandVO.getCreator());
         validator.validateBrandUpdatePermissions(user, token);

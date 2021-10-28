@@ -8,6 +8,7 @@ import cn.topland.entity.directus.DepartmentDO;
 import cn.topland.gateway.WeworkGateway;
 import cn.topland.gateway.response.WeworkDepartment;
 import cn.topland.service.parser.WeworkDepartmentParser;
+import cn.topland.util.exception.QueryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +38,7 @@ public class DepartmentService {
      */
     public List<DepartmentDO> syncWeworkDept(String deptId, User user) {
 
+        checkDept(deptId);
         List<Department> departments = departmentParser.parse(filterUpdateDepartments(deptId));
         List<Department> persistDepartments = repository.findByDeptIds(getDeptIds(departments), Source.WEWORK);
 
@@ -54,6 +56,14 @@ public class DepartmentService {
 
         List<Department> mergeDepartments = syncDepartments(persistDepartments, departments, user);
         return departmentGateway.saveAll(mergeDepartments, null, user.getAccessToken());
+    }
+
+    private void checkDept(String deptId) {
+
+        if (deptId == null || !repository.existsByDeptIdAndSource(deptId, Source.WEWORK)) {
+
+            throw new QueryException("企业微信部门[dept_id:" + deptId + "]不存在");
+        }
     }
 
     private Department getParent(String deptId) {

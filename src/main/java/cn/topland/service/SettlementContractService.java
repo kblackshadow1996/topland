@@ -8,6 +8,7 @@ import cn.topland.entity.*;
 import cn.topland.entity.directus.AttachmentDO;
 import cn.topland.entity.directus.DirectusSimpleIdEntity;
 import cn.topland.entity.directus.SettlementContractDO;
+import cn.topland.util.exception.QueryException;
 import cn.topland.vo.AttachmentVO;
 import cn.topland.vo.SettlementContractVO;
 import org.apache.commons.collections4.CollectionUtils;
@@ -57,6 +58,15 @@ public class SettlementContractService {
     @Autowired
     private SettlementContractGateway settlementGateway;
 
+    public SettlementContract get(Long id) {
+
+        if (!repository.existsById(id)) {
+
+            throw new QueryException("报价合同[id:" + id + "]不存在");
+        }
+        return repository.getById(id);
+    }
+
     public SettlementContractDO add(SettlementContractVO contractVO, User creator) {
 
         SettlementContractDO contractDO = settlementGateway.save(createContract(contractVO, creator), creator.getAccessToken());
@@ -67,7 +77,7 @@ public class SettlementContractService {
 
     public SettlementContractDO review(Long id, SettlementContractVO contractVO, User editor) {
 
-        SettlementContract contract = repository.getById(id);
+        SettlementContract contract = get(id);
         SettlementContractDO contractDO = settlementGateway.update(reviewSettlementContract(contract, contractVO, editor), editor.getAccessToken());
         saveOperation(id, contractVO.getAction(), editor, contractVO.getReviewComments());
         contractDO.setAttachments(listAttachments(contract.getAttachments()));
@@ -124,7 +134,7 @@ public class SettlementContractService {
     private Attachment createAttachment(String file, Long settlement) {
 
         Attachment attachment = new Attachment();
-        attachment.setFile(filesRepository.getById(file));
+        attachment.setFile(getFiles(file));
         attachment.setSettlement(settlement);
         return attachment;
     }
@@ -144,7 +154,7 @@ public class SettlementContractService {
         SettlementContract contract = new SettlementContract();
         contract.setContractDate(contractVO.getContractDate());
         contract.setIdentity(createIdentity(creator));
-        contract.setContract(contractRepository.getById(contractVO.getContract()));
+        contract.setContract(getContract(contractVO.getContract()));
         contract.setReceivable(contractVO.getReceivable());
         contract.setRemark(contractVO.getRemark());
         contract.setStatus(Status.REVIEWING);
@@ -187,8 +197,28 @@ public class SettlementContractService {
 
     private Order getOrder(Long orderId) {
 
-        return orderId != null
-                ? orderRepository.getById(orderId)
-                : null;
+        if (orderId == null || !orderRepository.existsById(orderId)) {
+
+            throw new QueryException("订单[id:" + orderId + "]不存在");
+        }
+        return orderRepository.getById(orderId);
+    }
+
+    private Contract getContract(Long contract) {
+
+        if (contract == null || !contractRepository.existsById(contract)) {
+
+            throw new QueryException("年框合同[id:" + contract + "不存在]");
+        }
+        return contractRepository.getById(contract);
+    }
+
+    private DirectusFiles getFiles(String file) {
+
+        if (file == null || !filesRepository.existsById(file)) {
+
+            throw new QueryException("附件[id:" + file + "]不存在");
+        }
+        return filesRepository.getById(file);
     }
 }

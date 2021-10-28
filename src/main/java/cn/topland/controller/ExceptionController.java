@@ -42,7 +42,7 @@ public class ExceptionController {
      * @return
      */
     @PostMapping("/add")
-    public Response add(@RequestBody List<ExceptionVO> exceptionVOs, String token) {
+    public Response add(@RequestBody List<ExceptionVO> exceptionVOs, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(exceptionVOs.get(0).getCreator());
         validator.validateExceptionCreatePermissions(user, token);
@@ -59,7 +59,7 @@ public class ExceptionController {
      * @return
      */
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody ExceptionVO exceptionVO, String token) {
+    public Response update(@PathVariable Long id, @RequestBody ExceptionVO exceptionVO, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(exceptionVO.getCreator());
         validator.validateExceptionUpdatePermissions(user, token);
@@ -76,7 +76,7 @@ public class ExceptionController {
      * @return
      */
     @PatchMapping("/solve/{id}")
-    public Response solve(@PathVariable Long id, @RequestBody ExceptionVO exceptionVO, String token) {
+    public Response solve(@PathVariable Long id, @RequestBody ExceptionVO exceptionVO, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(exceptionVO.getCreator());
         validator.validateExceptionSolvePermissions(user, token);

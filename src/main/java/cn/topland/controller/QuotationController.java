@@ -48,7 +48,7 @@ public class QuotationController {
     @GetMapping(value = "/pdf")
     public Response downloadPdf(String html, String title, String identity,
                                 @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
-                                Long creator, String token) {
+                                Long creator, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(creator);
         validator.validateQuotationCreatePermission(user, token);
@@ -63,7 +63,7 @@ public class QuotationController {
      * @return
      */
     @PostMapping("/add")
-    public Response add(@RequestBody QuotationVO quotationVO, String token) {
+    public Response add(@RequestBody QuotationVO quotationVO, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(quotationVO.getCreator());
         validator.validateQuotationCreatePermission(user, token);
@@ -79,7 +79,7 @@ public class QuotationController {
      * @return
      */
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody QuotationVO quotationVO, String token) {
+    public Response update(@PathVariable Long id, @RequestBody QuotationVO quotationVO, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(quotationVO.getCreator());
         validator.validateQuotationUpdatePermission(user, token);

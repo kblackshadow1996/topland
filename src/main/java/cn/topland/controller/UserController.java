@@ -31,7 +31,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/wework/sync/all")
-    public Response syncAll(Long creator, String token) {
+    public Response syncAll(Long creator, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(creator);
         validator.validateUserPermissions(user, token);
@@ -47,7 +47,7 @@ public class UserController {
      * @return
      */
     @PostMapping(value = "/wework/sync")
-    public Response sync(String deptId, Long creator, String token) {
+    public Response sync(String deptId, Long creator, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(creator);
         validator.validateUserPermissions(user, token);
@@ -63,7 +63,7 @@ public class UserController {
      * @return
      */
     @PatchMapping(value = "/auth/{id}")
-    public Response auth(@PathVariable Long id, @RequestBody UserVO userVO, String token) {
+    public Response auth(@PathVariable Long id, @RequestBody UserVO userVO, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(userVO.getCreator());
         validator.validateUserAuthPermissions(user, token);
@@ -78,7 +78,7 @@ public class UserController {
      * @return
      */
     @PatchMapping(value = "/auth")
-    public Response auth(@RequestBody UserVO userVO, String token) {
+    public Response auth(@RequestBody UserVO userVO, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(userVO.getCreator());
         validator.validateUserAuthPermissions(user, token);

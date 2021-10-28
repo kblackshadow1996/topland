@@ -8,8 +8,6 @@ import cn.topland.service.SettlementContractService;
 import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
-import cn.topland.util.exception.AccessException;
-import cn.topland.util.exception.InvalidException;
 import cn.topland.vo.SettlementContractVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -39,12 +37,9 @@ public class SettlementContractController {
      * @param contractVO 结算合同信息
      * @param token      操作用户token
      * @return
-     * @throws AccessException
-     * @throws InvalidException
-     * @throws QueryException
      */
     @PostMapping("/add")
-    public Response add(@RequestBody SettlementContractVO contractVO, String token) {
+    public Response add(@RequestBody SettlementContractVO contractVO, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(contractVO.getCreator());
         validator.validateSettlementCreatePermissions(user, token);
@@ -58,12 +53,10 @@ public class SettlementContractController {
      * @param contractVO 结算合同信息
      * @param token      操作用户token
      * @return
-     * @throws AccessException
-     * @throws QueryException
-     * @throws InvalidException
      */
     @PatchMapping("/review/{id}")
-    public Response review(@PathVariable Long id, @RequestBody SettlementContractVO contractVO, String token) {
+    public Response review(@PathVariable Long id, @RequestBody SettlementContractVO contractVO,
+                           @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(contractVO.getCreator());
         validator.validateSettlementReviewPermissions(user, token);

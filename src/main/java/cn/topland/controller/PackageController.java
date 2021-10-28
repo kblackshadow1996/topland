@@ -40,7 +40,7 @@ public class PackageController {
      * @return
      */
     @PostMapping("/add")
-    public Response add(@RequestBody PackageVO packageVO, String token) {
+    public Response add(@RequestBody PackageVO packageVO, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(packageVO.getCreator());
         validator.validatePackageCreatePermissions(user, token);
@@ -57,7 +57,7 @@ public class PackageController {
      * @return
      */
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody PackageVO packageVO, String token) {
+    public Response update(@PathVariable Long id, @RequestBody PackageVO packageVO, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(packageVO.getCreator());
         validator.validatePackageUpdatePermissions(user, token);

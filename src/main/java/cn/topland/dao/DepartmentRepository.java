@@ -20,4 +20,6 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
     List<Department> findBySource(Department.Source source);
 
     Department findByDeptIdAndSource(String deptId, Department.Source source);
+
+    boolean existsByDeptIdAndSource(String deptId, Department.Source source);
 }

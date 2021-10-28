@@ -6,6 +6,7 @@ import cn.topland.dao.gateway.PackageServiceGateway;
 import cn.topland.entity.IdEntity;
 import cn.topland.entity.PackageService;
 import cn.topland.entity.directus.PackageServiceDO;
+import cn.topland.util.exception.QueryException;
 import cn.topland.vo.PackageServiceVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,15 @@ public class PackageServiceService {
 
     @Autowired
     private PackageServiceGateway packageServiceGateway;
+
+    public PackageService get(Long id) {
+
+        if (id == null || !repository.existsById(id)) {
+
+            throw new QueryException("套餐服务[id:" + id + "]不存在");
+        }
+        return repository.getById(id);
+    }
 
     public List<PackageServiceDO> add(Long pkgId, List<PackageServiceVO> serviceVOs, String token) {
 

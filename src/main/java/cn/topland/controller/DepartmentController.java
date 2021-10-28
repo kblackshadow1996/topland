@@ -8,10 +8,7 @@ import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/department")
@@ -37,7 +34,7 @@ public class DepartmentController {
      * @return
      */
     @PostMapping("/wework/sync/all")
-    public Response syncAllWeworkDept(Long creator, String token) {
+    public Response syncAllWeworkDept(Long creator, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(creator);
         validator.validDepartmentPermissions(user, token);
@@ -53,7 +50,7 @@ public class DepartmentController {
      * @return
      */
     @PostMapping("/wework/sync/{deptId}")
-    public Response syncWeworkDept(@PathVariable String deptId, Long creator, String token) {
+    public Response syncWeworkDept(@PathVariable String deptId, Long creator, @RequestParam(value = "access_token") String token) {
 
         User user = userService.get(creator);
         validator.validDepartmentPermissions(user, token);

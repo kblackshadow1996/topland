@@ -9,6 +9,7 @@ import cn.topland.entity.directus.AttachmentDO;
 import cn.topland.entity.directus.ContractDO;
 import cn.topland.entity.directus.DirectusSimpleIdEntity;
 import cn.topland.util.exception.InternalException;
+import cn.topland.util.exception.QueryException;
 import cn.topland.vo.AttachmentVO;
 import cn.topland.vo.ContractVO;
 import org.apache.commons.collections4.CollectionUtils;
@@ -65,6 +66,10 @@ public class ContractService {
 
     public Contract get(Long id) {
 
+        if (id == null || !repository.existsById(id)) {
+
+            throw new QueryException("合同[id:" + id + "]不存在");
+        }
         return repository.getById(id);
     }
 
@@ -77,7 +82,7 @@ public class ContractService {
 
     public ContractDO review(Long id, ContractVO contractVO, User editor) {
 
-        Contract contract = repository.getById(id);
+        Contract contract = get(id);
         ContractDO contractDO = contractGateway.update(reviewContract(contract, contractVO, editor), editor.getAccessToken());
         saveOperation(id, contractVO.getAction(), editor, contractVO.getReviewComment());
         contractDO.setAttachments(listAttachments(contract.getAttachments()));
@@ -86,7 +91,7 @@ public class ContractService {
 
     public ContractDO receivePaper(Long id, ContractVO contractVO, User creator) {
 
-        Contract contract = repository.getById(id);
+        Contract contract = get(id);
         ContractDO contractDO = contractGateway.update(receiveContractPaper(contract, contractVO, creator), creator.getAccessToken());
         saveAllAttachments(contractDO, contractVO.getAttachments(), contract.getAttachments(), creator.getAccessToken());
         return contractDO;
@@ -142,7 +147,7 @@ public class ContractService {
     private Attachment createAttachment(String file, Long contract) {
 
         Attachment attachment = new Attachment();
-        attachment.setFile(filesRepository.getById(file));
+        attachment.setFile(getFile(file));
         attachment.setContract(contract);
         return attachment;
     }
@@ -221,31 +226,48 @@ public class ContractService {
         return prefix + date + employeeId + (count + 1);
     }
 
+    private DirectusFiles getFile(String file) {
+
+        if (file == null || !filesRepository.existsById(file)) {
+
+            throw new QueryException("附件[id:" + file + "]不存在");
+        }
+        return filesRepository.getById(file);
+    }
+
     private Order getOrder(Long orderId) {
 
-        return orderId != null
-                ? orderRepository.getById(orderId)
-                : null;
+        if (orderId == null || !orderRepository.existsById(orderId)) {
+
+            throw new QueryException("订单[id:" + orderId + "]不存在");
+        }
+        return orderRepository.getById(orderId);
     }
 
     private Customer getCustomer(Long customerId) {
 
-        return customerId != null
-                ? customerRepository.getById(customerId)
-                : null;
+        if (customerId == null || !customerRepository.existsById(customerId)) {
+
+            throw new QueryException("客户[id:" + customerId + "]不存在");
+        }
+        return customerRepository.getById(customerId);
     }
 
     private Brand getBrand(Long brandId) {
 
-        return brandId != null
-                ? brandRepository.getById(brandId)
-                : null;
+        if (brandId == null || !brandRepository.existsById(brandId)) {
+
+            throw new QueryException("品牌[id:" + brandId + "]不存在");
+        }
+        return brandRepository.getById(brandId);
     }
 
     private User getUser(Long userId) {
 
-        return userId != null
-                ? userRepository.getById(userId)
-                : null;
+        if (userId == null || !userRepository.existsById(userId)) {
+
+            throw new QueryException("用户[id:" + userId + "]不存在");
+        }
+        return userRepository.getById(userId);
     }
 }

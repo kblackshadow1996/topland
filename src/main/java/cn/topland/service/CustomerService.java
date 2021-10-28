@@ -9,6 +9,7 @@ import cn.topland.dao.gateway.OperationGateway;
 import cn.topland.entity.*;
 import cn.topland.entity.directus.ContactDO;
 import cn.topland.entity.directus.CustomerDO;
+import cn.topland.util.exception.QueryException;
 import cn.topland.util.exception.UniqueException;
 import cn.topland.vo.ContactVO;
 import cn.topland.vo.CustomerVO;
@@ -46,6 +47,15 @@ public class CustomerService {
     @Autowired
     private ContactGateway contactGateway;
 
+    public Customer get(Long id) {
+
+        if (id == null || !repository.existsById(id)) {
+
+            throw new QueryException("客户[id:" + id + "]不存在");
+        }
+        return repository.getById(id);
+    }
+
     public CustomerDO add(CustomerVO customerVO, User creator) {
 
         validateNameUnique(customerVO.getName());
@@ -57,8 +67,8 @@ public class CustomerService {
 
     public CustomerDO update(Long id, CustomerVO customerVO, User editor) {
 
-        Customer customer = repository.getById(id);
-        validateNameUnique(customerVO.getName(), customer.getId());
+        Customer customer = get(id);
+        validateNameUnique(customerVO.getName(), id);
         CustomerDO customerDO = customerGateway.update(updateCustomer(customer, customerVO, editor), editor.getAccessToken());
         List<ContactDO> contactDOs = updateCustomerContacts(customer.getContacts(), customerVO.getContacts(), id, editor.getAccessToken());
         customerDO.setContacts(listContacts(contactDOs));
@@ -156,7 +166,7 @@ public class CustomerService {
 
         if (repository.existsByNameAndIdNot(name, id)) {
 
-            throw new UniqueException("客户名称" + "[" + name + "]" + "重复");
+            throw new UniqueException("客户名称[" + name + "]重复");
         }
     }
 
@@ -164,7 +174,7 @@ public class CustomerService {
 
         if (repository.existsByName(name)) {
 
-            throw new UniqueException("客户名称" + "[" + name + "]" + "重复");
+            throw new UniqueException("客户名称[" + name + "]重复");
         }
     }
 
@@ -220,7 +230,7 @@ public class CustomerService {
 
     private void composeCustomer(CustomerVO customerVO, Customer customer) {
 
-        customer.setParent(getCustomer(customerVO.getParent()));
+        customer.setParent(get(customerVO.getParent()));
         customer.setSeller(getUser(customerVO.getSeller()));
         customer.setName(customerVO.getName());
         customer.setBusiness(customerVO.getBusiness());
@@ -242,17 +252,12 @@ public class CustomerService {
         return invoice;
     }
 
-    private Customer getCustomer(Long customerId) {
-
-        return customerId != null
-                ? repository.getById(customerId)
-                : null;
-    }
-
     private User getUser(Long userId) {
 
-        return userId != null
-                ? userRepository.getById(userId)
-                : null;
+        if (userId == null || !userRepository.existsById(userId)) {
+
+            throw new QueryException("用户[id:" + userId + "]不存在");
+        }
+        return userRepository.getById(userId);
     }
 }

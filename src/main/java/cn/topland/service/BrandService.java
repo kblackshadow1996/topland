@@ -10,6 +10,7 @@ import cn.topland.dao.gateway.OperationGateway;
 import cn.topland.entity.*;
 import cn.topland.entity.directus.BrandDO;
 import cn.topland.entity.directus.ContactDO;
+import cn.topland.util.exception.QueryException;
 import cn.topland.util.exception.UniqueException;
 import cn.topland.vo.BrandVO;
 import cn.topland.vo.ContactVO;
@@ -51,6 +52,10 @@ public class BrandService {
 
     public Brand get(Long id) {
 
+        if (id == null || !repository.existsById(id)) {
+
+            throw new QueryException("品牌[id:" + id + "]不存在");
+        }
         return repository.getById(id);
     }
 
@@ -65,7 +70,7 @@ public class BrandService {
 
     public BrandDO update(Long id, BrandVO brandVO, User editor) {
 
-        Brand brand = repository.getById(id);
+        Brand brand = get(id);
         validateNameUnique(brandVO.getName(), brand.getId());
         BrandDO brandDO = brandGateway.update(updateBrand(brand, brandVO, editor), editor.getAccessToken());
         brandDO.setContacts(listContacts(updateBrandContacts(brand.getContacts(), brandVO.getContacts(), id, editor.getAccessToken())));
@@ -138,7 +143,7 @@ public class BrandService {
 
         if (repository.existsByName(name)) {
 
-            throw new UniqueException("品牌名称" + "[" + name + "]" + "重复");
+            throw new UniqueException("品牌名称[" + name + "]重复");
         }
     }
 
@@ -146,7 +151,7 @@ public class BrandService {
 
         if (repository.existsByNameAndIdNot(name, id)) {
 
-            throw new UniqueException("品牌名称" + "[" + name + "]" + "重复");
+            throw new UniqueException("品牌名称[" + name + "]重复");
         }
     }
 
@@ -192,17 +197,21 @@ public class BrandService {
         brand.setBusiness(brandVO.getBusiness());
     }
 
-    private User getUser(Long userId) {
-
-        return userId != null
-                ? userRepository.getById(userId)
-                : null;
-    }
-
     private Customer getCustomer(Long customerId) {
 
-        return customerId != null
-                ? customerRepository.getById(customerId)
-                : null;
+        if (customerId == null || !customerRepository.existsById(customerId)) {
+
+            throw new QueryException("客户[id:" + customerId + "]不存在");
+        }
+        return customerRepository.getById(customerId);
+    }
+
+    private User getUser(Long userId) {
+
+        if (userId == null || !userRepository.existsById(userId)) {
+
+            throw new QueryException("用户[id:" + userId + "]不存在");
+        }
+        return userRepository.getById(userId);
     }
 }

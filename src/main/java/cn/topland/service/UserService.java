@@ -15,6 +15,7 @@ import cn.topland.service.parser.WeworkUserParser;
 import cn.topland.util.exception.AccessException;
 import cn.topland.util.exception.ExternalException;
 import cn.topland.util.exception.InternalException;
+import cn.topland.util.exception.QueryException;
 import cn.topland.vo.UserVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,10 @@ public class UserService {
 
     public User get(Long id) {
 
+        if (id == null || !repository.existsById(id)) {
+
+            throw new QueryException("用户[id:" + id + "]不存在");
+        }
         return repository.getById(id);
     }
 
@@ -127,16 +132,16 @@ public class UserService {
     // 授权
     public UserDO auth(Long id, UserVO userVO) {
 
-        User creator = repository.getById(userVO.getCreator());
-        Role role = roleRepository.getById(userVO.getRole());
-        User user = authUser(repository.getById(id), userVO, role, creator);
+        User creator = get(userVO.getCreator());
+        Role role = getRole(userVO.getRole());
+        User user = authUser(get(id), userVO, role, creator);
         user.setDirectusUser(authDirectusUser(user.getDirectusUser(), role.getRole(), creator.getAccessToken()));
         return userGateway.auth(List.of(user), creator.getAccessToken()).get(0);
     }
 
     public List<UserDO> auth(UserVO userVO) {
 
-        User creator = repository.getById(userVO.getCreator());
+        User creator = get(userVO.getCreator());
         return userGateway.auth(authUsers(userVO, creator), creator.getAccessToken());
     }
 
@@ -298,7 +303,16 @@ public class UserService {
 
         if (CollectionUtils.isEmpty(departments)) {
 
-            throw new InternalException("请先同步组织");
+            throw new QueryException("请先同步组织");
         }
+    }
+
+    private Role getRole(Long role) {
+
+        if (role == null || !roleRepository.existsById(role)) {
+
+            throw new QueryException("角色不存在");
+        }
+        return roleRepository.getById(role);
     }
 }

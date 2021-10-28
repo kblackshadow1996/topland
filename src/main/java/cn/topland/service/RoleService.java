@@ -9,7 +9,7 @@ import cn.topland.entity.directus.PermissionDO;
 import cn.topland.entity.directus.RoleDO;
 import cn.topland.entity.directus.RolesDO;
 import cn.topland.service.composer.PermissionComposer;
-import cn.topland.util.exception.AccessException;
+import cn.topland.util.exception.QueryException;
 import cn.topland.util.exception.UniqueException;
 import cn.topland.vo.RoleVO;
 import org.apache.commons.collections4.CollectionUtils;
@@ -57,6 +57,10 @@ public class RoleService {
 
     public Role get(Long id) {
 
+        if (id == null || !repository.existsById(id)) {
+
+            throw new QueryException("角色[id:" + id + "]不存在");
+        }
         return repository.getById(id);
     }
 
@@ -71,8 +75,8 @@ public class RoleService {
 
     public RoleDO update(Long id, RoleVO roleVO, User editor) {
 
+        Role role = get(id);
         validateNameUnique(roleVO.getName(), id);
-        Role role = repository.getById(id);
         validateAdmin(role.getName());
         List<Authority> authorities = authorityRepository.findAllById(roleVO.getAuthorities());
         DirectusRoles directusRole = updateDirectusRoles(role.getRole(), roleVO, editor.getAccessToken());
@@ -80,11 +84,11 @@ public class RoleService {
         return roleGateway.update(updateRole(role, roleVO, authorities, directusRole, editor), editor.getAccessToken());
     }
 
-    private void validateAdmin(String name) throws AccessException {
+    private void validateAdmin(String name) {
 
         if (ADMIN.equals(name)) {
 
-            throw new AccessException("[管理员]角色不可修改");
+            throw new QueryException("[管理员]角色不可修改");
         }
     }
 
@@ -92,7 +96,7 @@ public class RoleService {
 
         if (repository.existsByName(name)) {
 
-            throw new UniqueException("角色名称" + "[" + name + "]" + "重复");
+            throw new UniqueException("角色名称[" + name + "]重复");
         }
     }
 
@@ -100,7 +104,7 @@ public class RoleService {
 
         if (repository.existsByNameAndIdNot(name, id)) {
 
-            throw new UniqueException("角色名称" + "[" + name + "]" + "重复");
+            throw new UniqueException("角色名称[" + name + "]重复");
         }
     }
 

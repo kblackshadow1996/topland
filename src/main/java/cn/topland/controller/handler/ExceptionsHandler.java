@@ -70,6 +70,13 @@ public class ExceptionsHandler {
         return Responses.fail(Response.INVALID_QUERY, "请求参数无效");
     }
 
+    @ExceptionHandler(value = QueryException.class)
+    public Response handleInvalidQueryException(QueryException e) {
+
+        log.error(e.getMessage());
+        return Responses.fail(Response.INVALID_QUERY, e.getMessage());
+    }
+
     @ExceptionHandler(value = RequestsExceededException.class)
     public Response handleRequestsExceededException(RequestsExceededException e) {
 
