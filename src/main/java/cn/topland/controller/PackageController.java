@@ -1,6 +1,7 @@
 package cn.topland.controller;
 
 import cn.topland.controller.validator.PermissionValidator;
+import cn.topland.dto.PackageDTO;
 import cn.topland.dto.converter.PackageConverter;
 import cn.topland.entity.User;
 import cn.topland.entity.directus.PackageDO;
@@ -43,8 +44,8 @@ public class PackageController {
      * @return
      */
     @PostMapping("/add")
-    public Response add(@RequestBody PackageVO packageVO,
-                        @RequestParam(value = "access_token", required = true) String token) {
+    public Response<PackageDTO> add(@RequestBody PackageVO packageVO,
+                                    @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(packageVO.getCreator());
         validator.validatePackageCreatePermissions(user, token);
@@ -61,8 +62,8 @@ public class PackageController {
      * @return
      */
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody PackageVO packageVO,
-                           @RequestParam(value = "access_token", required = true) String token) {
+    public Response<PackageDTO> update(@PathVariable Long id, @RequestBody PackageVO packageVO,
+                                       @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(packageVO.getCreator());
         validator.validatePackageUpdatePermissions(user, token);

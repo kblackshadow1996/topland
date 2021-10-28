@@ -1,6 +1,7 @@
 package cn.topland.controller;
 
 import cn.topland.controller.validator.PermissionValidator;
+import cn.topland.dto.QuotationDTO;
 import cn.topland.dto.converter.QuotationConverter;
 import cn.topland.entity.User;
 import cn.topland.service.QuotationService;
@@ -49,9 +50,9 @@ public class QuotationController {
      * @return
      */
     @GetMapping(value = "/pdf")
-    public Response downloadPdf(String html, String title, String identity,
-                                @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
-                                Long creator, @RequestParam(value = "access_token", required = true) String token) {
+    public Response<byte[]> downloadPdf(String html, String title, String identity,
+                                        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
+                                        Long creator, @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(creator);
         validator.validateQuotationCreatePermission(user, token);
@@ -66,8 +67,8 @@ public class QuotationController {
      * @return
      */
     @PostMapping("/add")
-    public Response add(@RequestBody QuotationVO quotationVO,
-                        @RequestParam(value = "access_token", required = true) String token) {
+    public Response<QuotationDTO> add(@RequestBody QuotationVO quotationVO,
+                                      @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(quotationVO.getCreator());
         validator.validateQuotationCreatePermission(user, token);
@@ -83,8 +84,8 @@ public class QuotationController {
      * @return
      */
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody QuotationVO quotationVO,
-                           @RequestParam(value = "access_token", required = true) String token) {
+    public Response<QuotationDTO> update(@PathVariable Long id, @RequestBody QuotationVO quotationVO,
+                                         @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(quotationVO.getCreator());
         validator.validateQuotationUpdatePermission(user, token);
