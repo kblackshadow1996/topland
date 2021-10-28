@@ -154,11 +154,11 @@ public class SettlementContractService {
         SettlementContract contract = new SettlementContract();
         contract.setContractDate(contractVO.getContractDate());
         contract.setIdentity(createIdentity(creator));
-        contract.setContract(getContract(contractVO.getContract()));
+        contract.setContract(contractVO.getContract() == null ? null : getContract(contractVO.getContract()));
         contract.setReceivable(contractVO.getReceivable());
         contract.setRemark(contractVO.getRemark());
         contract.setStatus(Status.REVIEWING);
-        contract.setOrder(getOrder(contractVO.getOrder()));
+        contract.setOrder(contractVO.getOrder() == null ? null : getOrder(contractVO.getOrder()));
         contract.setCreator(creator);
         contract.setEditor(creator);
         return contract;

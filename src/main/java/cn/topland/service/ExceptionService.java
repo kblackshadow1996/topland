@@ -14,7 +14,6 @@ import cn.topland.vo.ExceptionVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -87,10 +86,9 @@ public class ExceptionService {
         return exceptionDO;
     }
 
-    @Transactional
     public ExceptionDO solve(Long id, ExceptionVO exceptionVO, User editor) {
 
-        Exception persistExp = repository.getById(id);
+        Exception persistExp = get(id);
         boolean isUpdate = isUpdateSolution(persistExp);
         ExceptionDO exception = exceptionGateway.update(solveException(persistExp, exceptionVO, editor), editor.getAccessToken());
         saveSolveOperation(id, editor, isUpdate);
@@ -181,11 +179,11 @@ public class ExceptionService {
         exception.setCreateDate(exceptionVO.getCreateDate());
         exception.setOrders(listOrders(exceptionVO.getOrders()));
         exception.setAttribute(exceptionVO.getAttribute());
-        exception.setType(getType(exceptionVO.getType()));
-        exception.setDepartment(getDepartment(exceptionVO.getDepartment()));
+        exception.setType(exceptionVO.getType() == null ? null : getType(exceptionVO.getType()));
+        exception.setDepartment(exceptionVO.getDepartment() == null ? null : getDepartment(exceptionVO.getDepartment()));
         exception.setOwners(listUsers(exceptionVO.getOwners()));
         exception.setCopies(listUsers(exceptionVO.getCopies()));
-        exception.setJudge(getUser(exceptionVO.getJudge()));
+        exception.setJudge(exceptionVO.getJudge() == null ? null : getUser(exceptionVO.getJudge()));
         exception.setComplaint(exceptionVO.getComplaint());
         exception.setSelfCheck(exceptionVO.getSelfCheck());
         exception.setNarrative(exceptionVO.getNarrative());
@@ -390,7 +388,7 @@ public class ExceptionService {
 
         if (type == null || !typeRepository.existsById(type)) {
 
-            throw new QueryException("部门[id:" + type + "]不存在");
+            throw new QueryException("异常类型[id:" + type + "]不存在");
         }
         return typeRepository.getById(type);
     }

@@ -78,7 +78,7 @@ public class CustomerService {
 
     public CustomerDO lost(Long id, CustomerVO customerVO, User editor) {
 
-        Customer customer = repository.getById(id);
+        Customer customer = get(id);
         CustomerDO customerDO = customerGateway.update(lostCustomer(customer, editor), editor.getAccessToken());
         saveOperation(id, Action.LOST, editor, customerVO.getLostReason());
         customerDO.setContacts(contacts(customer.getContacts()));
@@ -87,7 +87,7 @@ public class CustomerService {
 
     public CustomerDO retrieve(Long id, User editor) {
 
-        Customer customer = repository.getById(id);
+        Customer customer = get(id);
         CustomerDO customerDO = customerGateway.update(retrieveCustomer(customer, editor), editor.getAccessToken());
         saveOperation(id, Action.RETRIEVE, editor, null);
         customerDO.setContacts(contacts(customer.getContacts()));
@@ -230,8 +230,8 @@ public class CustomerService {
 
     private void composeCustomer(CustomerVO customerVO, Customer customer) {
 
-        customer.setParent(get(customerVO.getParent()));
-        customer.setSeller(getUser(customerVO.getSeller()));
+        customer.setParent(customerVO.getParent() == null ? null : get(customerVO.getParent()));
+        customer.setSeller(customerVO.getSeller() == null ? null : getUser(customerVO.getSeller()));
         customer.setName(customerVO.getName());
         customer.setBusiness(customerVO.getBusiness());
         customer.setSource(customerVO.getSource());
@@ -254,7 +254,7 @@ public class CustomerService {
 
     private User getUser(Long userId) {
 
-        if (userId == null || !userRepository.existsById(userId)) {
+        if (!userRepository.existsById(userId)) {
 
             throw new QueryException("用户[id:" + userId + "]不存在");
         }

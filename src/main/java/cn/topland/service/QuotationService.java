@@ -182,10 +182,10 @@ public class QuotationService {
         quotation.setExplanations(quotationVO.getExplanations());
 
         // 其他关联表信息
-        quotation.setServicePackage(getPackage(quotationVO.getServicePackage()));
-        quotation.setCustomer(getCustomer(quotationVO.getCustomer()));
-        quotation.setBrand(getBrand(quotationVO.getBrand()));
-        quotation.setSeller(getUser(quotationVO.getSeller()));
+        quotation.setServicePackage(quotationVO.getServicePackage() == null ? null : getPackage(quotationVO.getServicePackage()));
+        quotation.setCustomer(quotationVO.getCustomer() == null ? null : getCustomer(quotationVO.getCustomer()));
+        quotation.setBrand(quotationVO.getBrand() == null ? null : getBrand(quotationVO.getBrand()));
+        quotation.setSeller(quotationVO.getSeller() == null ? null : getUser(quotationVO.getSeller()));
     }
 
     private List<QuotationServiceDO> updateServices(List<cn.topland.entity.QuotationService> services,
@@ -254,31 +254,39 @@ public class QuotationService {
         return comment;
     }
 
-    private User getUser(Long userId) {
+    private Customer getCustomer(Long customerId) {
 
-        return userId != null
-                ? userRepository.getById(userId)
-                : null;
+        if (customerId == null || !customerRepository.existsById(customerId)) {
+
+            throw new QueryException("客户[id:" + customerId + "]不存在");
+        }
+        return customerRepository.getById(customerId);
     }
 
     private Brand getBrand(Long brandId) {
 
-        return brandId != null
-                ? brandRepository.getById(brandId)
-                : null;
+        if (brandId == null || !brandRepository.existsById(brandId)) {
+
+            throw new QueryException("品牌[id:" + brandId + "]不存在");
+        }
+        return brandRepository.getById(brandId);
     }
 
-    private Customer getCustomer(Long customerId) {
+    private User getUser(Long userId) {
 
-        return customerId != null
-                ? customerRepository.getById(customerId)
-                : null;
+        if (userId == null || !userRepository.existsById(userId)) {
+
+            throw new QueryException("用户[id:" + userId + "]不存在");
+        }
+        return userRepository.getById(userId);
     }
 
     private Package getPackage(Long packageId) {
 
-        return packageId != null
-                ? packageRepository.getById(packageId)
-                : null;
+        if (packageId == null || !packageRepository.existsById(packageId)) {
+
+            throw new QueryException("套餐[id:" + packageId + "]不存在");
+        }
+        return packageRepository.getById(packageId);
     }
 }

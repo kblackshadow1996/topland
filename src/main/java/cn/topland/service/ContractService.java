@@ -202,10 +202,10 @@ public class ContractService {
         contract.setStatus(Status.REVIEWING); // 新建合同则为审核中
         contract.setRemark(contractVO.getRemark());
 
-        contract.setOrder(getOrder(contractVO.getOrder()));
-        contract.setCustomer(getCustomer(contractVO.getCustomer()));
-        contract.setBrand(getBrand(contractVO.getBrand()));
-        contract.setSeller(getUser(contractVO.getSeller()));
+        contract.setOrder(contractVO.getOrder() == null ? null : getOrder(contractVO.getOrder()));
+        contract.setCustomer(contractVO.getCustomer() == null ? null : getCustomer(contractVO.getCustomer()));
+        contract.setBrand(contractVO.getBrand() == null ? null : getBrand(contractVO.getBrand()));
+        contract.setSeller(contractVO.getSeller() == null ? null : getUser(contractVO.getSeller()));
         contract.setCreator(creator);
         contract.setEditor(creator);
         return contract;

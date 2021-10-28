@@ -190,10 +190,10 @@ public class BrandService {
 
     private void composeBrand(Brand brand, BrandVO brandVO) {
 
-        brand.setSeller(getUser(brandVO.getSeller()));
-        brand.setProducer(getUser(brandVO.getProducer()));
+        brand.setSeller(brandVO.getSeller() == null ? null : getUser(brandVO.getSeller()));
+        brand.setProducer(brandVO.getProducer() == null ? null : getUser(brandVO.getProducer()));
         brand.setName(brandVO.getName());
-        brand.setCustomer(getCustomer(brandVO.getCustomer()));
+        brand.setCustomer(brandVO.getCustomer() == null ? null : getCustomer(brandVO.getCustomer()));
         brand.setBusiness(brandVO.getBusiness());
     }
 
