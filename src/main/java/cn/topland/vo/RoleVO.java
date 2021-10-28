@@ -10,11 +10,23 @@ import java.util.List;
 @Getter
 public class RoleVO implements Serializable {
 
+    /**
+     * 名称
+     */
     private String name;
 
+    /**
+     * 备注
+     */
     private String remark;
 
+    /**
+     * 权限组ID
+     */
     private List<Long> authorities;
 
+    /**
+     * 创建人ID
+     */
     private Long creator;
 }

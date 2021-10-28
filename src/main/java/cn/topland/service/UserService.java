@@ -76,6 +76,23 @@ public class UserService {
     }
 
     /**
+     * 刷新缓存
+     */
+    public String refreshToken(Long userId) {
+
+        User user = get(userId);
+        return userGateway.refreshToken(user);
+    }
+
+    /**
+     * 登出
+     */
+    public void logout(Long userId) {
+
+        userGateway.logout(get(userId));
+    }
+
+    /**
      * 企业微信登录
      */
     public UserDO loginByWework(String code) {

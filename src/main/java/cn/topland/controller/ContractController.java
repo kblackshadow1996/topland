@@ -1,6 +1,7 @@
 package cn.topland.controller;
 
 import cn.topland.controller.validator.PermissionValidator;
+import cn.topland.dto.ContractDTO;
 import cn.topland.dto.converter.ContractConverter;
 import cn.topland.entity.User;
 import cn.topland.entity.directus.ContractDO;
@@ -13,6 +14,9 @@ import cn.topland.vo.ContractVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 合同
+ */
 @RestController
 @RequestMapping("/contract")
 public class ContractController {
@@ -40,7 +44,8 @@ public class ContractController {
      * @return
      */
     @PostMapping("/add")
-    public Response add(@RequestBody ContractVO contractVO, @RequestParam(value = "access_token") String token) {
+    public Response<ContractDTO> add(@RequestBody ContractVO contractVO,
+                                     @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(contractVO.getCreator());
         validator.validateContractCreatePermissions(user, token);
@@ -56,7 +61,8 @@ public class ContractController {
      * @return
      */
     @PatchMapping("/receive-paper/{id}")
-    public Response receivePaper(@PathVariable Long id, @RequestBody ContractVO contractVO, @RequestParam(value = "access_token") String token) {
+    public Response<ContractDTO> receivePaper(@PathVariable Long id, @RequestBody ContractVO contractVO,
+                                              @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(contractVO.getCreator());
         validator.validateContractReceivePaperPermissions(user, token);
@@ -73,7 +79,8 @@ public class ContractController {
      * @return
      */
     @PatchMapping("/review/{id}")
-    public Response review(@PathVariable Long id, @RequestBody ContractVO contractVO, @RequestParam(value = "access_token") String token) {
+    public Response<ContractDTO> review(@PathVariable Long id, @RequestBody ContractVO contractVO,
+                                        @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(contractVO.getCreator());
         validator.validateContractReviewPermissions(user, token);

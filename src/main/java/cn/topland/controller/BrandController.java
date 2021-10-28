@@ -1,6 +1,7 @@
 package cn.topland.controller;
 
 import cn.topland.controller.validator.PermissionValidator;
+import cn.topland.dto.BrandDTO;
 import cn.topland.dto.converter.BrandConverter;
 import cn.topland.entity.User;
 import cn.topland.entity.directus.BrandDO;
@@ -13,6 +14,9 @@ import cn.topland.vo.BrandVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 品牌
+ */
 @RestController
 @RequestMapping("/brand")
 public class BrandController {
@@ -40,7 +44,8 @@ public class BrandController {
      * @return
      */
     @PostMapping("/add")
-    public Response add(@RequestBody BrandVO brandVO, @RequestParam(value = "access_token") String token) {
+    public Response<BrandDTO> add(@RequestBody BrandVO brandVO,
+                                  @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(brandVO.getCreator());
         validator.validateBrandCreatePermissions(user, token);
@@ -57,7 +62,8 @@ public class BrandController {
      * @return
      */
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody BrandVO brandVO, @RequestParam(value = "access_token") String token) {
+    public Response<BrandDTO> update(@PathVariable Long id, @RequestBody BrandVO brandVO,
+                                     @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(brandVO.getCreator());
         validator.validateBrandUpdatePermissions(user, token);

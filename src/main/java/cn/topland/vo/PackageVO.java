@@ -10,11 +10,20 @@ import java.util.List;
 @Getter
 public class PackageVO implements Serializable {
 
+    /**
+     * 名称
+     */
     private String name;
 
     private List<PackageServiceVO> services;
 
+    /**
+     * 备注
+     */
     private String remark;
 
+    /**
+     * 创建人
+     */
     private Long creator;
 }

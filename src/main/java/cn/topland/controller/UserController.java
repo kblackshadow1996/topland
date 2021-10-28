@@ -1,6 +1,7 @@
 package cn.topland.controller;
 
 import cn.topland.controller.validator.PermissionValidator;
+import cn.topland.dto.UserDTO;
 import cn.topland.dto.converter.UserConverter;
 import cn.topland.entity.User;
 import cn.topland.service.UserService;
@@ -10,6 +11,11 @@ import cn.topland.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+/**
+ * 用户
+ */
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -31,7 +37,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/wework/sync/all")
-    public Response syncAll(Long creator, @RequestParam(value = "access_token") String token) {
+    public Response<List<UserDTO>> syncAll(Long creator, @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(creator);
         validator.validateUserPermissions(user, token);
@@ -47,7 +53,8 @@ public class UserController {
      * @return
      */
     @PostMapping(value = "/wework/sync")
-    public Response sync(String deptId, Long creator, @RequestParam(value = "access_token") String token) {
+    public Response<List<UserDTO>> sync(String deptId, Long creator,
+                                        @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(creator);
         validator.validateUserPermissions(user, token);
@@ -63,7 +70,8 @@ public class UserController {
      * @return
      */
     @PatchMapping(value = "/auth/{id}")
-    public Response auth(@PathVariable Long id, @RequestBody UserVO userVO, @RequestParam(value = "access_token") String token) {
+    public Response<UserDTO> auth(@PathVariable Long id, @RequestBody UserVO userVO,
+                                  @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(userVO.getCreator());
         validator.validateUserAuthPermissions(user, token);
@@ -78,7 +86,8 @@ public class UserController {
      * @return
      */
     @PatchMapping(value = "/auth")
-    public Response auth(@RequestBody UserVO userVO, @RequestParam(value = "access_token") String token) {
+    public Response<List<UserDTO>> auth(@RequestBody UserVO userVO,
+                                        @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(userVO.getCreator());
         validator.validateUserAuthPermissions(user, token);

@@ -1,6 +1,7 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.DepartmentDTO;
+import cn.topland.entity.Department;
 import cn.topland.entity.directus.DepartmentDO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
@@ -35,8 +36,8 @@ public class DepartmentConverter extends BaseConverter<DepartmentDO, DepartmentD
         dto.setSort(department.getSort());
         dto.setDeptId(department.getDeptId());
         dto.setParent(department.getParent());
-        dto.setType(department.getType());
-        dto.setSource(department.getSource());
+        dto.setType(Department.Type.valueOf(department.getType()));
+        dto.setSource(Department.Source.valueOf(department.getSource()));
         dto.setCreator(department.getCreator());
         dto.setEditor(department.getEditor());
         dto.setCreateTime(department.getCreateTime());

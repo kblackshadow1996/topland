@@ -15,24 +15,48 @@ import java.util.List;
 @Getter
 public class SettlementContractVO implements Serializable {
 
+    /**
+     * 签约日期：yyyy-MM-dd
+     */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonProperty(value = "contract_date")
     private LocalDate contractDate;
 
+    /**
+     * 应收金额
+     */
     private BigDecimal receivable;
 
+    /**
+     * 订单ID
+     */
     private Long order;
 
+    /**
+     * 备注
+     */
     private String remark;
 
     private List<AttachmentVO> attachments;
 
+    /**
+     * 联系人ID
+     */
     private Long contract;
 
+    /**
+     * 创建人ID
+     */
     private Long creator;
 
+    /**
+     * 操作
+     */
     private SettlementContract.Action action;
 
+    /**
+     * 审核意见
+     */
     @JsonProperty("review_comments")
     private String reviewComments;
 }

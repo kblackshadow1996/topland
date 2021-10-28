@@ -1,6 +1,7 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.CustomerDTO;
+import cn.topland.entity.Customer;
 import cn.topland.entity.directus.CustomerDO;
 import org.springframework.stereotype.Component;
 
@@ -23,10 +24,10 @@ public class CustomerConverter extends BaseConverter<CustomerDO, CustomerDTO> {
         dto.setName(customer.getName());
         dto.setSeller(customer.getSeller());
         dto.setBusiness(customer.getBusiness());
-        dto.setType(customer.getType());
-        dto.setStatus(customer.getStatus());
+        dto.setType(Customer.Type.valueOf(customer.getType()));
+        dto.setStatus(Customer.Status.valueOf(customer.getStatus()));
         dto.setParent(customer.getParent());
-        dto.setSource(customer.getSource());
+        dto.setSource(Customer.Source.valueOf(customer.getSource()));
 
         // 发票
         dto.setInvoiceType(customer.getInvoiceType());

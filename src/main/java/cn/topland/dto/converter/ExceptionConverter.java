@@ -1,6 +1,7 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.ExceptionDTO;
+import cn.topland.entity.Exception;
 import cn.topland.entity.directus.ExceptionDO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
@@ -31,7 +32,7 @@ public class ExceptionConverter extends BaseConverter<ExceptionDO, ExceptionDTO>
 
         ExceptionDTO dto = new ExceptionDTO();
         dto.setId(exception.getId());
-        dto.setAttribute(exception.getAttribute());
+        dto.setAttribute(Exception.Attribute.valueOf(exception.getAttribute()));
         dto.setType(exception.getType());
         dto.setDepartment(exception.getDepartment());
         dto.setOrders(exception.getOrders());

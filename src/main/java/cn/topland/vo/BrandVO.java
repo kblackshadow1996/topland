@@ -10,17 +10,35 @@ import java.util.List;
 @Getter
 public class BrandVO implements Serializable {
 
+    /**
+     * 名称
+     */
     private String name;
 
+    /**
+     * 客户ID
+     */
     private Long customer;
 
+    /**
+     * 销售ID
+     */
     private Long seller;
 
+    /**
+     * 制片ID
+     */
     private Long producer;
 
+    /**
+     * 经营信息
+     */
     private String business;
 
     private List<ContactVO> contacts;
 
+    /**
+     * 操作人ID
+     */
     private Long creator;
 }

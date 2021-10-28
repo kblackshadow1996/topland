@@ -13,26 +13,53 @@ import java.util.List;
 @Getter
 public class RoleDTO implements Serializable {
 
+    /**
+     * ID
+     */
     private Long id;
 
+    /**
+     * 名称
+     */
     private String name;
 
+    /**
+     * directus角色
+     */
     @JsonProperty(value = "directus_role")
     private String directusRole;
 
+    /**
+     * 备注
+     */
     private String remark;
 
+    /**
+     * 角色-权限中间表ID
+     */
     private List<Long> authorities;
 
+    /**
+     * 创建人ID
+     */
     private Long creator;
 
+    /**
+     * 修改人ID
+     */
     private Long editor;
 
-    @JsonProperty(value = "create_time")
+    /**
+     * 创建时间：yyyy-MM-dd'T'HH:mm:ss
+     */
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonProperty(value = "create_time")
     private LocalDateTime createTime;
 
-    @JsonProperty(value = "last_update_time")
+    /**
+     * 更新时间：yyyy-MM-dd'T'HH:mm:ss
+     */
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonProperty(value = "last_update_time")
     private LocalDateTime lastUpdateTime;
 }

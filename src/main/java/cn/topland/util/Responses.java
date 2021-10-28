@@ -5,18 +5,13 @@ public final class Responses {
     private Responses() {
     }
 
-    public static Response success(Object data) {
+    public static <T> Response<T> success(T data) {
 
-        return new Response(data);
+        return new Response<>(data);
     }
 
-    public static Response fail(int code, String message) {
+    public static <T> Response<T> fail(int code, String message) {
 
-        return new Response(code, message);
-    }
-
-    public static Response fail(String message, Errors.Extensions extensions) {
-
-        return new Response(new Errors(message, extensions));
+        return new Response<>(code, message);
     }
 }

@@ -1,6 +1,7 @@
 package cn.topland.controller;
 
 import cn.topland.controller.validator.PermissionValidator;
+import cn.topland.dto.ExceptionDTO;
 import cn.topland.dto.converter.ExceptionConverter;
 import cn.topland.entity.User;
 import cn.topland.entity.directus.ExceptionDO;
@@ -15,6 +16,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 异常
+ */
 @RestController
 @RequestMapping("/exception")
 public class ExceptionController {
@@ -42,7 +46,8 @@ public class ExceptionController {
      * @return
      */
     @PostMapping("/add")
-    public Response add(@RequestBody List<ExceptionVO> exceptionVOs, @RequestParam(value = "access_token") String token) {
+    public Response<List<ExceptionDTO>> add(@RequestBody List<ExceptionVO> exceptionVOs,
+                                            @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(exceptionVOs.get(0).getCreator());
         validator.validateExceptionCreatePermissions(user, token);
@@ -59,7 +64,8 @@ public class ExceptionController {
      * @return
      */
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody ExceptionVO exceptionVO, @RequestParam(value = "access_token") String token) {
+    public Response<ExceptionDTO> update(@PathVariable Long id, @RequestBody ExceptionVO exceptionVO,
+                                         @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(exceptionVO.getCreator());
         validator.validateExceptionUpdatePermissions(user, token);
@@ -76,7 +82,8 @@ public class ExceptionController {
      * @return
      */
     @PatchMapping("/solve/{id}")
-    public Response solve(@PathVariable Long id, @RequestBody ExceptionVO exceptionVO, @RequestParam(value = "access_token") String token) {
+    public Response<ExceptionDTO> solve(@PathVariable Long id, @RequestBody ExceptionVO exceptionVO,
+                                        @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(exceptionVO.getCreator());
         validator.validateExceptionSolvePermissions(user, token);

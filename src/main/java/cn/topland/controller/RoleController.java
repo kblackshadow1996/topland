@@ -11,6 +11,9 @@ import cn.topland.vo.RoleVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 角色
+ */
 @RestController
 @RequestMapping("role")
 public class RoleController {
@@ -35,7 +38,8 @@ public class RoleController {
      * @return
      */
     @PostMapping("/add")
-    public Response add(@RequestBody RoleVO roleVO, @RequestParam(value = "access_token") String token) {
+    public Response add(@RequestBody RoleVO roleVO,
+                        @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(roleVO.getCreator());
         validator.validateRoleCreatePermissions(user, token);
@@ -51,7 +55,8 @@ public class RoleController {
      * @return
      */
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody RoleVO roleVO, @RequestParam(value = "access_token") String token) {
+    public Response update(@PathVariable Long id, @RequestBody RoleVO roleVO,
+                           @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(roleVO.getCreator());
         validator.validateRoleUpdatePermissions(user, token);

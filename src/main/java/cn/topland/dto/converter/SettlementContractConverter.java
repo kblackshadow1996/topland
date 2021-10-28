@@ -1,6 +1,7 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.SettlementContractDTO;
+import cn.topland.entity.SettlementContract;
 import cn.topland.entity.directus.SettlementContractDO;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +29,7 @@ public class SettlementContractConverter extends BaseConverter<SettlementContrac
         dto.setLastUpdateTime(settlementContract.getLastUpdateTime());
         dto.setReceivable(settlementContract.getReceivable());
         dto.setRemark(settlementContract.getRemark());
-        dto.setStatus(settlementContract.getStatus());
+        dto.setStatus(SettlementContract.Status.valueOf(settlementContract.getStatus()));
         dto.setOrder(settlementContract.getOrder());
         dto.setAttachments(settlementContract.getAttachments());
         return dto;

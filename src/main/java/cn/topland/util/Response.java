@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 @Setter
 @Getter
-public class Response implements Serializable {
+public class Response<T> implements Serializable {
 
     public static final int OK = 200;
 
@@ -38,15 +38,21 @@ public class Response implements Serializable {
 
     public static final int EXTERNAL_SERVICE_UNAVAILABLE = 503;
 
+    /**
+     * 错误码
+     */
     private int code;
 
-    private Object data;
+    private T data;
 
+    /**
+     * 错误信息
+     */
     private String message;
 
     private boolean success;
 
-    public Response(Object data) {
+    public Response(T data) {
 
         this.code = OK;
         this.data = data;

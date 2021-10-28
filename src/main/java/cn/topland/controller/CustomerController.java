@@ -1,6 +1,7 @@
 package cn.topland.controller;
 
 import cn.topland.controller.validator.PermissionValidator;
+import cn.topland.dto.CustomerDTO;
 import cn.topland.dto.converter.CustomerConverter;
 import cn.topland.entity.User;
 import cn.topland.entity.directus.CustomerDO;
@@ -13,6 +14,9 @@ import cn.topland.vo.CustomerVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 客户
+ */
 @RestController
 @RequestMapping("customer")
 public class CustomerController {
@@ -40,7 +44,8 @@ public class CustomerController {
      * @return
      */
     @PostMapping("/add")
-    public Response add(@RequestBody CustomerVO customerVO, @RequestParam(value = "access_token") String token) {
+    public Response<CustomerDTO> add(@RequestBody CustomerVO customerVO,
+                                     @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(customerVO.getCreator());
         validator.validateCustomerCreatePermissions(user, token);
@@ -57,7 +62,8 @@ public class CustomerController {
      * @return
      */
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody CustomerVO customerVO, @RequestParam(value = "access_token") String token) {
+    public Response<CustomerDTO> update(@PathVariable Long id, @RequestBody CustomerVO customerVO,
+                                        @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(customerVO.getCreator());
         validator.validateCustomerUpdatePermissions(user, token);
@@ -74,7 +80,8 @@ public class CustomerController {
      * @return
      */
     @PatchMapping("/lost/{id}")
-    public Response lost(@PathVariable Long id, @RequestBody CustomerVO customerVO, @RequestParam(value = "access_token") String token) {
+    public Response<CustomerDTO> lost(@PathVariable Long id, @RequestBody CustomerVO customerVO,
+                                      @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(customerVO.getCreator());
         validator.validateCustomerLostPermissions(user, token);
@@ -91,7 +98,8 @@ public class CustomerController {
      * @return
      */
     @PatchMapping("/retrieve/{id}")
-    public Response retrieve(@PathVariable Long id, @RequestBody CustomerVO customerVO, @RequestParam(value = "access_token") String token) {
+    public Response<CustomerDTO> retrieve(@PathVariable Long id, @RequestBody CustomerVO customerVO,
+                                          @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(customerVO.getCreator());
         validator.validateCustomerRetrievePermissions(user, token);

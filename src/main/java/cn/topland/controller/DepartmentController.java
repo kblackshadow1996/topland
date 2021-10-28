@@ -1,6 +1,7 @@
 package cn.topland.controller;
 
 import cn.topland.controller.validator.PermissionValidator;
+import cn.topland.dto.DepartmentDTO;
 import cn.topland.dto.converter.DepartmentConverter;
 import cn.topland.entity.User;
 import cn.topland.service.DepartmentService;
@@ -10,6 +11,11 @@ import cn.topland.util.Responses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+/**
+ * 部门
+ */
 @RestController
 @RequestMapping("/department")
 public class DepartmentController {
@@ -34,7 +40,8 @@ public class DepartmentController {
      * @return
      */
     @PostMapping("/wework/sync/all")
-    public Response syncAllWeworkDept(Long creator, @RequestParam(value = "access_token") String token) {
+    public Response<List<DepartmentDTO>> syncAllWeworkDept(Long creator,
+                                                           @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(creator);
         validator.validDepartmentPermissions(user, token);
@@ -50,7 +57,8 @@ public class DepartmentController {
      * @return
      */
     @PostMapping("/wework/sync/{deptId}")
-    public Response syncWeworkDept(@PathVariable String deptId, Long creator, @RequestParam(value = "access_token") String token) {
+    public Response<List<DepartmentDTO>> syncWeworkDept(@PathVariable String deptId, Long creator,
+                                                        @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(creator);
         validator.validDepartmentPermissions(user, token);

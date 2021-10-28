@@ -10,13 +10,28 @@ import java.math.BigDecimal;
 @Getter
 public class PackageServiceVO implements Serializable {
 
+    /**
+     * 套餐服务ID, 新建服务不用传
+     */
     private Long id;
 
+    /**
+     * 服务ID
+     */
     private Long service;
 
+    /**
+     * 单位
+     */
     private String unit;
 
+    /**
+     * 单价
+     */
     private BigDecimal price;
 
+    /**
+     * 交付方式
+     */
     private String delivery;
 }

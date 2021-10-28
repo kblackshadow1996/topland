@@ -1,6 +1,7 @@
 package cn.topland.controller;
 
 import cn.topland.controller.validator.PermissionValidator;
+import cn.topland.dto.SettlementContractDTO;
 import cn.topland.dto.converter.SettlementContractConverter;
 import cn.topland.entity.User;
 import cn.topland.service.AttachmentService;
@@ -12,6 +13,9 @@ import cn.topland.vo.SettlementContractVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 结算合同
+ */
 @RestController
 @RequestMapping("/settlement-contract")
 public class SettlementContractController {
@@ -39,7 +43,8 @@ public class SettlementContractController {
      * @return
      */
     @PostMapping("/add")
-    public Response add(@RequestBody SettlementContractVO contractVO, @RequestParam(value = "access_token") String token) {
+    public Response<SettlementContractDTO> add(@RequestBody SettlementContractVO contractVO,
+                                               @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(contractVO.getCreator());
         validator.validateSettlementCreatePermissions(user, token);
@@ -55,8 +60,8 @@ public class SettlementContractController {
      * @return
      */
     @PatchMapping("/review/{id}")
-    public Response review(@PathVariable Long id, @RequestBody SettlementContractVO contractVO,
-                           @RequestParam(value = "access_token") String token) {
+    public Response<SettlementContractDTO> review(@PathVariable Long id, @RequestBody SettlementContractVO contractVO,
+                                                  @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(contractVO.getCreator());
         validator.validateSettlementReviewPermissions(user, token);

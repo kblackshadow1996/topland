@@ -9,7 +9,13 @@ import java.io.Serializable;
 @Getter
 public class AttachmentVO implements Serializable {
 
+    /**
+     * 附件id
+     */
     private Long id;
 
+    /**
+     * 附件文件id
+     */
     private String file;
 }
