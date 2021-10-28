@@ -1,6 +1,7 @@
 package cn.topland.controller;
 
 import cn.topland.controller.validator.PermissionValidator;
+import cn.topland.dto.RoleDTO;
 import cn.topland.dto.converter.RoleConverter;
 import cn.topland.entity.User;
 import cn.topland.service.RoleService;
@@ -38,8 +39,8 @@ public class RoleController {
      * @return
      */
     @PostMapping("/add")
-    public Response add(@RequestBody RoleVO roleVO,
-                        @RequestParam(value = "access_token", required = true) String token) {
+    public Response<RoleDTO> add(@RequestBody RoleVO roleVO,
+                                 @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(roleVO.getCreator());
         validator.validateRoleCreatePermissions(user, token);
@@ -55,8 +56,8 @@ public class RoleController {
      * @return
      */
     @PatchMapping("/update/{id}")
-    public Response update(@PathVariable Long id, @RequestBody RoleVO roleVO,
-                           @RequestParam(value = "access_token", required = true) String token) {
+    public Response<RoleDTO> update(@PathVariable Long id, @RequestBody RoleVO roleVO,
+                                    @RequestParam(value = "access_token", required = true) String token) {
 
         User user = userService.get(roleVO.getCreator());
         validator.validateRoleUpdatePermissions(user, token);
