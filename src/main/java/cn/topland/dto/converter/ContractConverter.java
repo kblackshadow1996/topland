@@ -29,8 +29,8 @@ public class ContractConverter extends BaseConverter<ContractDO, ContractDTO> {
         dto.setReceivable(contract.getReceivable());
         dto.setMargin(contract.getMargin());
         dto.setGuarantee(contract.getGuarantee());
-        dto.setStatus(Contract.Status.valueOf(contract.getStatus()));
-        dto.setType(Contract.Type.valueOf(contract.getType()));
+        dto.setStatus(contract.getStatus());
+        dto.setType(contract.getType());
         dto.setRemark(contract.getRemark());
         dto.setAttachments(contract.getAttachments());
 

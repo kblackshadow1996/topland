@@ -42,12 +42,12 @@ public class DepartmentDTO implements Serializable {
     /**
      * 类型
      */
-    private Department.Type type;
+    private String type;
 
     /**
      * 来源
      */
-    private Department.Source source;
+    private String source;
 
     /**
      * 创建人ID

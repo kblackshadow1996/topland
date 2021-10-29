@@ -61,6 +61,7 @@ public class UsersGateway extends BaseGateway {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         node.put("email", user.getEmail());
         node.put("password", user.getPassword());
+        node.put("role", user.getRole() == null ? null : user.getRole().getId());
         return node;
     }
 

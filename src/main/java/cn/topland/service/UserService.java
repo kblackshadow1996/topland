@@ -1,9 +1,6 @@
 package cn.topland.service;
 
-import cn.topland.dao.DepartmentRepository;
-import cn.topland.dao.DirectusUsersRepository;
-import cn.topland.dao.RoleRepository;
-import cn.topland.dao.UserRepository;
+import cn.topland.dao.*;
 import cn.topland.dao.gateway.UserGateway;
 import cn.topland.dao.gateway.UsersGateway;
 import cn.topland.entity.*;
@@ -12,8 +9,8 @@ import cn.topland.gateway.WeworkGateway;
 import cn.topland.gateway.response.UserInfo;
 import cn.topland.gateway.response.WeworkUser;
 import cn.topland.service.parser.WeworkUserParser;
-import cn.topland.util.exception.AccessException;
 import cn.topland.util.exception.ExternalException;
+import cn.topland.util.exception.InternalAccessException;
 import cn.topland.util.exception.InternalException;
 import cn.topland.util.exception.QueryException;
 import cn.topland.vo.UserVO;
@@ -37,6 +34,9 @@ public class UserService {
     @Value("${directus.root.password}")
     private String ROOT_PASSWORD;
 
+    @Value("${default.role.name}")
+    private String DEFAULT_ROLE_NAME;
+
     @Autowired
     private WeworkGateway weworkGateway;
 
@@ -51,6 +51,9 @@ public class UserService {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private DirectusRolesRepository rolesRepository;
 
     @Autowired
     private WeworkUserParser userParser;
@@ -106,7 +109,7 @@ public class UserService {
 
                 return loginByWeworkUser(user);
             }
-            throw new AccessException("该用户未同步到系统,请同步后重试");
+            throw new InternalAccessException("该用户未同步到系统,请同步后重试");
         }
         throw new ExternalException("企业微信服务异常");
     }
@@ -166,7 +169,10 @@ public class UserService {
 
         List<User> users = repository.findAllById(userVO.getUsers());
         Role role = roleRepository.getById(userVO.getRole());
-        combineWithDirectus(users, role.getRole(), creator.getAccessToken());
+        // directus用户授权
+        listDirectusUsers(users).forEach(directusUser -> directusUser.setRole(role.getRole()));
+        // 关联用户及directus用户
+        combineWithDirectus(users, creator.getAccessToken());
         return users.stream().map(user -> authUser(user, userVO, role, creator)).collect(Collectors.toList());
     }
 
@@ -228,15 +234,15 @@ public class UserService {
         });
 
         List<User> mergeUsers = new ArrayList<>(userMap.values());
-        combineWithDirectus(mergeUsers, null, creator.getAccessToken());
+        combineWithDirectus(mergeUsers, creator.getAccessToken());
         return mergeUsers;
     }
 
-    private void combineWithDirectus(List<User> users, DirectusRoles role, String accessToken) {
+    private void combineWithDirectus(List<User> users, String accessToken) {
 
         if (CollectionUtils.isNotEmpty(users)) {
 
-            List<DirectusUsers> directusUsers = listDirectusUsers(users).stream().peek(directusUser -> directusUser.setRole(role)).collect(Collectors.toList());
+            List<DirectusUsers> directusUsers = listDirectusUsers(users);
             Map<String, DirectusUsers> directusUsersMap = usersGateway.saveAll(directusUsers, accessToken).stream()
                     .collect(Collectors.toMap(DirectusUsers::getEmail, u -> u));
             users.forEach(user -> {
@@ -253,6 +259,7 @@ public class UserService {
 
     private User createUser(User user, List<Department> departments, User creator, DirectusUsers root) {
 
+        user.setRole(getDefaultRole());
         user.setCreator(creator);
         user.setEditor(creator);
         user.setDirectusPassword(ROOT_PASSWORD);
@@ -274,6 +281,7 @@ public class UserService {
         users.setId(null);
         users.setEmail(email);
         users.setPassword(root.getPassword());
+        users.setRole(getDefaultRoles());
         return users;
     }
 
@@ -312,7 +320,7 @@ public class UserService {
             return userGateway.login(user);
         } else { // 禁用
 
-            throw new AccessException("该用户已被禁用,请联系管理员");
+            throw new InternalAccessException("该用户已被禁用,请联系管理员");
         }
     }
 
@@ -331,5 +339,15 @@ public class UserService {
             throw new QueryException("角色不存在");
         }
         return roleRepository.getById(role);
+    }
+
+    private Role getDefaultRole() {
+
+        return roleRepository.getByName(DEFAULT_ROLE_NAME);
+    }
+
+    private DirectusRoles getDefaultRoles() {
+
+        return rolesRepository.getByName(DEFAULT_ROLE_NAME);
     }
 }

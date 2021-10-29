@@ -25,6 +25,7 @@ public class DepartmentDO extends DirectusRecordEntity {
     public static DepartmentDO from(Department department) {
 
         DepartmentDO departmentDO = new DepartmentDO();
+        departmentDO.setId(department.getId());
         departmentDO.setName(department.getName());
         departmentDO.setDeptId(department.getDeptId());
         departmentDO.setParent(department.getParent() == null ? null : department.getParent().getId());

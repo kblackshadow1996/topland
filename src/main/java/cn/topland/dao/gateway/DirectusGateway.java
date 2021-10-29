@@ -104,7 +104,7 @@ public class DirectusGateway {
     public Reply delete(String url, MultiValueMap<String, String> parameters, JsonNode body) {
 
         CloseableHttpClient client = HttpClients.createDefault();
-        cn.topland.util.HttpDelete httpDelete;
+        HttpDelete httpDelete;
         HttpResponse response;
         try {
 
@@ -127,7 +127,6 @@ public class DirectusGateway {
         try {
 
             reply = new Reply(Response.Status.fromStatusCode(statusCode), EntityUtils.toString(response.getEntity(), Consts.UTF_8));
-            return reply;
         } catch (IOException | ParseException e) {
 
             log.error("error", e);
@@ -144,17 +143,20 @@ public class DirectusGateway {
     private static List<NameValuePair> composeParams(MultiValueMap<String, String> parameters) {
 
         List<NameValuePair> params = new ArrayList<>();
-        Iterator<String> iterator = parameters.keySet().iterator();
+        if (parameters != null) {
 
-        while (iterator.hasNext()) {
+            Iterator<String> iterator = parameters.keySet().iterator();
 
-            String key = iterator.next();
-            Iterator<String> param = parameters.get(key).iterator();
+            while (iterator.hasNext()) {
 
-            while (param.hasNext()) {
+                String key = iterator.next();
+                Iterator<String> param = parameters.get(key).iterator();
 
-                String value = param.next();
-                params.add(new BasicNameValuePair(key, value));
+                while (param.hasNext()) {
+
+                    String value = param.next();
+                    params.add(new BasicNameValuePair(key, value));
+                }
             }
         }
         return params;

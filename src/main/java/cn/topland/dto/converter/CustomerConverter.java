@@ -24,10 +24,10 @@ public class CustomerConverter extends BaseConverter<CustomerDO, CustomerDTO> {
         dto.setName(customer.getName());
         dto.setSeller(customer.getSeller());
         dto.setBusiness(customer.getBusiness());
-        dto.setType(Customer.Type.valueOf(customer.getType()));
-        dto.setStatus(Customer.Status.valueOf(customer.getStatus()));
+        dto.setType(customer.getType());
+        dto.setStatus(customer.getStatus());
         dto.setParent(customer.getParent());
-        dto.setSource(Customer.Source.valueOf(customer.getSource()));
+        dto.setSource(customer.getSource());
 
         // 发票
         dto.setInvoiceType(customer.getInvoiceType());

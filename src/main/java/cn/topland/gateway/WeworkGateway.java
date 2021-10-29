@@ -7,6 +7,7 @@ import cn.topland.util.WebUtils;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 企业微信api
  */
+@Slf4j
 @Component
 public class WeworkGateway {
 
@@ -73,6 +75,7 @@ public class WeworkGateway {
         params.add("corpid", wework.getCropId());
         params.add("corpsecret", wework.getAgentSecret());
         String accessToken = WebUtils.get(accessTokenUrl, params);
+        log.info("wework accessToken: " + accessToken);
         return StringUtils.isNotBlank(accessToken) && JsonUtils.parse(accessToken, AccessToken.class) != null
                 ? JsonUtils.parse(accessToken, AccessToken.class)
                 : new AccessToken();
@@ -88,6 +91,7 @@ public class WeworkGateway {
         params.add("access_token", loadToken());
         params.add("code", code);
         String userInfo = safeGet(url, params);
+       log.info("wework userInfo: " + userInfo);
         return JsonUtils.parse(userInfo, UserInfo.class);
     }
 

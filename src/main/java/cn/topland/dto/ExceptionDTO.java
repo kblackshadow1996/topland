@@ -23,7 +23,7 @@ public class ExceptionDTO implements Serializable {
     /**
      * 属性
      */
-    private Exception.Attribute attribute;
+    private String attribute;
 
     /**
      * 订单ID

@@ -56,7 +56,7 @@ public class UserDTO implements Serializable {
     /**
      * 来源
      */
-    private User.Source source;
+    private String source;
 
     /**
      * 工号
@@ -92,7 +92,7 @@ public class UserDTO implements Serializable {
     /**
      * 数据权限
      */
-    private User.DataAuth auth;
+    private String auth;
 
     /**
      * 创建人ID

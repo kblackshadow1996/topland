@@ -11,15 +11,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class UserGateway extends BaseGateway {
 
@@ -44,7 +45,8 @@ public class UserGateway extends BaseGateway {
     public UserDO login(User user) {
 
         Reply result = directus.post(LOGIN_URI, null, user.loginInfo());
-        return cacheToken(user, JsonUtils.parse(result.getContent()));
+        log.info("user login status: " + result.getContent());
+        return cacheToken(user, JsonUtils.read(result.getContent()).path("data"));
     }
 
     public void logout(User user) {
@@ -55,8 +57,7 @@ public class UserGateway extends BaseGateway {
     public String refreshToken(User user) {
 
         JsonNode token = refresh(user);
-        UserDO userDO = cacheToken(user, Map.of("access_token", token.path("access_token").asText(),
-                "refresh_token", token.path("refresh_token").asText()));
+        UserDO userDO = cacheToken(user, token);
         return userDO.getAccessToken();
     }
 
@@ -79,15 +80,17 @@ public class UserGateway extends BaseGateway {
         ObjectNode body = JsonNodeFactory.instance.objectNode();
         body.put("refresh_token", user.getRefreshToken());
         Reply reply = directus.post(REFRESH_URI + "/" + user.getId(), tokenParam(user.getAccessToken()), body);
+        log.info("user refresh: " + reply.getContent());
         return JsonUtils.read(reply.getContent()).path("data");
     }
 
-    private UserDO cacheToken(User user, Map<String, Object> tokens) throws InternalException {
+    private UserDO cacheToken(User user, JsonNode tokens) throws InternalException {
 
         ObjectNode body = JsonNodeFactory.instance.objectNode();
-        body.put("access_token", (String) tokens.get("access_token"));
-        body.put("refresh_token", (String) tokens.get("refresh_token"));
-        Reply result = directus.patch(USER_URI + "/" + user.getId(), tokenParam((String) tokens.get("access_token")), body);
+        body.put("access_token", tokens.path("access_token").asText());
+        body.put("refresh_token", tokens.path("refresh_token").asText());
+        Reply result = directus.patch(USER_URI + "/" + user.getId(), tokenParam(tokens.path("access_token").asText()), body);
+        log.info("user cacheToken: " + result.getContent());
         String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
         return JsonUtils.parse(data, UserDO.class);
     }
@@ -160,6 +163,7 @@ public class UserGateway extends BaseGateway {
     private ObjectNode composeUser(User user) {
 
         ObjectNode node = (ObjectNode) JsonUtils.toJsonNode(UserDO.from(user));
+        node.put("active", user.getActive() != null && user.getActive() ? "1" : "0");
         node.set("departments", composeDepartments(user.getDepartments()));
         return node;
     }

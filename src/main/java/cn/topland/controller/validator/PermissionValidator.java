@@ -5,6 +5,7 @@ import cn.topland.entity.Role;
 import cn.topland.entity.User;
 import cn.topland.util.exception.AccessException;
 import cn.topland.util.exception.InvalidException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -220,7 +221,7 @@ public class PermissionValidator {
 
     private void validateToken(String token, String cacheToken) throws InvalidException {
 
-        if (!cacheToken.equals(token)) {
+        if (StringUtils.isBlank(token) || StringUtils.isBlank(cacheToken) || !cacheToken.equals(token)) {
 
             throw new InvalidException("用户口令已过期,请刷新后重试");
         }

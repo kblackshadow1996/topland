@@ -37,12 +37,12 @@ public class CustomerDTO implements Serializable {
     /**
      * 客户类型
      */
-    private Customer.Type type;
+    private String type;
 
     /**
      * 客户来源
      */
-    private Customer.Status status;
+    private String status;
 
     /**
      * 父公司ID
@@ -52,7 +52,7 @@ public class CustomerDTO implements Serializable {
     /**
      * 来源
      */
-    private Customer.Source source;
+    private String source;
 
     /**
      * 发票类型

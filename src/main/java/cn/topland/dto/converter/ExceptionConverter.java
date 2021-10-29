@@ -32,7 +32,7 @@ public class ExceptionConverter extends BaseConverter<ExceptionDO, ExceptionDTO>
 
         ExceptionDTO dto = new ExceptionDTO();
         dto.setId(exception.getId());
-        dto.setAttribute(Exception.Attribute.valueOf(exception.getAttribute()));
+        dto.setAttribute(exception.getAttribute());
         dto.setType(exception.getType());
         dto.setDepartment(exception.getDepartment());
         dto.setOrders(exception.getOrders());

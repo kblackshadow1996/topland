@@ -29,7 +29,7 @@ public class ContractDTO implements Serializable {
     /**
      * 类型
      */
-    private Contract.Type type;
+    private String type;
 
     /**
      * 客户ID
@@ -103,7 +103,7 @@ public class ContractDTO implements Serializable {
     /**
      * 状态
      */
-    private Contract.Status status;
+    private String status;
 
     /**
      * 创建人ID

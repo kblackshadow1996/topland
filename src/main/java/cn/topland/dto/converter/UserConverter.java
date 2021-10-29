@@ -37,11 +37,11 @@ public class UserConverter extends BaseConverter<UserDO, UserDTO> {
         userDTO.setEmployeeId(user.getEmployeeId());
         userDTO.setAvatar(user.getAvatar());
         userDTO.setMobile(user.getMobile());
-        userDTO.setActive(user.isActive());
+        userDTO.setActive(user.getActive());
         userDTO.setRemark(user.getRemark());
         userDTO.setRole(user.getRole());
-        userDTO.setAuth(User.DataAuth.valueOf(user.getAuth()));
-        userDTO.setSource(User.Source.valueOf(user.getSource()));
+        userDTO.setAuth(user.getAuth());
+        userDTO.setSource(user.getSource());
         userDTO.setCreator(user.getCreator());
         userDTO.setCreateTime(user.getCreateTime());
 

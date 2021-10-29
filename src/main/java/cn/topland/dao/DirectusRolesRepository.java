@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DirectusRolesRepository extends JpaRepository<DirectusRoles, String> {
+
+    DirectusRoles getByName(String name);
 }
