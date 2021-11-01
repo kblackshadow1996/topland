@@ -37,7 +37,10 @@ public class SettlementContractVO implements Serializable {
      */
     private String remark;
 
-    private List<AttachmentVO> attachments;
+    /**
+     * 附件ID
+     */
+    private String attachments;
 
     /**
      * 联系人ID

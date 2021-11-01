@@ -57,9 +57,7 @@ public class SettlementContract extends RecordEntity {
     /**
      * 附件
      */
-    @OneToMany
-    @JoinColumn(name = "settlement")
-    private List<Attachment> attachments;
+    private String attachments;
 
     /**
      * 状态

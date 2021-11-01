@@ -106,9 +106,7 @@ public class Contract extends RecordEntity {
     /**
      * 附件directus_files的id，以分号隔开
      */
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "contract")
-    private List<Attachment> attachments;
+    private String attachments;
 
     /**
      * 收款记录

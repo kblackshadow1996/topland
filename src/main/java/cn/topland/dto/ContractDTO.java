@@ -1,6 +1,5 @@
 package cn.topland.dto;
 
-import cn.topland.entity.Contract;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -10,7 +9,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Setter
 @Getter
@@ -96,9 +94,9 @@ public class ContractDTO implements Serializable {
     private Long order;
 
     /**
-     * 合同-附件中间表ID
+     * 附件ID
      */
-    private List<Long> attachments;
+    private String attachments;
 
     /**
      * 状态

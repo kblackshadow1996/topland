@@ -5,7 +5,6 @@ import cn.topland.dto.ExceptionDTO;
 import cn.topland.dto.converter.ExceptionConverter;
 import cn.topland.entity.User;
 import cn.topland.entity.directus.ExceptionDO;
-import cn.topland.service.AttachmentService;
 import cn.topland.service.ExceptionService;
 import cn.topland.service.UserService;
 import cn.topland.util.Response;
@@ -28,9 +27,6 @@ public class ExceptionController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private AttachmentService attachmentService;
 
     @Autowired
     private PermissionValidator validator;

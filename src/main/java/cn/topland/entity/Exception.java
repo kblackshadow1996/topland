@@ -84,9 +84,7 @@ public class Exception extends RecordEntity {
     /**
      * 投诉附件
      */
-    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name = "exception")
-    private List<Attachment> attachments;
+    private String attachments;
 
     /**
      * 自检内容

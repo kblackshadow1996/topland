@@ -5,7 +5,6 @@ import cn.topland.dto.ContractDTO;
 import cn.topland.dto.converter.ContractConverter;
 import cn.topland.entity.User;
 import cn.topland.entity.directus.ContractDO;
-import cn.topland.service.AttachmentService;
 import cn.topland.service.ContractService;
 import cn.topland.service.UserService;
 import cn.topland.util.Response;
@@ -23,9 +22,6 @@ public class ContractController {
 
     @Autowired
     private ContractService contractService;
-
-    @Autowired
-    private AttachmentService attachmentService;
 
     @Autowired
     private UserService userService;

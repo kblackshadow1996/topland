@@ -34,7 +34,7 @@ public class ExceptionDO extends DirectusRecordEntity {
 
     private String complaint;
 
-    private List<Long> attachments;
+    private String attachments;
 
     @JsonProperty(value = "self_check")
     private String selfCheck;
@@ -73,6 +73,7 @@ public class ExceptionDO extends DirectusRecordEntity {
     public static ExceptionDO from(Exception exception) {
 
         ExceptionDO exceptionDO = new ExceptionDO();
+        exceptionDO.setAttachments(exception.getAttachments());
         exceptionDO.setAttribute(exception.getAttribute().name());
         exceptionDO.setType(exception.getType() == null ? null : exception.getType().getId());
         exceptionDO.setCreateDate(exception.getCreateDate());

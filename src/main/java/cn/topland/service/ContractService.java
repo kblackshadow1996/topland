@@ -1,18 +1,13 @@
 package cn.topland.service;
 
 import cn.topland.dao.*;
-import cn.topland.dao.gateway.AttachmentGateway;
 import cn.topland.dao.gateway.ContractGateway;
 import cn.topland.dao.gateway.OperationGateway;
 import cn.topland.entity.*;
-import cn.topland.entity.directus.AttachmentDO;
 import cn.topland.entity.directus.ContractDO;
-import cn.topland.entity.directus.DirectusSimpleIdEntity;
 import cn.topland.util.exception.InternalException;
 import cn.topland.util.exception.QueryException;
-import cn.topland.vo.AttachmentVO;
 import cn.topland.vo.ContractVO;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +15,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static cn.topland.entity.Contract.*;
 
@@ -53,16 +43,10 @@ public class ContractService {
     private DirectusFilesRepository filesRepository;
 
     @Autowired
-    private AttachmentRepository attachmentRepository;
-
-    @Autowired
     private ContractGateway contractGateway;
 
     @Autowired
     private OperationGateway operationGateway;
-
-    @Autowired
-    private AttachmentGateway attachmentGateway;
 
     public Contract get(Long id) {
 
@@ -85,71 +69,13 @@ public class ContractService {
         Contract contract = get(id);
         ContractDO contractDO = contractGateway.update(reviewContract(contract, contractVO, editor), editor.getAccessToken());
         saveOperation(id, contractVO.getAction(), editor, contractVO.getReviewComment());
-        contractDO.setAttachments(listAttachments(contract.getAttachments()));
         return contractDO;
     }
 
     public ContractDO receivePaper(Long id, ContractVO contractVO, User creator) {
 
         Contract contract = get(id);
-        ContractDO contractDO = contractGateway.update(receiveContractPaper(contract, contractVO, creator), creator.getAccessToken());
-        saveAllAttachments(contractDO, contractVO.getAttachments(), contract.getAttachments(), creator.getAccessToken());
-        return contractDO;
-    }
-
-    private List<Long> listAttachments(List<Attachment> attachments) {
-
-        return CollectionUtils.isEmpty(attachments)
-                ? List.of()
-                : attachments.stream().map(SimpleIdEntity::getId).filter(Objects::nonNull).collect(Collectors.toList());
-    }
-
-    private void saveAllAttachments(ContractDO contractDO, List<AttachmentVO> attachmentVOs, List<Attachment> attachments, String accessToken) {
-
-        List<Attachment> contractAttachments = createAttachments(attachmentVOs, attachments, contractDO.getId());
-        Map<Long, List<AttachmentDO>> attachmentMap = attachmentGateway.upload(contractAttachments, accessToken).stream()
-                .filter(attachmentDO -> attachmentDO.getContract() != null)
-                .collect(Collectors.groupingBy(AttachmentDO::getContract));
-        List<Long> attaches = attachmentMap.get(contractDO.getId()).stream().map(DirectusSimpleIdEntity::getId).collect(Collectors.toList());
-        contractDO.setAttachments(attaches);
-    }
-
-    public List<Attachment> createAttachments(List<AttachmentVO> attachmentVOs, List<Attachment> attachments, Long contract) {
-
-        List<Long> ids = attachmentVOs.stream().map(AttachmentVO::getId).filter(Objects::nonNull).collect(Collectors.toList());
-        Map<Long, Attachment> attachmentMap = attachmentRepository.findAllById(ids).stream()
-                .collect(Collectors.toMap(SimpleIdEntity::getId, attachment -> attachment));
-
-        List<Attachment> contractAttachments = new ArrayList<>();
-        List<Attachment> updates = new ArrayList<>();
-        for (AttachmentVO attachmentVO : attachmentVOs) {
-
-            if (attachmentMap.containsKey(attachmentVO.getId())) {
-
-                Attachment attachment = attachmentMap.get(attachmentVO.getId());
-                attachment.setContract(contract);
-                contractAttachments.add(attachment);
-                updates.add(attachment);
-            } else {
-
-                contractAttachments.add(createAttachment(attachmentVO.getFile(), contract));
-            }
-        }
-        List<Attachment> deletes = (List<Attachment>) CollectionUtils.removeAll(attachments, updates);
-        deletes.forEach(delete -> {
-
-            delete.setContract(null);
-        });
-        contractAttachments.addAll(deletes);
-        return contractAttachments;
-    }
-
-    private Attachment createAttachment(String file, Long contract) {
-
-        Attachment attachment = new Attachment();
-        attachment.setFile(getFile(file));
-        attachment.setContract(contract);
-        return attachment;
+        return contractGateway.update(receiveContractPaper(contract, contractVO, creator), creator.getAccessToken());
     }
 
     private void saveOperation(Long id, Action action, User creator, String remark) throws InternalException {
@@ -171,6 +97,7 @@ public class ContractService {
 
     private Contract receiveContractPaper(Contract contract, ContractVO contractVO, User creator) {
 
+        contract.setAttachments(contractVO.getAttachments());
         contract.setPaperDate(contractVO.getPaperDate());
         contract.setEditor(creator);
         contract.setLastUpdateTime(LocalDateTime.now());

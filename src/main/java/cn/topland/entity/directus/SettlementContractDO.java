@@ -26,7 +26,7 @@ public class SettlementContractDO extends DirectusRecordEntity {
 
     private String remark;
 
-    private List<Long> attachments;
+    private String attachments;
 
     private String status;
 
@@ -35,6 +35,7 @@ public class SettlementContractDO extends DirectusRecordEntity {
     public static SettlementContractDO from(SettlementContract contract) {
 
         SettlementContractDO contractDO = new SettlementContractDO();
+        contractDO.setAttachments(contract.getAttachments());
         contractDO.setIdentity(contract.getIdentity());
         contractDO.setContractDate(contract.getContractDate());
         contractDO.setReceivable(contract.getReceivable());

@@ -55,7 +55,10 @@ public class ExceptionVO implements Serializable {
      */
     private String complaint;
 
-    private List<AttachmentVO> attachments;
+    /**
+     * 附件ID
+     */
+    private String attachments;
 
     /**
      * 自检内容

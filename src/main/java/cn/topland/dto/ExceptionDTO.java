@@ -1,6 +1,5 @@
 package cn.topland.dto;
 
-import cn.topland.entity.Exception;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -63,7 +62,7 @@ public class ExceptionDTO implements Serializable {
     /**
      * 附件ID
      */
-    private List<Long> attachments;
+    private String attachments;
 
     /**
      * 自检

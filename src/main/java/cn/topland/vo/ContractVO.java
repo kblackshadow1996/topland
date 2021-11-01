@@ -9,7 +9,6 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
 @Setter
 @Getter
@@ -88,7 +87,10 @@ public class ContractVO implements Serializable {
      */
     private Long order;
 
-    private List<AttachmentVO> attachments;
+    /**
+     * 附件ID
+     */
+    private String attachments;
 
     /**
      * 操作人ID

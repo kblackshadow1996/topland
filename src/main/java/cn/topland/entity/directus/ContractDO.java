@@ -8,7 +8,6 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
 @Setter
 @Getter
@@ -50,13 +49,14 @@ public class ContractDO extends DirectusRecordEntity {
 
     private Long order;
 
-    private List<Long> attachments;
+    private String attachments;
 
     private String status;
 
     public static ContractDO from(Contract contract) {
 
         ContractDO contractDO = new ContractDO();
+        contractDO.setAttachments(contract.getAttachments());
         contractDO.setIdentity(contract.getIdentity());
         contractDO.setType(contract.getType().name());
         contractDO.setCustomer(contract.getCustomer() == null ? null : contract.getCustomer().getId());

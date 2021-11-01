@@ -56,7 +56,7 @@ public class SettlementContractDTO implements Serializable {
     /**
      * 附件ID
      */
-    private List<Long> attachments;
+    private String attachments;
 
     /**
      * 年框合同ID

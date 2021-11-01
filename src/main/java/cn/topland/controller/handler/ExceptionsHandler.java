@@ -25,7 +25,7 @@ public class ExceptionsHandler {
     public Response<String> handleCredentialException(CredentialException e) {
 
         log.error(e.getMessage());
-        return Responses.fail(Response.INVALID_CREDENTIALS, "口令过期, 请刷新后重试");
+        return Responses.fail(Response.INVALID_CREDENTIALS, "无效身份口令, 请刷新后重试");
     }
 
     @ExceptionHandler(value = ExternalException.class)
@@ -53,7 +53,7 @@ public class ExceptionsHandler {
     public Response<String> handleInvalidOtpException(InvalidOtpException e) {
 
         log.error(e.getMessage());
-        return Responses.fail(Response.INVALID_OTP, "用户ip不可用");
+        return Responses.fail(Response.INVALID_OTP, "用户token不可用");
     }
 
     @ExceptionHandler(value = InvalidPayloadException.class)
@@ -71,7 +71,7 @@ public class ExceptionsHandler {
     }
 
     @ExceptionHandler(value = QueryException.class)
-    public Response<String> handleInvalidQueryException(QueryException e) {
+    public Response<String> handleQueryException(QueryException e) {
 
         log.error(e.getMessage());
         return Responses.fail(Response.INVALID_QUERY, e.getMessage());
@@ -126,10 +126,10 @@ public class ExceptionsHandler {
         return Responses.fail(Response.INTERNAL_SERVICE_UNAVAILABLE, e.getMessage());
     }
 
-//    @ExceptionHandler(value = Exception.class)
-//    public Response<String> handleException(Exception e) {
-//
-//        log.error(e.getMessage());
-//        return Responses.fail(Response.INTERNAL_SERVICE_UNAVAILABLE, "内部未知错误");
-//    }
+    @ExceptionHandler(value = Exception.class)
+    public Response<String> handleException(Exception e) {
+
+        log.error("内部异常:", e);
+        return Responses.fail(Response.INTERNAL_SERVICE_UNAVAILABLE, "内部未知错误");
+    }
 }

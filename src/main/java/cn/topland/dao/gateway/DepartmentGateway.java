@@ -80,10 +80,6 @@ public class DepartmentGateway extends BaseGateway {
     private void mappingParentDept(List<DepartmentDO> deptDOs, Map<String, String> parentMap, Department parentDept) {
 
         // 得到部门deptId与其父部门id的关系映射
-        deptDOs.forEach(departmentDO -> {
-
-            System.out.println(departmentDO.getDeptId() + "===" + departmentDO.getId());
-        });
         Map<String, Long> deptMap = deptDOs.stream().collect(Collectors.toMap(DepartmentDO::getDeptId, DirectusIdEntity::getId));
         if (parentDept != null) {
 

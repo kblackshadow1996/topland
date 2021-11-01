@@ -4,7 +4,6 @@ import cn.topland.entity.Operation;
 import cn.topland.entity.directus.OperationDO;
 import cn.topland.util.JsonUtils;
 import cn.topland.util.Reply;
-import cn.topland.util.exception.InternalException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +35,8 @@ public class OperationGateway extends BaseGateway {
     public List<OperationDO> saveAll(List<Operation> operations, String accessToken) {
 
         Reply result = directus.post(OPERATION_URI, tokenParam(accessToken), composeOperations(operations));
-        if (result.isSuccessful()) {
-
-            String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
-            return JsonUtils.parse(data, OPERATIONS);
-        }
-        throw new InternalException("添加操作记录失败");
+        String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+        return JsonUtils.parse(data, OPERATIONS);
     }
 
     private JsonNode composeOperations(List<Operation> operations) {

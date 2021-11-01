@@ -4,7 +4,6 @@ import cn.topland.controller.validator.PermissionValidator;
 import cn.topland.dto.SettlementContractDTO;
 import cn.topland.dto.converter.SettlementContractConverter;
 import cn.topland.entity.User;
-import cn.topland.service.AttachmentService;
 import cn.topland.service.SettlementContractService;
 import cn.topland.service.UserService;
 import cn.topland.util.Response;
@@ -19,9 +18,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/settlement-contract")
 public class SettlementContractController {
-
-    @Autowired
-    private AttachmentService attachmentService;
 
     @Autowired
     private SettlementContractService contractService;
