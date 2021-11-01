@@ -33,6 +33,7 @@ public class UsersGateway extends BaseGateway {
 
     public List<DirectusUsers> saveAll(List<DirectusUsers> directusUsers, String accessToken) {
 
+        // 只用创建新用户
         List<DirectusUsers> users = directusUsers.stream().filter(user -> user.getId() == null).collect(Collectors.toList());
         Map<String, DirectusUsers> usersMap = directusUsers.stream().collect(Collectors.toMap(DirectusUsers::getEmail, u -> u));
         if (CollectionUtils.isNotEmpty(users)) {
