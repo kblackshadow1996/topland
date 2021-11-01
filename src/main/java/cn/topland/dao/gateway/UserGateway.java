@@ -79,7 +79,7 @@ public class UserGateway extends BaseGateway {
 
         ObjectNode body = JsonNodeFactory.instance.objectNode();
         body.put("refresh_token", user.getRefreshToken());
-        Reply reply = directus.post(REFRESH_URI + "/" + user.getId(), tokenParam(user.getAccessToken()), body);
+        Reply reply = directus.post(REFRESH_URI, tokenParam(user.getAccessToken()), body);
         log.info("user refresh: " + reply.getContent());
         return JsonUtils.read(reply.getContent()).path("data");
     }
