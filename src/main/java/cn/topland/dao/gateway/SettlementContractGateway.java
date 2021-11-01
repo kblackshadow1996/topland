@@ -31,4 +31,12 @@ public class SettlementContractGateway extends BaseGateway {
         String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
         return JsonUtils.parse(data, SettlementContractDO.class);
     }
+
+    public SettlementContractDO review(SettlementContract contract, String accessToken) {
+
+        Reply result = directus.patch(SETTLEMENT_URI + "/" + contract.getId(), tokenParam(accessToken),
+                JsonUtils.toJsonNode(SettlementContractDO.review(contract)));
+        String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+        return JsonUtils.parse(data, SettlementContractDO.class);
+    }
 }

@@ -79,7 +79,7 @@ public class CustomerService {
     public CustomerDO lost(Long id, CustomerVO customerVO, User editor) {
 
         Customer customer = get(id);
-        CustomerDO customerDO = customerGateway.update(lostCustomer(customer, editor), editor.getAccessToken());
+        CustomerDO customerDO = customerGateway.lostAndRetrieve(lostCustomer(customer, editor), editor.getAccessToken());
         saveOperation(id, Action.LOST, editor, customerVO.getLostReason());
         customerDO.setContacts(contacts(customer.getContacts()));
         return customerDO;
@@ -88,7 +88,7 @@ public class CustomerService {
     public CustomerDO retrieve(Long id, User editor) {
 
         Customer customer = get(id);
-        CustomerDO customerDO = customerGateway.update(retrieveCustomer(customer, editor), editor.getAccessToken());
+        CustomerDO customerDO = customerGateway.lostAndRetrieve(retrieveCustomer(customer, editor), editor.getAccessToken());
         saveOperation(id, Action.RETRIEVE, editor, null);
         customerDO.setContacts(contacts(customer.getContacts()));
         return customerDO;

@@ -62,7 +62,7 @@ public class SettlementContractService {
     public SettlementContractDO review(Long id, SettlementReviewVO reviewVO, User editor) {
 
         SettlementContract contract = get(id);
-        SettlementContractDO contractDO = settlementGateway.update(reviewSettlementContract(contract, reviewVO, editor), editor.getAccessToken());
+        SettlementContractDO contractDO = settlementGateway.review(reviewSettlementContract(contract, reviewVO, editor), editor.getAccessToken());
         saveOperation(id, reviewVO.getAction(), editor, reviewVO.getReviewComment());
         return contractDO;
     }

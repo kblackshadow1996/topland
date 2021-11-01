@@ -44,6 +44,13 @@ public class ExceptionGateway extends BaseGateway {
         return JsonUtils.parse(data, ExceptionDO.class);
     }
 
+    public ExceptionDO solve(Exception exception, String accessToken) {
+
+        Reply result = directus.patch(EXCEPTION_URI + "/" + exception.getId(), tokenParam(accessToken), composeSolution(exception));
+        String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+        return JsonUtils.parse(data, ExceptionDO.class);
+    }
+
     private JsonNode composeExceptions(List<Exception> exceptions) {
 
         ArrayNode array = JsonNodeFactory.instance.arrayNode();
@@ -58,13 +65,16 @@ public class ExceptionGateway extends BaseGateway {
     private JsonNode composeException(Exception exception) {
 
         ObjectNode node = (ObjectNode) JsonUtils.toJsonNode(ExceptionDO.from(exception));
-        node.put("resolved", exception.getResolved() != null && exception.getResolved() ? 1 : 0);
         node.put("critical", exception.getCritical() != null && exception.getCritical() ? 1 : 0);
-        node.put("optimal", exception.getOptimal() != null && exception.getOptimal() ? 1 : 0);
         node.set("copies", composeCopies(exception.getCopies()));
         node.set("owners", composeOwners(exception.getOwners()));
         node.set("orders", composeOrders(exception.getOrders()));
         return node;
+    }
+
+    private JsonNode composeSolution(Exception exception) {
+
+        return JsonUtils.toJsonNode(ExceptionDO.solution(exception));
     }
 
     private JsonNode composeOrders(List<Order> orders) {

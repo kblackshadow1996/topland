@@ -8,7 +8,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -32,21 +32,78 @@ public class SettlementContractDO extends DirectusRecordEntity {
 
     private Long contract;
 
-    public static SettlementContractDO from(SettlementContract contract) {
+    @Setter
+    @Getter
+    public static class BaseSettlement {
 
-        SettlementContractDO contractDO = new SettlementContractDO();
-        contractDO.setAttachments(contract.getAttachments());
-        contractDO.setIdentity(contract.getIdentity());
-        contractDO.setContractDate(contract.getContractDate());
-        contractDO.setReceivable(contract.getReceivable());
-        contractDO.setOrder(contract.getOrder() == null ? null : contract.getOrder().getId());
-        contractDO.setRemark(contract.getRemark());
-        contractDO.setStatus(contract.getStatus().name());
-        contractDO.setContract(contract.getContract() == null ? null : contract.getContract().getId());
-        contractDO.setCreator(contract.getCreator().getId());
-        contractDO.setEditor(contract.getEditor().getId());
-        contractDO.setCreateTime(contract.getCreateTime());
-        contractDO.setLastUpdateTime(contract.getLastUpdateTime());
-        return contractDO;
+        private String identity;
+
+        @JsonProperty(value = "contract_date")
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        private LocalDate contractDate;
+
+        private BigDecimal receivable;
+
+        private Long order;
+
+        private String remark;
+
+        private String attachments;
+
+        private String status;
+
+        private Long contract;
+
+        @JsonProperty(value = "create_time")
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+        private LocalDateTime createTime;
+
+        @JsonProperty(value = "last_update_time")
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+        private LocalDateTime lastUpdateTime;
+
+        private Long creator;
+
+        private Long editor;
+    }
+
+    @Setter
+    @Getter
+    public static class Review {
+
+        private String status;
+
+        @JsonProperty(value = "last_update_time")
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+        private LocalDateTime lastUpdateTime;
+
+        private Long editor;
+    }
+
+    public static BaseSettlement from(SettlementContract contract) {
+
+        BaseSettlement base = new BaseSettlement();
+        base.setAttachments(contract.getAttachments());
+        base.setIdentity(contract.getIdentity());
+        base.setContractDate(contract.getContractDate());
+        base.setReceivable(contract.getReceivable());
+        base.setOrder(contract.getOrder() == null ? null : contract.getOrder().getId());
+        base.setRemark(contract.getRemark());
+        base.setStatus(contract.getStatus().name());
+        base.setContract(contract.getContract() == null ? null : contract.getContract().getId());
+        base.setCreator(contract.getCreator().getId());
+        base.setEditor(contract.getEditor().getId());
+        base.setCreateTime(contract.getCreateTime());
+        base.setLastUpdateTime(contract.getLastUpdateTime());
+        return base;
+    }
+
+    public static Review review(SettlementContract contract) {
+
+        Review review = new Review();
+        review.setStatus(contract.getStatus().name());
+        review.setEditor(contract.getEditor().getId());
+        review.setLastUpdateTime(contract.getLastUpdateTime());
+        return review;
     }
 }

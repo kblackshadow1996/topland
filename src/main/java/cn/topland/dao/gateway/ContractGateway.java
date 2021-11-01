@@ -30,4 +30,18 @@ public class ContractGateway extends BaseGateway {
         String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
         return JsonUtils.parse(data, ContractDO.class);
     }
+
+    public ContractDO receivePaper(Contract contract, String accessToken) {
+
+        Reply result = directus.patch(CONTRACT_URI + "/" + contract.getId(), tokenParam(accessToken), JsonUtils.toJsonNode(ContractDO.paper(contract)));
+        String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+        return JsonUtils.parse(data, ContractDO.class);
+    }
+
+    public ContractDO review(Contract contract, String accessToken) {
+
+        Reply result = directus.patch(CONTRACT_URI + "/" + contract.getId(), tokenParam(accessToken), JsonUtils.toJsonNode(ContractDO.review(contract)));
+        String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+        return JsonUtils.parse(data, ContractDO.class);
+    }
 }

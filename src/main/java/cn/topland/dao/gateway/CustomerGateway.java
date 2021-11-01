@@ -26,7 +26,16 @@ public class CustomerGateway extends BaseGateway {
 
     public CustomerDO update(Customer customer, String accessToken) {
 
-        Reply result = directus.patch(CUSTOMER_URI + "/" + customer.getId(), tokenParam(accessToken), JsonUtils.toJsonNode(CustomerDO.from(customer)));
+        Reply result = directus.patch(CUSTOMER_URI + "/" + customer.getId(), tokenParam(accessToken),
+                JsonUtils.toJsonNode(CustomerDO.from(customer)));
+        String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
+        return JsonUtils.parse(data, CustomerDO.class);
+    }
+
+    public CustomerDO lostAndRetrieve(Customer customer, String accessToken) {
+
+        Reply result = directus.patch(CUSTOMER_URI + "/" + customer.getId(), tokenParam(accessToken),
+                JsonUtils.toJsonNode(CustomerDO.lostAndRetrieve(customer)));
         String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
         return JsonUtils.parse(data, CustomerDO.class);
     }

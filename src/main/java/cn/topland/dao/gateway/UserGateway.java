@@ -124,10 +124,7 @@ public class UserGateway extends BaseGateway {
 
     private JsonNode composeAuthData(User user) {
 
-        ObjectNode node = JsonNodeFactory.instance.objectNode();
-        node.put("role", user.getRole().getId());
-        node.put("auth", user.getAuth().name());
-        return node;
+        return JsonUtils.toJsonNode(UserDO.auth(user));
     }
 
     private JsonNode listUserIds(List<User> users) {

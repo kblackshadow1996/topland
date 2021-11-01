@@ -81,7 +81,7 @@ public class ExceptionService {
 
         Exception persistExp = get(id);
         boolean isUpdate = isUpdateSolution(persistExp);
-        ExceptionDO exception = exceptionGateway.update(solveException(persistExp, solutionVO, editor), editor.getAccessToken());
+        ExceptionDO exception = exceptionGateway.solve(solveException(persistExp, solutionVO, editor), editor.getAccessToken());
         saveSolveOperation(id, editor, isUpdate);
         return exception;
     }

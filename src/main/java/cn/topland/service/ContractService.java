@@ -7,9 +7,9 @@ import cn.topland.entity.*;
 import cn.topland.entity.directus.ContractDO;
 import cn.topland.util.exception.InternalException;
 import cn.topland.util.exception.QueryException;
+import cn.topland.vo.ContractReviewVO;
 import cn.topland.vo.ContractVO;
 import cn.topland.vo.PaperVO;
-import cn.topland.vo.ContractReviewVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -69,7 +69,7 @@ public class ContractService {
     public ContractDO review(Long id, ContractReviewVO reviewVO, User editor) {
 
         Contract contract = get(id);
-        ContractDO contractDO = contractGateway.update(reviewContract(contract, reviewVO, editor), editor.getAccessToken());
+        ContractDO contractDO = contractGateway.review(reviewContract(contract, reviewVO, editor), editor.getAccessToken());
         saveOperation(id, reviewVO.getAction(), editor, reviewVO.getReviewComment());
         return contractDO;
     }
@@ -77,7 +77,7 @@ public class ContractService {
     public ContractDO receivePaper(Long id, PaperVO paperVO, User creator) {
 
         Contract contract = get(id);
-        return contractGateway.update(receiveContractPaper(contract, paperVO, creator), creator.getAccessToken());
+        return contractGateway.receivePaper(receiveContractPaper(contract, paperVO, creator), creator.getAccessToken());
     }
 
     private void saveOperation(Long id, Action action, User creator, String remark) throws InternalException {
