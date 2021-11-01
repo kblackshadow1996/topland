@@ -7,6 +7,7 @@ import cn.topland.entity.*;
 import cn.topland.entity.directus.SettlementContractDO;
 import cn.topland.util.exception.QueryException;
 import cn.topland.vo.SettlementContractVO;
+import cn.topland.vo.SettlementReviewVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,17 +59,17 @@ public class SettlementContractService {
         return contractDO;
     }
 
-    public SettlementContractDO review(Long id, SettlementContractVO contractVO, User editor) {
+    public SettlementContractDO review(Long id, SettlementReviewVO reviewVO, User editor) {
 
         SettlementContract contract = get(id);
-        SettlementContractDO contractDO = settlementGateway.update(reviewSettlementContract(contract, contractVO, editor), editor.getAccessToken());
-        saveOperation(id, contractVO.getAction(), editor, contractVO.getReviewComments());
+        SettlementContractDO contractDO = settlementGateway.update(reviewSettlementContract(contract, reviewVO, editor), editor.getAccessToken());
+        saveOperation(id, reviewVO.getAction(), editor, reviewVO.getReviewComment());
         return contractDO;
     }
 
-    private SettlementContract reviewSettlementContract(SettlementContract contract, SettlementContractVO contractVO, User editor) {
+    private SettlementContract reviewSettlementContract(SettlementContract contract, SettlementReviewVO reviewVO, User editor) {
 
-        Action action = contractVO.getAction();
+        Action action = reviewVO.getAction();
         Status status = Action.APPROVE == action ? Status.APPROVED : Status.REJECTED;
         contract.setStatus(status);
         contract.setEditor(editor);

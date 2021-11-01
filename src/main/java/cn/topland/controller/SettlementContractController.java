@@ -9,6 +9,7 @@ import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.vo.SettlementContractVO;
+import cn.topland.vo.SettlementReviewVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,16 +52,16 @@ public class SettlementContractController {
      * 审核结算合同
      *
      * @param id         结算合同id
-     * @param contractVO 结算合同信息
+     * @param reviewVO 结算合同信息
      * @param token      操作用户token
      * @return
      */
     @PatchMapping("/review/{id}")
-    public Response<SettlementContractDTO> review(@PathVariable Long id, @RequestBody SettlementContractVO contractVO,
+    public Response<SettlementContractDTO> review(@PathVariable Long id, @RequestBody SettlementReviewVO reviewVO,
                                                   @RequestParam(value = "access_token", required = true) String token) {
 
-        User user = userService.get(contractVO.getCreator());
+        User user = userService.get(reviewVO.getCreator());
         validator.validateSettlementReviewPermissions(user, token);
-        return Responses.success(settlementContractConverter.toDTO(contractService.review(id, contractVO, user)));
+        return Responses.success(settlementContractConverter.toDTO(contractService.review(id, reviewVO, user)));
     }
 }

@@ -8,6 +8,7 @@ import cn.topland.entity.*;
 import cn.topland.entity.directus.ExceptionDO;
 import cn.topland.util.exception.QueryException;
 import cn.topland.vo.ExceptionVO;
+import cn.topland.vo.SolutionVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,23 +77,23 @@ public class ExceptionService {
         return exceptionDO;
     }
 
-    public ExceptionDO solve(Long id, ExceptionVO exceptionVO, User editor) {
+    public ExceptionDO solve(Long id, SolutionVO solutionVO, User editor) {
 
         Exception persistExp = get(id);
         boolean isUpdate = isUpdateSolution(persistExp);
-        ExceptionDO exception = exceptionGateway.update(solveException(persistExp, exceptionVO, editor), editor.getAccessToken());
+        ExceptionDO exception = exceptionGateway.update(solveException(persistExp, solutionVO, editor), editor.getAccessToken());
         saveSolveOperation(id, editor, isUpdate);
         return exception;
     }
 
-    private Exception solveException(Exception exception, ExceptionVO exceptionVO, User editor) {
+    private Exception solveException(Exception exception, SolutionVO solutionVO, User editor) {
 
-        exception.setCloseDate(exceptionVO.getCloseDate());
-        exception.setSolution(exceptionVO.getSolution());
-        exception.setActualLoss(exceptionVO.getActualLoss());
-        exception.setActualLossCondition(exceptionVO.getActualLossCondition());
-        exception.setOptimal(exceptionVO.getOptimal());
-        exception.setOptimalSolution(exceptionVO.getOptimalSolution());
+        exception.setCloseDate(solutionVO.getCloseDate());
+        exception.setSolution(solutionVO.getSolution());
+        exception.setActualLoss(solutionVO.getActualLoss());
+        exception.setActualLossCondition(solutionVO.getActualLossCondition());
+        exception.setOptimal(solutionVO.getOptimal());
+        exception.setOptimalSolution(solutionVO.getOptimalSolution());
         exception.setResolved(true);
         exception.setEditor(editor);
         exception.setLastUpdateTime(LocalDateTime.now());

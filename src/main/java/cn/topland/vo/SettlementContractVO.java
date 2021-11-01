@@ -9,7 +9,6 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
 @Setter
 @Getter
@@ -56,10 +55,4 @@ public class SettlementContractVO implements Serializable {
      * 操作
      */
     private SettlementContract.Action action;
-
-    /**
-     * 审核意见
-     */
-    @JsonProperty("review_comments")
-    private String reviewComments;
 }

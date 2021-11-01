@@ -10,6 +10,8 @@ import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.vo.ContractVO;
+import cn.topland.vo.PaperVO;
+import cn.topland.vo.ContractReviewVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,17 +54,17 @@ public class ContractController {
      * 收到纸质合同
      *
      * @param id         合同id
-     * @param contractVO 合同信息
+     * @param paperVO 合同信息
      * @param token      操作用户token
      * @return
      */
     @PatchMapping("/receive-paper/{id}")
-    public Response<ContractDTO> receivePaper(@PathVariable Long id, @RequestBody ContractVO contractVO,
+    public Response<ContractDTO> receivePaper(@PathVariable Long id, @RequestBody PaperVO paperVO,
                                               @RequestParam(value = "access_token", required = true) String token) {
 
-        User user = userService.get(contractVO.getCreator());
+        User user = userService.get(paperVO.getCreator());
         validator.validateContractReceivePaperPermissions(user, token);
-        ContractDO contractDO = contractService.receivePaper(id, contractVO, user);
+        ContractDO contractDO = contractService.receivePaper(id, paperVO, user);
         return Responses.success(contractConverter.toDTO(contractDO));
     }
 
@@ -70,17 +72,17 @@ public class ContractController {
      * 审核合同
      *
      * @param id         合同id
-     * @param contractVO 合同信息
+     * @param reviewVO 合同信息
      * @param token      操作用户token
      * @return
      */
     @PatchMapping("/review/{id}")
-    public Response<ContractDTO> review(@PathVariable Long id, @RequestBody ContractVO contractVO,
+    public Response<ContractDTO> review(@PathVariable Long id, @RequestBody ContractReviewVO reviewVO,
                                         @RequestParam(value = "access_token", required = true) String token) {
 
-        User user = userService.get(contractVO.getCreator());
+        User user = userService.get(reviewVO.getCreator());
         validator.validateContractReviewPermissions(user, token);
-        ContractDO contractDO = contractService.review(id, contractVO, user);
+        ContractDO contractDO = contractService.review(id, reviewVO, user);
         return Responses.success(contractConverter.toDTO(contractDO));
     }
 }
