@@ -51,9 +51,9 @@ public class SettlementContractController {
     /**
      * 审核结算合同
      *
-     * @param id         结算合同id
+     * @param id       结算合同id
      * @param reviewVO 结算合同信息
-     * @param token      操作用户token
+     * @param token    操作用户token
      * @return
      */
     @PatchMapping("/review/{id}")

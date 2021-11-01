@@ -1,7 +1,6 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.DepartmentDTO;
-import cn.topland.entity.Department;
 import cn.topland.entity.directus.DepartmentDO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;

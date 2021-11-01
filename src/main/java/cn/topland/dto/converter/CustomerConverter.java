@@ -1,7 +1,6 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.CustomerDTO;
-import cn.topland.entity.Customer;
 import cn.topland.entity.directus.CustomerDO;
 import org.springframework.stereotype.Component;
 

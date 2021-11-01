@@ -1,7 +1,6 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.UserDTO;
-import cn.topland.entity.User;
 import cn.topland.entity.directus.UserDO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;

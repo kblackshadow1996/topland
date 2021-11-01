@@ -9,9 +9,9 @@ import cn.topland.service.ContractService;
 import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
+import cn.topland.vo.ContractReviewVO;
 import cn.topland.vo.ContractVO;
 import cn.topland.vo.PaperVO;
-import cn.topland.vo.ContractReviewVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,9 +53,9 @@ public class ContractController {
     /**
      * 收到纸质合同
      *
-     * @param id         合同id
+     * @param id      合同id
      * @param paperVO 合同信息
-     * @param token      操作用户token
+     * @param token   操作用户token
      * @return
      */
     @PatchMapping("/receive-paper/{id}")
@@ -71,9 +71,9 @@ public class ContractController {
     /**
      * 审核合同
      *
-     * @param id         合同id
+     * @param id       合同id
      * @param reviewVO 合同信息
-     * @param token      操作用户token
+     * @param token    操作用户token
      * @return
      */
     @PatchMapping("/review/{id}")

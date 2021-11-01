@@ -1,7 +1,6 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.ExceptionDTO;
-import cn.topland.entity.Exception;
 import cn.topland.entity.directus.ExceptionDO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;

@@ -1,7 +1,6 @@
 package cn.topland.dto.converter;
 
 import cn.topland.dto.ContractDTO;
-import cn.topland.entity.Contract;
 import cn.topland.entity.directus.ContractDO;
 import org.springframework.stereotype.Component;
 

@@ -91,7 +91,7 @@ public class WeworkGateway {
         params.add("access_token", loadToken());
         params.add("code", code);
         String userInfo = safeGet(url, params);
-       log.info("wework userInfo: " + userInfo);
+        log.info("wework userInfo: " + userInfo);
         return JsonUtils.parse(userInfo, UserInfo.class);
     }
 
