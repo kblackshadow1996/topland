@@ -68,12 +68,12 @@ public class LoginController {
     public Response<String> refreshToken(@PathVariable Long userId) {
 
         User user = userService.get(userId);
-        validator.validateUserAuthPermissions(user, user.getAccessToken());
+        validator.validateUserRefreshPermissions(user, user.getAccessToken());
         return Responses.success(userService.refreshToken(userId));
     }
 
     /**
-     * 刷新口令
+     * 登出
      *
      * @param userId 用户id
      * @return
