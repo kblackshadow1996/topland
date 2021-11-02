@@ -214,7 +214,6 @@ public class QuotationService {
             quotationServices.add(service);
         }
         List<cn.topland.entity.QuotationService> deletes = (List<cn.topland.entity.QuotationService>) CollectionUtils.removeAll(services, updates);
-        System.out.println(deletes);
         deletes.forEach(delete -> {
             // 解除关联
             delete.setQuotation(null);

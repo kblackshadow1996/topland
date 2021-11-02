@@ -27,7 +27,7 @@ public class RoleGateway extends BaseGateway {
 
     public RoleDO add(Role role, String accessToken) {
 
-        Reply result = directus.post(ROLE_URI, tokenParam(accessToken), JsonUtils.toJsonNode(RoleDO.from(role)));
+        Reply result = directus.post(ROLE_URI, tokenParam(accessToken), composeRole(role));
         String data = JsonUtils.read(result.getContent()).path("data").toPrettyString();
         return JsonUtils.parse(data, RoleDO.class);
     }

@@ -255,7 +255,6 @@ public class ExceptionService {
 
     private List<Operation> createAddExceptionOperations(List<ExceptionDO> exceptions, User creator) {
 
-        System.out.println(exceptions);
         return exceptions.stream()
                 .map(exception -> createOperation(Action.CREATE, exception.getId(), creator))
                 .collect(Collectors.toList());
