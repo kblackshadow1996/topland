@@ -33,9 +33,26 @@ public class UsersGateway extends BaseGateway {
 
     public List<DirectusUsers> saveAll(List<DirectusUsers> directusUsers, String accessToken) {
 
-        // 只用创建新用户
-        List<DirectusUsers> users = directusUsers.stream().filter(user -> user.getId() == null).collect(Collectors.toList());
-        Map<String, DirectusUsers> usersMap = directusUsers.stream().collect(Collectors.toMap(DirectusUsers::getEmail, u -> u));
+        List<DirectusUsers> users = createUsers(getCreateUsers(directusUsers), accessToken);
+        users.addAll(updateUsers(getUpdateUsers(directusUsers), accessToken));
+        return users;
+    }
+
+    private List<DirectusUsers> updateUsers(List<DirectusUsers> users, String accessToken) {
+
+        if (CollectionUtils.isNotEmpty(users)) {
+
+            for (DirectusUsers user : users) {
+
+                auth(user, accessToken);
+            }
+        }
+        return users;
+    }
+
+    private List<DirectusUsers> createUsers(List<DirectusUsers> users, String accessToken) {
+
+        Map<String, DirectusUsers> usersMap = users.stream().collect(Collectors.toMap(DirectusUsers::getEmail, u -> u));
         if (CollectionUtils.isNotEmpty(users)) {
 
             Reply result = directus.post(USERS_URI, tokenParam(accessToken), composeUsers(users));
@@ -45,6 +62,16 @@ public class UsersGateway extends BaseGateway {
             });
         }
         return new ArrayList<>(usersMap.values());
+    }
+
+    private List<DirectusUsers> getCreateUsers(List<DirectusUsers> directusUsers) {
+
+        return directusUsers.stream().filter(user -> user.getId() == null).collect(Collectors.toList());
+    }
+
+    private List<DirectusUsers> getUpdateUsers(List<DirectusUsers> directusUsers) {
+
+        return directusUsers.stream().filter(user -> user.getId() != null).collect(Collectors.toList());
     }
 
     private JsonNode composeUsers(List<DirectusUsers> directusUsers) {
@@ -69,7 +96,7 @@ public class UsersGateway extends BaseGateway {
     private JsonNode composeAuth(DirectusUsers directusUser) {
 
         ObjectNode node = JsonNodeFactory.instance.objectNode();
-        node.put("role", directusUser.getRole().getId());
+        node.put("role", directusUser.getRole() == null ? null : directusUser.getRole().getId());
         return node;
     }
 }

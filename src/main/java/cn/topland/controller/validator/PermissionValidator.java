@@ -55,7 +55,7 @@ public class PermissionValidator {
     public void validateUserAuthPermissions(User user, String token) throws AccessException, InvalidException {
 
         validateToken(token, user.getAccessToken());
-        validateRole(hasPermission(user.getRole(), USER, ACTION_UPDATE, "role"));
+        validateRole(hasPermission(user.getRole(), USER, ACTION_UPDATE, "auth"));
     }
 
     public void validateUserRefreshPermissions(User user, String token) throws AccessException, InvalidException {

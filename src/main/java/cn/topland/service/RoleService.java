@@ -28,6 +28,9 @@ public class RoleService {
     @Value("${admin.role.name}")
     private String ADMIN;
 
+    @Value("${default.role.name}")
+    private String DEFAULT_ROLE;
+
     @Autowired
     private RoleRepository repository;
 
@@ -77,18 +80,18 @@ public class RoleService {
 
         Role role = get(id);
         validateNameUnique(roleVO.getName(), id);
-        validateAdmin(role.getName());
+        validateAdminOrUser(role.getName());
         List<Authority> authorities = authorityRepository.findAllById(roleVO.getAuthorities());
         DirectusRoles directusRole = updateDirectusRoles(role.getRole(), roleVO, editor.getAccessToken());
         updatePermissions(role.getRole().getPermissions(), authorities, directusRole.getId(), editor.getAccessToken());
         return roleGateway.update(updateRole(role, roleVO, authorities, directusRole, editor), editor.getAccessToken());
     }
 
-    private void validateAdmin(String name) {
+    private void validateAdminOrUser(String name) {
 
-        if (ADMIN.equals(name)) {
+        if (ADMIN.equals(name) || DEFAULT_ROLE.equals(name)) {
 
-            throw new QueryException("[管理员]角色不可修改");
+            throw new QueryException("[" + ADMIN + "]或[" + DEFAULT_ROLE + "]不可修改");
         }
     }
 

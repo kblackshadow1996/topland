@@ -124,6 +124,8 @@ public class UserDO extends DirectusRecordEntity {
         private Long creator;
 
         private Long editor;
+
+        private Long role;
     }
 
     @Setter
@@ -149,6 +151,7 @@ public class UserDO extends DirectusRecordEntity {
         base.setUserId(user.getUserId());
         base.setExternalPosition(user.getExternalPosition());
         base.setInternalPosition(user.getInternalPosition());
+        base.setRole(user.getRole() == null ? null : user.getRole().getId());
         base.setMobile(user.getMobile());
         base.setEmail(user.getEmail());
         base.setAvatar(user.getAvatar());
