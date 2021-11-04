@@ -9,6 +9,7 @@ import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.vo.RoleVO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,9 +40,11 @@ public class RoleController {
      * @return
      */
     @PostMapping("/add")
-    public Response<RoleDTO> add(@RequestBody RoleVO roleVO,
-                                 @RequestParam(value = "access_token", required = true) String token) {
+    public Response<RoleDTO> add(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                 @RequestBody RoleVO roleVO,
+                                 @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(roleVO.getCreator());
         validator.validateRoleCreatePermissions(user, token);
         return Responses.success(roleConverter.toDTO(roleService.add(roleVO, user)));
@@ -56,9 +59,11 @@ public class RoleController {
      * @return
      */
     @PatchMapping("/update/{id}")
-    public Response<RoleDTO> update(@PathVariable Long id, @RequestBody RoleVO roleVO,
-                                    @RequestParam(value = "access_token", required = true) String token) {
+    public Response<RoleDTO> update(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                    @PathVariable Long id, @RequestBody RoleVO roleVO,
+                                    @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(roleVO.getCreator());
         validator.validateRoleUpdatePermissions(user, token);
         return Responses.success(roleConverter.toDTO(roleService.update(id, roleVO, user)));

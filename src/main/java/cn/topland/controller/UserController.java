@@ -8,6 +8,7 @@ import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.vo.UserVO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,8 +38,10 @@ public class UserController {
      * @return
      */
     @PostMapping("/wework/sync/all")
-    public Response<List<UserDTO>> syncAll(Long creator, @RequestParam(value = "access_token", required = true) String token) {
+    public Response<List<UserDTO>> syncAll(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                           Long creator, @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(creator);
         validator.validateUserPermissions(user, token);
         return Responses.success(userConverter.toDTOs(userService.syncAllWeworkUser(user)));
@@ -53,9 +56,11 @@ public class UserController {
      * @return
      */
     @PostMapping(value = "/wework/sync")
-    public Response<List<UserDTO>> sync(String deptId, Long creator,
-                                        @RequestParam(value = "access_token", required = true) String token) {
+    public Response<List<UserDTO>> sync(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                        String deptId, Long creator,
+                                        @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(creator);
         validator.validateUserPermissions(user, token);
         return Responses.success(userConverter.toDTOs(userService.syncWeworkUser(deptId, user)));
@@ -70,9 +75,11 @@ public class UserController {
      * @return
      */
     @PatchMapping(value = "/auth/{id}")
-    public Response<UserDTO> auth(@PathVariable Long id, @RequestBody UserVO userVO,
-                                  @RequestParam(value = "access_token", required = true) String token) {
+    public Response<UserDTO> auth(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                  @PathVariable Long id, @RequestBody UserVO userVO,
+                                  @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(userVO.getCreator());
         validator.validateUserAuthPermissions(user, token);
         return Responses.success(userConverter.toDTO(userService.auth(id, userVO)));
@@ -86,9 +93,11 @@ public class UserController {
      * @return
      */
     @PatchMapping(value = "/auth")
-    public Response<List<UserDTO>> auth(@RequestBody UserVO userVO,
-                                        @RequestParam(value = "access_token", required = true) String token) {
+    public Response<List<UserDTO>> auth(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                        @RequestBody UserVO userVO,
+                                        @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(userVO.getCreator());
         validator.validateUserAuthPermissions(user, token);
         return Responses.success(userConverter.toDTOs(userService.auth(userVO)));

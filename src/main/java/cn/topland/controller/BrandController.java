@@ -11,6 +11,7 @@ import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.vo.BrandVO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,9 +45,11 @@ public class BrandController {
      * @return
      */
     @PostMapping("/add")
-    public Response<BrandDTO> add(@RequestBody BrandVO brandVO,
-                                  @RequestParam(value = "access_token", required = true) String token) {
+    public Response<BrandDTO> add(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                  @RequestBody BrandVO brandVO,
+                                  @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(brandVO.getCreator());
         validator.validateBrandCreatePermissions(user, token);
         BrandDO brandDO = brandService.add(brandVO, user);
@@ -62,9 +65,11 @@ public class BrandController {
      * @return
      */
     @PatchMapping("/update/{id}")
-    public Response<BrandDTO> update(@PathVariable Long id, @RequestBody BrandVO brandVO,
-                                     @RequestParam(value = "access_token", required = true) String token) {
+    public Response<BrandDTO> update(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                     @PathVariable Long id, @RequestBody BrandVO brandVO,
+                                     @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(brandVO.getCreator());
         validator.validateBrandUpdatePermissions(user, token);
         BrandDO brandDO = brandService.update(id, brandVO, user);

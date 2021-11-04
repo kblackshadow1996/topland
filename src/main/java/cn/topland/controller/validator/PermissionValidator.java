@@ -229,7 +229,7 @@ public class PermissionValidator {
 
         if (StringUtils.isBlank(token) || StringUtils.isBlank(cacheToken) || !cacheToken.equals(token)) {
 
-            throw new InvalidException("用户口令已过期,请刷新后重试");
+            throw new InvalidException("用户口令错误或已过期,请刷新后重试");
         }
     }
 }

@@ -10,6 +10,7 @@ import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.vo.SettlementContractVO;
 import cn.topland.vo.SettlementReviewVO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,9 +41,11 @@ public class SettlementContractController {
      * @return
      */
     @PostMapping("/add")
-    public Response<SettlementContractDTO> add(@RequestBody SettlementContractVO contractVO,
-                                               @RequestParam(value = "access_token", required = true) String token) {
+    public Response<SettlementContractDTO> add(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                               @RequestBody SettlementContractVO contractVO,
+                                               @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(contractVO.getCreator());
         validator.validateSettlementCreatePermissions(user, token);
         return Responses.success(settlementContractConverter.toDTO(contractService.add(contractVO, user)));
@@ -57,9 +60,11 @@ public class SettlementContractController {
      * @return
      */
     @PatchMapping("/review/{id}")
-    public Response<SettlementContractDTO> review(@PathVariable Long id, @RequestBody SettlementReviewVO reviewVO,
-                                                  @RequestParam(value = "access_token", required = true) String token) {
+    public Response<SettlementContractDTO> review(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                                  @PathVariable Long id, @RequestBody SettlementReviewVO reviewVO,
+                                                  @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(reviewVO.getCreator());
         validator.validateSettlementReviewPermissions(user, token);
         return Responses.success(settlementContractConverter.toDTO(contractService.review(id, reviewVO, user)));

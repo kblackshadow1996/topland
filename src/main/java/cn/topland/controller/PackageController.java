@@ -11,6 +11,7 @@ import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.vo.PackageVO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,9 +45,11 @@ public class PackageController {
      * @return
      */
     @PostMapping("/add")
-    public Response<PackageDTO> add(@RequestBody PackageVO packageVO,
-                                    @RequestParam(value = "access_token", required = true) String token) {
+    public Response<PackageDTO> add(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                    @RequestBody PackageVO packageVO,
+                                    @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(packageVO.getCreator());
         validator.validatePackageCreatePermissions(user, token);
         PackageDO packageDO = packageService.add(packageVO, user);
@@ -62,9 +65,11 @@ public class PackageController {
      * @return
      */
     @PatchMapping("/update/{id}")
-    public Response<PackageDTO> update(@PathVariable Long id, @RequestBody PackageVO packageVO,
-                                       @RequestParam(value = "access_token", required = true) String token) {
+    public Response<PackageDTO> update(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                       @PathVariable Long id, @RequestBody PackageVO packageVO,
+                                       @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(packageVO.getCreator());
         validator.validatePackageUpdatePermissions(user, token);
         PackageDO packageDO = packageService.update(id, packageVO, user);

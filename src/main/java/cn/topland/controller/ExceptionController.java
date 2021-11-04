@@ -11,6 +11,7 @@ import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.vo.ExceptionVO;
 import cn.topland.vo.SolutionVO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,9 +44,11 @@ public class ExceptionController {
      * @return
      */
     @PostMapping("/add")
-    public Response<List<ExceptionDTO>> add(@RequestBody List<ExceptionVO> exceptionVOs,
-                                            @RequestParam(value = "access_token", required = true) String token) {
+    public Response<List<ExceptionDTO>> add(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                            @RequestBody List<ExceptionVO> exceptionVOs,
+                                            @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(exceptionVOs.get(0).getCreator());
         validator.validateExceptionCreatePermissions(user, token);
         List<ExceptionDO> exceptionDOs = exceptionService.add(exceptionVOs, user);
@@ -61,9 +64,11 @@ public class ExceptionController {
      * @return
      */
     @PatchMapping("/update/{id}")
-    public Response<ExceptionDTO> update(@PathVariable Long id, @RequestBody ExceptionVO exceptionVO,
-                                         @RequestParam(value = "access_token", required = true) String token) {
+    public Response<ExceptionDTO> update(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                         @PathVariable Long id, @RequestBody ExceptionVO exceptionVO,
+                                         @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(exceptionVO.getCreator());
         validator.validateExceptionUpdatePermissions(user, token);
         ExceptionDO exceptionDO = exceptionService.update(id, exceptionVO, user);
@@ -79,9 +84,11 @@ public class ExceptionController {
      * @return
      */
     @PatchMapping("/solve/{id}")
-    public Response<ExceptionDTO> solve(@PathVariable Long id, @RequestBody SolutionVO solutionVO,
-                                        @RequestParam(value = "access_token", required = true) String token) {
+    public Response<ExceptionDTO> solve(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                        @PathVariable Long id, @RequestBody SolutionVO solutionVO,
+                                        @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(solutionVO.getCreator());
         validator.validateExceptionSolvePermissions(user, token);
         return Responses.success(exceptionConverter.toDTO(exceptionService.solve(id, solutionVO, user)));

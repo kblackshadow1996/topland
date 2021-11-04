@@ -12,6 +12,7 @@ import cn.topland.util.Responses;
 import cn.topland.vo.ContractReviewVO;
 import cn.topland.vo.ContractVO;
 import cn.topland.vo.PaperVO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,9 +43,11 @@ public class ContractController {
      * @return
      */
     @PostMapping("/add")
-    public Response<ContractDTO> add(@RequestBody ContractVO contractVO,
-                                     @RequestParam(value = "access_token", required = true) String token) {
+    public Response<ContractDTO> add(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                     @RequestBody ContractVO contractVO,
+                                     @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(contractVO.getCreator());
         validator.validateContractCreatePermissions(user, token);
         return Responses.success(contractConverter.toDTO(contractService.add(contractVO, user)));
@@ -59,9 +62,11 @@ public class ContractController {
      * @return
      */
     @PatchMapping("/receive-paper/{id}")
-    public Response<ContractDTO> receivePaper(@PathVariable Long id, @RequestBody PaperVO paperVO,
-                                              @RequestParam(value = "access_token", required = true) String token) {
+    public Response<ContractDTO> receivePaper(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                              @PathVariable Long id, @RequestBody PaperVO paperVO,
+                                              @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(paperVO.getCreator());
         validator.validateContractReceivePaperPermissions(user, token);
         ContractDO contractDO = contractService.receivePaper(id, paperVO, user);
@@ -77,9 +82,11 @@ public class ContractController {
      * @return
      */
     @PatchMapping("/review/{id}")
-    public Response<ContractDTO> review(@PathVariable Long id, @RequestBody ContractReviewVO reviewVO,
-                                        @RequestParam(value = "access_token", required = true) String token) {
+    public Response<ContractDTO> review(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                        @PathVariable Long id, @RequestBody ContractReviewVO reviewVO,
+                                        @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(reviewVO.getCreator());
         validator.validateContractReviewPermissions(user, token);
         ContractDO contractDO = contractService.review(id, reviewVO, user);

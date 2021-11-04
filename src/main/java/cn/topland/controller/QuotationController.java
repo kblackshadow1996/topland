@@ -10,6 +10,7 @@ import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.util.StringReader;
 import cn.topland.vo.QuotationVO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -50,10 +51,12 @@ public class QuotationController {
      * @return
      */
     @GetMapping(value = "/pdf")
-    public Response<byte[]> downloadPdf(String html, String title, String identity,
+    public Response<byte[]> downloadPdf(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                        String html, String title, String identity,
                                         @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
-                                        Long creator, @RequestParam(value = "access_token", required = true) String token) {
+                                        Long creator, @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(creator);
         validator.validateQuotationCreatePermission(user, token);
         return Responses.success(quotationService.downloadPdf(readHtml(html), title, identity, date));
@@ -67,9 +70,11 @@ public class QuotationController {
      * @return
      */
     @PostMapping("/add")
-    public Response<QuotationDTO> add(@RequestBody QuotationVO quotationVO,
-                                      @RequestParam(value = "access_token", required = true) String token) {
+    public Response<QuotationDTO> add(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                      @RequestBody QuotationVO quotationVO,
+                                      @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(quotationVO.getCreator());
         validator.validateQuotationCreatePermission(user, token);
         return Responses.success(quotationConverter.toDTO(quotationService.add(quotationVO, user)));
@@ -84,9 +89,11 @@ public class QuotationController {
      * @return
      */
     @PatchMapping("/update/{id}")
-    public Response<QuotationDTO> update(@PathVariable Long id, @RequestBody QuotationVO quotationVO,
-                                         @RequestParam(value = "access_token", required = true) String token) {
+    public Response<QuotationDTO> update(@RequestHeader(value = "topak-v1", required = false) String topToken,
+                                         @PathVariable Long id, @RequestBody QuotationVO quotationVO,
+                                         @RequestParam(value = "access_token", required = false) String token) {
 
+        token = StringUtils.isNotBlank(topToken) ? topToken : token;
         User user = userService.get(quotationVO.getCreator());
         validator.validateQuotationUpdatePermission(user, token);
         return Responses.success(quotationConverter.toDTO(quotationService.update(id, quotationVO, user)));
