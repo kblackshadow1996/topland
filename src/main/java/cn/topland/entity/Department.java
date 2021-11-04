@@ -15,7 +15,6 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "department")
-@JsonIgnoreProperties(value = {"hibernateLazyInitializer"})
 public class Department extends RecordEntity {
 
     /**

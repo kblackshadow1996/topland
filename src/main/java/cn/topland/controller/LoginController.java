@@ -81,8 +81,7 @@ public class LoginController {
     @PostMapping(value = "/logout/{userId}")
     public Response<String> logout(@PathVariable Long userId) {
 
-        User user = userService.get(userId);
-        validator.validateUserAuthPermissions(user, user.getAccessToken());
+        userService.get(userId);
         userService.logout(userId);
         return Responses.success("登出成功");
     }

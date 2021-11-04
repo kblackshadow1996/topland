@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 @Component
 public class PermissionComposer {
 
-    public List<DirectusPermissions> compose(List<Authority> authorities) {
+    public List<DirectusPermissions> compose(List<Authority> authorities, List<Permission> permissions) {
 
-        return createPermissions(getPermissions(authorities));
+        return createPermissions(getPermissions(authorities, permissions));
     }
 
     public List<DirectusPermissions> createPermissions(Collection<Permission> permissions) {
@@ -37,7 +37,7 @@ public class PermissionComposer {
         return directusPermission;
     }
 
-    private List<Permission> getPermissions(List<Authority> auths) {
+    private List<Permission> getPermissions(List<Authority> auths, List<Permission> defaults) {
 
         if (CollectionUtils.isEmpty(auths)) {
 
@@ -48,6 +48,7 @@ public class PermissionComposer {
 
             permissions.addAll(auth.getPermissions());
         });
+        permissions.addAll(defaults);
         List<Permission> distinct = permissions.stream().distinct().collect(Collectors.toList());
         // 合并fields
         return mergeFields(distinct);
@@ -94,6 +95,6 @@ public class PermissionComposer {
     // 组装fields时，顺序对于判断删除某条数据十分重要，否则可能判断失败，所以统一排序后再返回
     private String getSortedString(List<String> fields) {
 
-        return fields.stream().sorted().collect(Collectors.joining(","));
+        return fields.stream().sorted().distinct().collect(Collectors.joining(","));
     }
 }

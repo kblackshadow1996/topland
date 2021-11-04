@@ -226,7 +226,7 @@ public class UserService {
 
             if (userMap.containsKey(user.getUserId())) {
 
-                updateUser(userMap.get(user.getUserId()), user);
+                updateUser(userMap.get(user.getUserId()), user, userDeptMap.get(user.getUserId()));
             } else {
 
                 userMap.put(user.getUserId(), createUser(user, userDeptMap.get(user.getUserId()), creator, root));
@@ -285,7 +285,7 @@ public class UserService {
         return users;
     }
 
-    private void updateUser(User persistUser, User user) {
+    private void updateUser(User persistUser, User user, List<Department> departments) {
 
         persistUser.setName(user.getName());
         persistUser.setMobile(user.getMobile());
@@ -294,6 +294,7 @@ public class UserService {
         persistUser.setExternalPosition(user.getExternalPosition());
         persistUser.setInternalPosition(user.getInternalPosition());
         persistUser.setActive(user.getActive() && persistUser.getActive());
+        persistUser.setDepartments(departments);
         persistUser.setLeadDepartments(user.getLeadDepartments());
     }
 

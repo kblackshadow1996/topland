@@ -154,8 +154,7 @@ public class RoleService {
 
     private List<DirectusPermissions> createWithDefaultPermissions(List<Authority> authorities, String role) {
 
-        List<DirectusPermissions> directusPermissions = permissionComposer.compose(authorities);
-        directusPermissions.addAll(permissionComposer.createPermissions(listDefaultPermissions()));
+        List<DirectusPermissions> directusPermissions = permissionComposer.compose(authorities, listDefaultPermissions());
         directusPermissions.forEach(p -> p.setRole(role));
         return directusPermissions;
     }

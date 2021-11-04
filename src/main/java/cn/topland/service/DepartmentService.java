@@ -69,7 +69,7 @@ public class DepartmentService {
     private Department getParent(String deptId) {
 
         Department dept = repository.findByDeptIdAndSource(deptId, Source.WEWORK);
-        return dept.getParent() != null
+        return dept.getParent()!= null
                 ? repository.findByDeptIdAndSource(dept.getParent().getDeptId(), Source.WEWORK)
                 : null;
     }
@@ -92,14 +92,15 @@ public class DepartmentService {
 
     private List<Department> setParents(List<Department> departments) {
 
-        Map<String, Department> deptMap = departments.stream().collect(Collectors.toMap(Department::getDeptId, d -> d));
+        Map<String, Department> allDeptMap = repository.listAllDeptIds(Source.WEWORK).stream()
+                .collect(Collectors.toMap(Department::getDeptId, d -> d));
         List<String> parents = departments.stream().map(Department::getParentDeptId).collect(Collectors.toList());
         Map<String, Department> parentMap = new HashMap<>();
         parents.forEach(p -> {
 
-            if (deptMap.containsKey(p)) {
+            if (allDeptMap.containsKey(p)) {
 
-                parentMap.put(p, deptMap.get(p));
+                parentMap.put(p, allDeptMap.get(p));
             }
         });
         departments.forEach(dept -> {

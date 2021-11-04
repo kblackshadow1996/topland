@@ -28,6 +28,7 @@ public class PermissionDO extends DirectusSimpleIdEntity {
     public static PermissionDO from(DirectusPermissions permission) {
 
         PermissionDO permissionDO = new PermissionDO();
+        permissionDO.setRole(permission.getRole());
         permissionDO.setCollection(permission.getCollection());
         permissionDO.setAction(permission.getAction());
         permissionDO.setPermissions(permission.getPermissions() != null
