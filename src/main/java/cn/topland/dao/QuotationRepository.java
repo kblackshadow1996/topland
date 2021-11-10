@@ -6,9 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface QuotationRepository extends JpaRepository<Quotation, Long> {
 
-    Long countByCreatorAndCreateTimeBetween(User creator, LocalDateTime start, LocalDateTime end);
+    List<Quotation> findByCreatorAndCreateTimeBetween(User creator, LocalDateTime start, LocalDateTime end);
 }

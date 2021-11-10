@@ -9,13 +9,11 @@ import cn.topland.service.UserService;
 import cn.topland.util.Response;
 import cn.topland.util.Responses;
 import cn.topland.util.StringReader;
+import cn.topland.vo.QuotationPdfVO;
 import cn.topland.vo.QuotationVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
 
 /**
  * 报价
@@ -42,24 +40,19 @@ public class QuotationController {
     /**
      * pdf下载
      *
-     * @param html     合同页面
-     * @param title    合同标题
-     * @param identity 合同编号
-     * @param date     合同日期
-     * @param creator  操作用户
-     * @param token    操作用户token
+     * @param token 操作用户token
+     * @param pdfVO pdf
      * @return
      */
-    @GetMapping(value = "/pdf")
-    public Response<byte[]> downloadPdf(@RequestHeader(value = "topak-v1", required = false) String topToken,
-                                        String html, String title, String identity,
-                                        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
-                                        Long creator, @RequestParam(value = "access_token", required = false) String token) {
+    @PostMapping(value = "/pdf")
+    public Response<byte[]> downloadPdf(@RequestBody QuotationPdfVO pdfVO,
+                                        @RequestHeader(value = "topak-v1", required = false) String topToken,
+                                        @RequestParam(value = "access_token", required = false) String token) {
 
         token = StringUtils.isNotBlank(topToken) ? topToken : token;
-        User user = userService.get(creator);
+        User user = userService.get(pdfVO.getCreator());
         validator.validateQuotationCreatePermission(user, token);
-        return Responses.success(quotationService.downloadPdf(readHtml(html), title, identity, date));
+        return Responses.success(quotationService.downloadPdf(pdfVO));
     }
 
     /**

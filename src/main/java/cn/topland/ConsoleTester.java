@@ -30,10 +30,15 @@ public class ConsoleTester {
 //        UserDO userDo = JsonUtils.parse(json, UserDO.class);
 //        System.out.println(JsonUtils.toJson(userDo));
 
+//        DepartmentDO departmentDO = new DepartmentDO();
+//        departmentDO.setLastUpdateTime(LocalDateTime.now());
+//        String json = "{\"errors\":[{\"message\":\"Route /active 不存在。\",\"extensions\":{\"code\":\"ROUTE_NOT_FOUND\"}}]}";
+//        System.out.println(JsonUtils.read(json).path("errors").findPath("code"));
+
         DepartmentDO departmentDO = new DepartmentDO();
-        departmentDO.setLastUpdateTime(LocalDateTime.now());
-        String json = "{\"errors\":[{\"message\":\"Route /active 不存在。\",\"extensions\":{\"code\":\"ROUTE_NOT_FOUND\"}}]}";
-        System.out.println(JsonUtils.read(json).path("errors").findPath("code"));
+        departmentDO.setCreateTime(LocalDateTime.now());
+//        DepartmentDO dept = JsonUtils.parse("{\"creator\":null,\"editor\":null,\"name\":null,\"parent\":null,\"sort\":null,\"type\":null,\"source\":null,\"create_time\":\"2021-11-10T14:16:22.000Z\",\"last_update_time\":null,\"dept_id\":null}", DepartmentDO.class);
+        System.out.println(JsonUtils.toJsonNode(departmentDO).toPrettyString());
 //        JsonUtils.read(json).path("data").forEach(u -> {
 //
 //            System.out.println(u.path("id").asLong());

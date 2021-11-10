@@ -14,6 +14,7 @@ import cn.topland.util.pdf.HtmlToPdfOperation;
 import cn.topland.util.pdf.HtmlToPdfParams;
 import cn.topland.util.pdf.HtmlToPdfParamsFactory;
 import cn.topland.util.pdf.QuotationPdfOperation;
+import cn.topland.vo.QuotationPdfVO;
 import cn.topland.vo.QuotationServiceVO;
 import cn.topland.vo.QuotationVO;
 import org.apache.commons.collections4.CollectionUtils;
@@ -92,7 +93,7 @@ public class QuotationService {
         return quotationDO;
     }
 
-    public byte[] downloadPdf(String html, String title, String number, LocalDate date) {
+    public byte[] downloadPdf(QuotationPdfVO pdfVO) {
 
         try {
 
@@ -106,14 +107,14 @@ public class QuotationService {
             String dest = temDir + "/" + randomName + ".pdf";
 
             // 存html
-            FileUtils.writeStringToFile(new File(htmlPath), html, StandardCharsets.UTF_8);
+            FileUtils.writeStringToFile(new File(htmlPath), pdfVO.getHtml(), StandardCharsets.UTF_8);
 
             // 生成pdf
             HtmlToPdfParams params = new HtmlToPdfParamsFactory().quotation();
             new HtmlToPdfOperation(params).apply(htmlPath, tmp);
 
             // 处理pdf
-            QuotationPdfOperation pdfOperation = getPdfOperation(title, number, date);
+            QuotationPdfOperation pdfOperation = getPdfOperation(pdfVO.getTitle(), pdfVO.getIdentity(), pdfVO.getDate());
             pdfOperation.apply(tmp, dest);
 
             return FileUtils.readFileToByteArray(new File(dest));
@@ -152,16 +153,25 @@ public class QuotationService {
 
     private String createIdentity(User creator) {
 
-        // 该用户当天生成报价合同的数量
-        Long count = repository.countByCreatorAndCreateTimeBetween(creator,
+        // 该用户当天生成报价合同
+        List<Quotation> quotations = repository.findByCreatorAndCreateTimeBetween(creator,
                 LocalDateTime.of(LocalDate.now(), LocalTime.MIN),
                 LocalDateTime.of(LocalDate.now(), LocalTime.MAX));
         // 当日时间：年月日如20211212
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         // 工号
         String employeeId = creator.getEmployeeId();
+        long count = countByEmployeeId(quotations, employeeId, date);
         // 时间+工号+第n份合同
         return date + employeeId + (count + 1);
+    }
+
+    private long countByEmployeeId(List<Quotation> quotations, String employeeId, String date) {
+
+        return quotations.stream()
+                .mapToLong(quotation -> Long.parseLong(quotation.getIdentity().replace(date + employeeId, "")))
+                .max()
+                .orElse(0);
     }
 
     private Quotation updateQuotation(Quotation quotation, QuotationVO quotationVO, User editor) {
